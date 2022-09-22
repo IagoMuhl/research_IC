@@ -31,8 +31,4 @@
 *.out
 *.app
 
-# images e dat
-*.dat 
-*.png
-
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Fortran
