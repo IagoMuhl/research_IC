@@ -6,14 +6,21 @@ program normal
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
    integer :: i,j
-
-
+   real, parameter:: J1=1.,J2=0.
+   real, dimension(maxConfig):: H_intra
+   
    call base(s)
 
-   do i = 1, maxConfig
-      write(*,*) (s(i,j),j = 1, num_sites)
+   !do i = 1, maxConfig
+     ! write(*,*) (s(i,j),j = 1, num_sites)
+   !end do
+   do j = 1, maxConfig
+      H_intra = J1*(s(j,1)*s(j,2) + s(j,1)*s(j,3) + s(j,4)*s(j,3) + s(j,2)*s(j,4)) &
+      & + J2*(s(j,1)*s(j,4) + s(j,3)*s(j,2))
    end do
 
+   print *, H_intra
+      
 
 end program normal
 
