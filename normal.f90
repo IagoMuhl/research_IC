@@ -6,26 +6,33 @@ program normal
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
    integer :: i
-   real, parameter:: J1=1.,J2=0.
+   real, parameter:: J1=1.,J2=0.5,J3=0
    real, dimension(maxConfig):: H_intra
-
+   real, dimension(maxConfig):: H_inter
    call base(s)
 
-   !do i = 1, maxConfig
-   ! write(*,*) (s(i,j),j = 1, num_sites)
-   !end do
+   !---------------------HAMILTONIANO INTRA-----------------------------
    do i = 1, maxConfig
       H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,3) + s(i,4)*s(i,3) + s(i,2)*s(i,4)) &
       & + J2*(s(i,1)*s(i,4) + s(i,3)*s(i,2))
-      !H_intra(i) = s(i,1)*s(i,2)
-      !H_intra(1) = J1*(s(1,14)*s(2,14))
-   end do
-call print_matrix(maxConfig,num_sites,s)
-   !print *, H_intra(1)
-!print *, H_intra
-call print_matrixH(maxConfig,1,H_intra)
 
-   !print *, s(1,2),s(2,2),s(1,2),s(3,2),s(4,2),s(3,2),s(2,2),s(4,2),s(1,2),s(4,2),s(3,2),s(2,2)
+   end do
+   !---------------------HAMILTONIANO INTRA-----------------------------
+
+   do i = 1, maxConfig
+      H_inter(i) = J1*(((s(i,1)*s(i,2))-(s(i,1)*s(i,2))/2.) &
+                   & + ((s(i,1)*s(i,3))-(s(i,1)*s(i,3))/2.)) &
+      & + (3*J2)*((s(i,1)*s(i,4))-(s(i,1)*s(i,4))/2.) &
+      & + (4*J3)*((s(i,1)**2)-((s(i,1))**2.)/2.)
+   end do
+
+
+
+
+   call print_matrix(maxConfig,num_sites,s)
+
+   call print_matrixH(maxConfig,1,H_intra)
+
 end program normal
 
 subroutine base(s)
@@ -72,9 +79,9 @@ subroutine print_matrix(row,column,matrix)
    integer:: i,j
    do i = 1, row
       write(*,*) (matrix(i,j),j = 1, column)
-  end do
+   end do
 
-end subroutine 
+end subroutine
 
 subroutine print_matrixH(rowH,columnH,matrixH)
    integer, intent(in):: rowH,columnH
@@ -82,6 +89,6 @@ subroutine print_matrixH(rowH,columnH,matrixH)
    integer:: i,j
    do i = 1, rowH
       write(*,*) (matrixH(i,j),j = 1, columnH)
-  end do
+   end do
 
-end subroutine 
+end subroutine
