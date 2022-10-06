@@ -1,27 +1,31 @@
 program normal
    implicit none
 
-   integer, parameter:: minConfig=2
+   integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   integer :: i,j
+   integer :: i
    real, parameter:: J1=1.,J2=0.
    real, dimension(maxConfig):: H_intra
-   
+
    call base(s)
 
    !do i = 1, maxConfig
-     ! write(*,*) (s(i,j),j = 1, num_sites)
+   ! write(*,*) (s(i,j),j = 1, num_sites)
    !end do
-   do j = 1, maxConfig
-      H_intra = J1*(s(j,1)*s(j,2) + s(j,1)*s(j,3) + s(j,4)*s(j,3) + s(j,2)*s(j,4)) &
-      & + J2*(s(j,1)*s(j,4) + s(j,3)*s(j,2))
+   do i = 1, maxConfig
+      H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,3) + s(i,4)*s(i,3) + s(i,2)*s(i,4)) &
+      & + J2*(s(i,1)*s(i,4) + s(i,3)*s(i,2))
+      !H_intra(i) = s(i,1)*s(i,2)
+      !H_intra(1) = J1*(s(1,14)*s(2,14))
    end do
+call print_matrix(maxConfig,num_sites,s)
+   !print *, H_intra(1)
+!print *, H_intra
+call print_matrixH(maxConfig,1,H_intra)
 
-   print *, H_intra
-      
-
+   !print *, s(1,2),s(2,2),s(1,2),s(3,2),s(4,2),s(3,2),s(2,2),s(4,2),s(1,2),s(4,2),s(3,2),s(2,2)
 end program normal
 
 subroutine base(s)
@@ -61,3 +65,23 @@ subroutine base(s)
 
 
 end subroutine
+
+subroutine print_matrix(row,column,matrix)
+   integer, intent(in):: row,column
+   integer, dimension(row,column), intent(in):: matrix
+   integer:: i,j
+   do i = 1, row
+      write(*,*) (matrix(i,j),j = 1, column)
+  end do
+
+end subroutine 
+
+subroutine print_matrixH(rowH,columnH,matrixH)
+   integer, intent(in):: rowH,columnH
+   real, dimension(rowH,columnH), intent(in):: matrixH
+   integer:: i,j
+   do i = 1, rowH
+      write(*,*) (matrixH(i,j),j = 1, columnH)
+  end do
+
+end subroutine 
