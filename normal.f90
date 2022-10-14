@@ -5,9 +5,10 @@ program normal
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   real, parameter:: J1=1.,J2=0.,J3=0
+   real, parameter:: J1=1.,J2=0.5,J3=0.1
    real, dimension(maxConfig):: H_intra, H_inter, H
    real, dimension(num_sites):: m_guess
+
 
    call base(s)
 
@@ -16,7 +17,7 @@ program normal
       m_guess = [1.,-1.,-1.,1.]
 
    call HAM_INTER(J2,J3,s,m_guess,H_inter)
-
+   
    H = H_intra + H_inter
 
 
@@ -101,31 +102,36 @@ subroutine HAM_INTER(J2,J3,s,mag,H_inter)
    real, parameter:: J1=1.
    real, dimension(num_sites), intent(in):: mag
    real, dimension(maxConfig), intent(out):: H_inter
- 
+
+
 
     do i = 1, maxConfig
-      H_inter(i) = J1*(((s(i,1)*mag(2))-(mag(1)*mag(2))/2.) &
-    & +                ((s(i,1)*mag(3))-(mag(1)*mag(3))/2.)) &
-    & +         (3*J2)*((s(i,1)*mag(4))-(mag(1)*mag(4))/2.) &
-      & +       (4*J3)*((s(i,1)*mag(1))-((mag(1))**2)/2.) +&
+      H_inter(i) = (4*J3)*(((s(i,1)*mag(1))-((mag(1))**2)/2.)+((s(i,2)*mag(2))-((mag(2))**2)/2.)+ &
+                           ((s(i,3)*mag(3))-((mag(3))**2)/2.)+((s(i,4)*mag(4))-((mag(4))**2)/2.))+&
 
-      &            J1*(((s(i,2)*mag(4))-(mag(2)*mag(4))/2.) &
-    & +                ((s(i,2)*mag(1))-(mag(2)*mag(1))/2.)) &
-    & +         (3*J2)*((s(i,2)*mag(3))-(mag(2)*mag(3))/2.) &
-      & +       (4*J3)*((s(i,2)*mag(2))-((mag(2))**2)/2.) +&
+             (3*J2)*(((s(i,1)*mag(4))-(mag(1)*mag(4))/2.)+((s(i,2)*mag(3))-(mag(2)*mag(3))/2.)+ &    
+                     ((s(i,3)*mag(2))-(mag(3)*mag(2))/2.)+((s(i,4)*mag(1))-(mag(4)*mag(1))/2.))+&
 
-      &            J1*(((s(i,3)*mag(1))-(mag(3)*mag(1))/2.) &
-    & +                ((s(i,3)*mag(4))-(mag(3)*mag(4))/2.)) &
-    & +         (3*J2)*((s(i,3)*mag(2))-(mag(3)*mag(2))/2.) &
-      & +       (4*J3)*((s(i,3)*mag(3))-((mag(3))**2)/2.) +&
-
-      &            J1*(((s(i,4)*mag(2))-(mag(4)*mag(2))/2.) &
-    & +                ((s(i,4)*mag(3))-(mag(4)*mag(3))/2.)) &
-    & +         (3*J2)*((s(i,4)*mag(1))-(mag(4)*mag(1))/2.) &
-      & +       (4*J3)*((s(i,4)*mag(4))-((mag(4))**2)/2.)
-
+                J1*((((s(i,1)*mag(2))-(mag(1)*mag(2))/2.)+((s(i,1)*mag(3))-(mag(1)*mag(3))/2.))+ &
+                  & (((s(i,2)*mag(4))-(mag(2)*mag(4))/2.)+((s(i,2)*mag(1))-(mag(2)*mag(1))/2.))+ &
+                  & (((s(i,3)*mag(1))-(mag(3)*mag(1))/2.)+((s(i,3)*mag(4))-(mag(3)*mag(4))/2.))+ &
+                  & (((s(i,4)*mag(2))-(mag(4)*mag(2))/2.)+((s(i,4)*mag(3))-(mag(4)*mag(3))/2.)))
+      
     end do
-
+   
+    !contains
+      !subroutine sum(sumJ1,sumJ2,sumJ3)  
+      !sumJ1 = J1*((((s(i,1)*mag(2))-(mag(1)*mag(2))/2.)+((s(i,1)*mag(3))-(mag(1)*mag(3))/2.))+ &
+      !          & (((s(i,2)*mag(4))-(mag(2)*mag(4))/2.)+((s(i,2)*mag(1))-(mag(2)*mag(1))/2.))+ &
+      !          & (((s(i,3)*mag(1))-(mag(3)*mag(1))/2.)+((s(i,3)*mag(4))-(mag(3)*mag(4))/2.))+ &
+      !          & (((s(i,4)*mag(2))-(mag(4)*mag(2))/2.)+((s(i,4)*mag(3))-(mag(4)*mag(3))/2.)))
+      !
+      !sumJ2 = (3*J2)*(((s(i,1)*mag(4))-(mag(1)*mag(4))/2.)+((s(i,2)*mag(3))-(mag(2)*mag(3))/2.)+ &    
+      !                ((s(i,3)*mag(2))-(mag(3)*mag(2))/2.)+((s(i,4)*mag(1))-(mag(4)*mag(1))/2.))
+      !
+      !sumJ3 = (4*J3)*(((s(i,1)*mag(1))-((mag(1))**2)/2.)+((s(i,2)*mag(2))-((mag(2))**2)/2.)+ &
+      !                ((s(i,3)*mag(3))-((mag(3))**2)/2.)+((s(i,4)*mag(4))-((mag(4))**2)/2.))
+      !endsubroutine
 end subroutine
 
 subroutine print_matrix(row,column,matrix)
