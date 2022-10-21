@@ -1,20 +1,20 @@
 program normal
    implicit none
-
+   integer, parameter:: db=8
    integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   real, parameter:: J1=1.,J2=0.5,J3=0.1
-   real, dimension(maxConfig):: H_intra, H_inter, H
-   real, dimension(num_sites):: m_guess
+   real(kind=db), parameter:: J1=1.d0,J2=0.5d0,J3=0.1d0
+   real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
+   real(kind=db), dimension(num_sites):: m_guess
 
 
    call base(s)
 
    call HAM_INTRA(J2,s,H_intra)
 
-      m_guess = [1.,-1.,-1.,1.]
+      m_guess = [1.d0,-1.d0,-1.d0,1.d0]
 
    call HAM_INTER(J2,J3,s,m_guess,H_inter)
    
@@ -66,14 +66,15 @@ subroutine base(s)
 end subroutine
 
 subroutine HAM_INTRA(J2,s,H_intra)
+   integer, parameter:: db=8
    integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
-   real, intent(in):: J2
-   real, parameter:: J1=1.
-   real, dimension(maxConfig), intent(out):: H_intra
+   real(kind=db), intent(in):: J2
+   real(kind=db), parameter:: J1=1.d0
+   real(kind=db), dimension(maxConfig), intent(out):: H_intra
 
    !---------------------HAMILTONIANO INTRA-----------------------------
    do i = 1, maxConfig
@@ -95,29 +96,47 @@ end subroutine
 subroutine HAM_INTER(J2,J3,s,mag,H_inter)
    integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
+   integer, parameter:: db=8
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
-   real, intent(in):: J2,J3
-   real, parameter:: J1=1.
-   real, dimension(num_sites), intent(in):: mag
-   real, dimension(maxConfig), intent(out):: H_inter
+   real(kind=db), intent(in):: J2,J3
+   real(kind=db), parameter:: J1=1.d0
+   real(kind=db), dimension(num_sites), intent(in):: mag
+   real(kind=db), dimension(maxConfig), intent(out):: H_inter
 
 
 
     do i = 1, maxConfig
-      H_inter(i) = (4*J3)*(((s(i,1)*mag(1))-((mag(1))**2)/2.)+((s(i,2)*mag(2))-((mag(2))**2)/2.)+ &
-                           ((s(i,3)*mag(3))-((mag(3))**2)/2.)+((s(i,4)*mag(4))-((mag(4))**2)/2.))+&
-
-             (3*J2)*(((s(i,1)*mag(4))-(mag(1)*mag(4))/2.)+((s(i,2)*mag(3))-(mag(2)*mag(3))/2.)+ &    
-                     ((s(i,3)*mag(2))-(mag(3)*mag(2))/2.)+((s(i,4)*mag(1))-(mag(4)*mag(1))/2.))+&
-
-                J1*((((s(i,1)*mag(2))-(mag(1)*mag(2))/2.)+((s(i,1)*mag(3))-(mag(1)*mag(3))/2.))+ &
-                  & (((s(i,2)*mag(4))-(mag(2)*mag(4))/2.)+((s(i,2)*mag(1))-(mag(2)*mag(1))/2.))+ &
-                  & (((s(i,3)*mag(1))-(mag(3)*mag(1))/2.)+((s(i,3)*mag(4))-(mag(3)*mag(4))/2.))+ &
-                  & (((s(i,4)*mag(2))-(mag(4)*mag(2))/2.)+((s(i,4)*mag(3))-(mag(4)*mag(3))/2.)))
+      H_inter(i) = 4*(J3*sumJ3()) + 3*(J2*sumJ2()) + J1*sumJ1()
       
     end do
+    contains 
+      real function sumJ1()
+      implicit none
+         sumJ1 = s(i,1)*mag(2)-mag(1)*mag(2)/2.+ &
+               & s(i,1)*mag(3)-mag(1)*mag(3)/2.+ &
+               & s(i,2)*mag(4)-mag(2)*mag(4)/2.+ &
+               & s(i,2)*mag(1)-mag(2)*mag(1)/2.+ &
+               & s(i,3)*mag(1)-mag(3)*mag(1)/2.+ &
+               & s(i,3)*mag(4)-mag(3)*mag(4)/2.+ &
+               & s(i,4)*mag(2)-mag(4)*mag(2)/2.+ &
+               & s(i,4)*mag(3)-mag(4)*mag(3)/2.
+      end function
+      real function sumJ2()
+      implicit none
+         sumJ2 = s(i,1)*mag(4)-mag(1)*mag(4)/2.+ &
+               & s(i,2)*mag(3)-mag(2)*mag(3)/2.+ &    
+               & s(i,3)*mag(2)-mag(3)*mag(2)/2.+ &
+               & s(i,4)*mag(1)-mag(4)*mag(1)/2.
+      end function
+      real function sumJ3()
+      implicit none
+         sumJ3 = s(i,1)*mag(1)-(mag(1)*mag(1))/2.+ &
+               & s(i,2)*mag(2)-(mag(2)*mag(2))/2.+ &
+               & s(i,3)*mag(3)-(mag(3)*mag(3))/2.+ &
+               & s(i,4)*mag(4)-(mag(4)*mag(4))/2.
+      end function
    
     !contains
       !subroutine sum(sumJ1,sumJ2,sumJ3)  
@@ -145,8 +164,9 @@ subroutine print_matrix(row,column,matrix)
 end subroutine
 
 subroutine print_matrixH(rowH,columnH,matrixH)
+   integer, parameter:: db=8
    integer, intent(in):: rowH,columnH
-   real, dimension(rowH,columnH), intent(in):: matrixH
+   real(kind=db), dimension(rowH,columnH), intent(in):: matrixH
    integer:: i,j
    do i = 1, rowH
       write(*,*) (matrixH(i,j),j = 1, columnH)
