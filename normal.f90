@@ -5,9 +5,10 @@ program normal
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J1=1.d0,J2=0.5d0,J3=0.1d0
+   real(kind=db), parameter:: J1=1.d0,J2=0.2d0,J3=0.1d0,T=0.5d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
+   real(kind=db):: Z
 
 
    call base(s)
@@ -20,10 +21,10 @@ program normal
    
    H = H_intra + H_inter
 
-
+   call partition(H,T,Z)
    !call print_matrix(maxConfig,num_sites,s)
-
-   call print_matrixH(maxConfig,1,H)
+   print *, 'Z equal to:',Z
+   !call print_matrixH(maxConfig,1,H)
 
 end program normal
 
@@ -84,12 +85,6 @@ subroutine HAM_INTRA(J2,s,H_intra)
    end do
    !---------------------HAMILTONIANO INTRA-----------------------------
 
-   ! do i = 1, maxConfig
-   !  H_inter(i) = J1*(((s(i,1)*s(i,2))-(s(i,1)*s(i,2))/2.) &
-   !  & + ((s(i,1)*s(i,3))-(s(i,1)*s(i,3))/2.)) &
-   !  & + (3*J2)*((s(i,1)*s(i,4))-(s(i,1)*s(i,4))/2.) &
-   !   & + (4*J3)*((s(i,1)**2)-((s(i,1))**2.)/2.)
-   ! end do
 
 end subroutine
 
@@ -138,19 +133,6 @@ subroutine HAM_INTER(J2,J3,s,mag,H_inter)
                & s(i,4)*mag(4)-(mag(4)*mag(4))/2.
       end function
    
-    !contains
-      !subroutine sum(sumJ1,sumJ2,sumJ3)  
-      !sumJ1 = J1*((((s(i,1)*mag(2))-(mag(1)*mag(2))/2.)+((s(i,1)*mag(3))-(mag(1)*mag(3))/2.))+ &
-      !          & (((s(i,2)*mag(4))-(mag(2)*mag(4))/2.)+((s(i,2)*mag(1))-(mag(2)*mag(1))/2.))+ &
-      !          & (((s(i,3)*mag(1))-(mag(3)*mag(1))/2.)+((s(i,3)*mag(4))-(mag(3)*mag(4))/2.))+ &
-      !          & (((s(i,4)*mag(2))-(mag(4)*mag(2))/2.)+((s(i,4)*mag(3))-(mag(4)*mag(3))/2.)))
-      !
-      !sumJ2 = (3*J2)*(((s(i,1)*mag(4))-(mag(1)*mag(4))/2.)+((s(i,2)*mag(3))-(mag(2)*mag(3))/2.)+ &    
-      !                ((s(i,3)*mag(2))-(mag(3)*mag(2))/2.)+((s(i,4)*mag(1))-(mag(4)*mag(1))/2.))
-      !
-      !sumJ3 = (4*J3)*(((s(i,1)*mag(1))-((mag(1))**2)/2.)+((s(i,2)*mag(2))-((mag(2))**2)/2.)+ &
-      !                ((s(i,3)*mag(3))-((mag(3))**2)/2.)+((s(i,4)*mag(4))-((mag(4))**2)/2.))
-      !endsubroutine
 end subroutine
 
 subroutine print_matrix(row,column,matrix)
@@ -172,4 +154,21 @@ subroutine print_matrixH(rowH,columnH,matrixH)
       write(*,*) (matrixH(i,j),j = 1, columnH)
    end do
 
+end subroutine
+
+subroutine partition(H,T,Z)
+   integer, parameter:: minConfig= 2
+   integer, parameter:: num_sites= 4
+   integer, parameter:: db=8
+   integer, parameter:: maxConfig= minConfig**num_sites
+   real(kind=db), intent(out):: Z
+   real(kind=db), dimension(maxConfig), intent(in):: H
+   real(kind=db), intent(in):: T
+   real(kind=db):: b
+   b = 1.d0/T
+   Z = 0.d0
+
+   do i = 1, maxConfig
+      Z = Z + (dexp(-b*(H(i))))
+   end do
 end subroutine
