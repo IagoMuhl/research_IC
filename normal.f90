@@ -5,25 +5,42 @@ program normal
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J1=1.d0,J2=0.2d0,J3=0.1d0,T=0.5d0
+   real(kind=db), parameter:: J1=-1.d0,J2=0.d0,J3=0.d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
-   real(kind=db):: Z
+   real(kind=db):: Z,T,m
+   m = 1.d0
+   T = 0.1d0
 
 
    call base(s)
 
-   call HAM_INTRA(J2,s,H_intra)
 
-      m_guess = [1.d0,-1.d0,-1.d0,1.d0]
 
-   call HAM_INTER(J2,J3,s,m_guess,H_inter)
+   do while (T<=4.d0)
+
+      m_guess = [m,m,m,m]
+
+      call HAM_INTRA(J2,s,H_intra)
+
+      call HAM_INTER(J2,J3,s,m_guess,H_inter)
+
+      H = H_intra + H_inter
+
+      call partition(H,T,Z)
+
+      call magnetization(H,s,T,m)
+
+      write(101,*) T,m,Z
+
+      !print*, m_guess
+      T = T + 0.01d0
+
+   enddo
+
    
-   H = H_intra + H_inter
-
-   call partition(H,T,Z)
-   !call print_matrix(maxConfig,num_sites,s)
-   print *, 'Z equal to:',Z
+   ! call print_matrix(maxConfig,num_sites,s)
+   !print *, T,Z
    !call print_matrixH(maxConfig,1,H)
 
 end program normal
@@ -34,7 +51,7 @@ subroutine base(s)
    integer, parameter:: minConfig=2
    integer, parameter:: maxConfig= minConfig**4
    integer:: k
-   integer:: s1,s2,s3,s4,m1,m2,m3,m4
+   integer:: s1,s2,s3,s4
    integer, dimension(16,4), intent(out):: s(maxConfig,4)
 
 
@@ -49,12 +66,6 @@ subroutine base(s)
                s(k,2)=s2
                s(k,3)=s3
                s(k,4)=s4
-
-
-               m1=s1
-               m2=s2
-               m3=s3
-               m4=s4
 
                k=k+1
 
@@ -74,7 +85,7 @@ subroutine HAM_INTRA(J2,s,H_intra)
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
    real(kind=db), intent(in):: J2
-   real(kind=db), parameter:: J1=1.d0
+   real(kind=db), parameter:: J1=-1.d0
    real(kind=db), dimension(maxConfig), intent(out):: H_intra
 
    !---------------------HAMILTONIANO INTRA-----------------------------
@@ -88,7 +99,7 @@ subroutine HAM_INTRA(J2,s,H_intra)
 
 end subroutine
 
-subroutine HAM_INTER(J2,J3,s,mag,H_inter)
+subroutine HAM_INTER(J2,J3,s,m_guess,H_inter)
    integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
    integer, parameter:: db=8
@@ -96,43 +107,43 @@ subroutine HAM_INTER(J2,J3,s,mag,H_inter)
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
    real(kind=db), intent(in):: J2,J3
-   real(kind=db), parameter:: J1=1.d0
-   real(kind=db), dimension(num_sites), intent(in):: mag
+   real(kind=db), parameter:: J1=-1.d0
+   real(kind=db), dimension(num_sites), intent(in):: m_guess
    real(kind=db), dimension(maxConfig), intent(out):: H_inter
 
 
 
-    do i = 1, maxConfig
+   do i = 1, maxConfig
       H_inter(i) = 4*(J3*sumJ3()) + 3*(J2*sumJ2()) + J1*sumJ1()
-      
-    end do
-    contains 
-      real function sumJ1()
+
+   end do
+contains
+   real function sumJ1()
       implicit none
-         sumJ1 = s(i,1)*mag(2)-mag(1)*mag(2)/2.+ &
-               & s(i,1)*mag(3)-mag(1)*mag(3)/2.+ &
-               & s(i,2)*mag(4)-mag(2)*mag(4)/2.+ &
-               & s(i,2)*mag(1)-mag(2)*mag(1)/2.+ &
-               & s(i,3)*mag(1)-mag(3)*mag(1)/2.+ &
-               & s(i,3)*mag(4)-mag(3)*mag(4)/2.+ &
-               & s(i,4)*mag(2)-mag(4)*mag(2)/2.+ &
-               & s(i,4)*mag(3)-mag(4)*mag(3)/2.
-      end function
-      real function sumJ2()
+      sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
+      & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
+      & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
+      & s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.+ &
+      & s(i,3)*m_guess(1)-m_guess(3)*m_guess(1)/2.+ &
+      & s(i,3)*m_guess(4)-m_guess(3)*m_guess(4)/2.+ &
+      & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.+ &
+      & s(i,4)*m_guess(3)-m_guess(4)*m_guess(3)/2.
+   end function
+   real function sumJ2()
       implicit none
-         sumJ2 = s(i,1)*mag(4)-mag(1)*mag(4)/2.+ &
-               & s(i,2)*mag(3)-mag(2)*mag(3)/2.+ &    
-               & s(i,3)*mag(2)-mag(3)*mag(2)/2.+ &
-               & s(i,4)*mag(1)-mag(4)*mag(1)/2.
-      end function
-      real function sumJ3()
+      sumJ2 = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
+      & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
+      & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
+      & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.
+   end function
+   real function sumJ3()
       implicit none
-         sumJ3 = s(i,1)*mag(1)-(mag(1)*mag(1))/2.+ &
-               & s(i,2)*mag(2)-(mag(2)*mag(2))/2.+ &
-               & s(i,3)*mag(3)-(mag(3)*mag(3))/2.+ &
-               & s(i,4)*mag(4)-(mag(4)*mag(4))/2.
-      end function
-   
+      sumJ3 = s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
+      & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
+      & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
+      & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
+   end function
+
 end subroutine
 
 subroutine print_matrix(row,column,matrix)
@@ -167,8 +178,49 @@ subroutine partition(H,T,Z)
    real(kind=db):: b
    b = 1.d0/T
    Z = 0.d0
+   m = 0.d0
+   !T = 0.1d0
+   ! do while (T<=0.999d0)
+
 
    do i = 1, maxConfig
       Z = Z + (dexp(-b*(H(i))))
    end do
+   !print*, Z,T
+
+   !T = T + 0.1d0
+
+   !end do
+end subroutine
+
+subroutine magnetization(H,s,T,m)
+   integer, parameter:: minConfig= 2
+   integer, parameter:: num_sites= 4
+   integer, parameter:: db=8
+   integer, parameter:: maxConfig= minConfig**num_sites
+   integer, dimension(maxConfig,num_sites), intent(in) :: s
+   real(kind=db):: b,Z
+   real(kind=db), dimension(maxConfig), intent(in):: H
+   real(kind=db), intent(out):: m
+   real(kind=db), intent(in):: T
+   Z = 0.d0
+   b = 1.d0/T
+   m = 0.d0
+
+   !do while (T<=0.999d0)
+
+
+   do i = 1, maxConfig
+      Z = Z + (dexp(-b*(H(i))))
+      m = m + s(i,1)*(dexp(-b*(H(i))))
+
+   end do
+   print*, m,Z,(m/Z)
+   m = (m/Z)
+   print*, m,Z
+   
+ !  print*, Z, m, T
+   ! T = T + 0.1d0
+
+   !end do
 end subroutine
