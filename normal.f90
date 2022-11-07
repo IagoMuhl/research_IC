@@ -5,21 +5,31 @@ program normal
    integer, parameter:: num_sites= 4
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J1=-1.d0,J2=0.d0,J3=0.d0
+   real(kind=db), parameter:: J1=1.d0,J2=0.0d0,J3=0.1d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
-   real(kind=db):: Z,T,m
+   real(kind=db):: Z,T,m,step,tol,error
+   character(len=5) :: nameFileJ2, nameFileJ3
+
    m = 1.d0
-   T = 0.1d0
+   T = 1.d0
+   step = (10.d0)**(-3)
+   tol = (10.d0)**(-5)
 
 
    call base(s)
 
+   !Automatização criação de arquivos
+   !Conversão real -> string
+   WRITE (nameFileJ2, '(F5.2)') j2
+   WRITE (nameFileJ3, '(F5.2)') j3
 
 
-   do while (T<=4.d0)
+   open(unit=20, file="AF_T-m-Z_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
 
-      m_guess = [m,m,m,m]
+   do while (T<=4.0d0)
+
+      m_guess = [m,-m,-m,m]
 
       call HAM_INTRA(J2,s,H_intra)
 
@@ -29,16 +39,38 @@ program normal
 
       call partition(H,T,Z)
 
-      call magnetization(H,s,T,m)
+      call magnetization(H,Z,s,T,m)
 
-      write(101,*) T,m,Z
+      error = abs(m - m_guess(1))
+
+      do while (error >= tol)
+         !ATUALIZANDO O CHUTE
+         m_guess = [m,-m,-m,m]
+
+         call HAM_INTER(J2,J3,s,m_guess,H_inter)
+
+         H = H_intra + H_inter
+
+         call partition(H,T,Z)
+
+         call magnetization(H,Z,s,T,m)
+
+         error = abs(m - m_guess(1))
+
+         if ( error <= tol ) exit
+
+      enddo
+      !print*, 'Saí do loop'
+
+      write(20,*) T,m,Z
 
       !print*, m_guess
-      T = T + 0.01d0
+      T = T + step
 
    enddo
 
-   
+   close(20)
+
    ! call print_matrix(maxConfig,num_sites,s)
    !print *, T,Z
    !call print_matrixH(maxConfig,1,H)
@@ -85,7 +117,7 @@ subroutine HAM_INTRA(J2,s,H_intra)
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
    real(kind=db), intent(in):: J2
-   real(kind=db), parameter:: J1=-1.d0
+   real(kind=db), parameter:: J1=1.d0
    real(kind=db), dimension(maxConfig), intent(out):: H_intra
 
    !---------------------HAMILTONIANO INTRA-----------------------------
@@ -107,7 +139,7 @@ subroutine HAM_INTER(J2,J3,s,m_guess,H_inter)
    integer, dimension(maxConfig,num_sites), intent(in):: s
    integer :: i
    real(kind=db), intent(in):: J2,J3
-   real(kind=db), parameter:: J1=-1.d0
+   real(kind=db), parameter:: J1=1.d0
    real(kind=db), dimension(num_sites), intent(in):: m_guess
    real(kind=db), dimension(maxConfig), intent(out):: H_inter
 
@@ -118,7 +150,7 @@ subroutine HAM_INTER(J2,J3,s,m_guess,H_inter)
 
    end do
 contains
-   real function sumJ1()
+   real(kind=db) function sumJ1()
       implicit none
       sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
       & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
@@ -129,14 +161,14 @@ contains
       & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.+ &
       & s(i,4)*m_guess(3)-m_guess(4)*m_guess(3)/2.
    end function
-   real function sumJ2()
+   real(kind=db) function sumJ2()
       implicit none
       sumJ2 = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
       & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
       & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
       & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.
    end function
-   real function sumJ3()
+   real(kind=db) function sumJ3()
       implicit none
       sumJ3 = s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
       & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
@@ -193,17 +225,17 @@ subroutine partition(H,T,Z)
    !end do
 end subroutine
 
-subroutine magnetization(H,s,T,m)
+subroutine magnetization(H,Z,s,T,m)
    integer, parameter:: minConfig= 2
    integer, parameter:: num_sites= 4
    integer, parameter:: db=8
    integer, parameter:: maxConfig= minConfig**num_sites
    integer, dimension(maxConfig,num_sites), intent(in) :: s
-   real(kind=db):: b,Z
+   real(kind=db):: b
    real(kind=db), dimension(maxConfig), intent(in):: H
    real(kind=db), intent(out):: m
-   real(kind=db), intent(in):: T
-   Z = 0.d0
+   real(kind=db), intent(in):: T, Z
+
    b = 1.d0/T
    m = 0.d0
 
@@ -211,15 +243,14 @@ subroutine magnetization(H,s,T,m)
 
 
    do i = 1, maxConfig
-      Z = Z + (dexp(-b*(H(i))))
       m = m + s(i,1)*(dexp(-b*(H(i))))
 
    end do
-   print*, m,Z,(m/Z)
-   m = (m/Z)
-   print*, m,Z
-   
- !  print*, Z, m, T
+
+   m = m/Z
+
+
+   !  print*, Z, m, T
    ! T = T + 0.1d0
 
    !end do
