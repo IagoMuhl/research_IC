@@ -3,16 +3,16 @@ program normal
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
    integer:: mJ
-   real(kind=db), parameter:: J2=0.5d0,J3=0.0d0
+   real(kind=db), parameter:: J2=0.61d0,J3=0.0d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
-   real(kind=db):: Z,T,m,step,tol,error,tolJ
+   real(kind=db):: Z,T,m,step,tol,error,tolJ,F
    character(len=5) :: nameFileJ2, nameFileJ3
    character(len=3) :: state
 
-   state = 'SAF'
+   state = 'PM'
    mJ = 1
-   m = 1.d0
+   m = 0.d0
    T = 1.d0
    step = (10.d0)**(-3)
    tol = (10.d0)**(-5)
@@ -70,9 +70,9 @@ program normal
 
       end if
 
+      call F_helm(Z,F)
 
-
-      write(20,*) T,m,mJ
+      write(20,*) T,F
 
       !print*, m_guess
       T = T + step

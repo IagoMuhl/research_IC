@@ -3,7 +3,7 @@ program normal
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
    integer:: mJ
-   real(kind=db), parameter:: J3=0.0d0,T=0.5d0
+   real(kind=db), parameter:: J3=0.0d0,T=1.7d0
    real(kind=db):: J2
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess

@@ -176,6 +176,8 @@ contains
          m = [sigma, -sigma, -sigma, sigma]
       else if (state=='SAF') then
          m = [sigma, -sigma, sigma, -sigma]
+      else if (state=='PM') then
+         m = [0.d0, 0.d0, 0.d0, 0.d0]
       end if
 
    end subroutine
