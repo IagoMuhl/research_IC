@@ -27,21 +27,21 @@ set style line 3 lc rgb '#070BE8'
 set style line 4 lc rgb '#8313E8'
 
 #Label
-set label 1 at 0.48, 4
+set label 1 at 0.48, 3.5
 set label 1 "PM" tc rgb '#8313E8'
 
-set label 2 at 0.05, 1.
+set label 2 at 0.2, 1.
 set label 2 "AF" tc rgb '#8313E8'
 
-set label 3 at 0.9, 1.
+set label 3 at 0.8, 1.
 set label 3 "SAF" tc rgb '#8313E8'
 
 #set label 5 at 0.484, .4
 #set label 5 "SD" tc rgb '#8313E8'
 
 #Ponto Crítico
-#set label 4 at 0.625, 1.85
-#set label 4 "0.67" tc rgb '#8313E8'
+set label 4 at 0.6, 2.25
+set label 4 "0.66" tc rgb '#8313E8'
 
 #set label 9 at 0.65, .2
 #set label 9 "0.64" tc rgb '#8313E8'
@@ -52,7 +52,7 @@ set key off
 #set label 6 at 0.0, 4.78
 #set label 6 "b)" tc rgb 'black'
 
-set label 7 at 0.2, 4
+set label 7 at 0.85, 4.5
 set label 7 "J_{3} = 0.00" tc rgb 'black'
 
 #set label 8 at 0.7, 4
@@ -60,10 +60,11 @@ set label 7 "J_{3} = 0.00" tc rgb 'black'
 
 #Plot
 plot AF using ($2<=0.52?$2:1/0):1 w l ls 3, \
-    SAF using ($2>=0.57?$2:1/0):1 w l ls 3, \
-    AF_SAF using 1:($2<=1.5?$2:1/0) w l ls 3 dt 2, \
-    "<echo '.675 1.63572'" with points ls 1#, \
-    #SAF using ($3<=0.675 && $3>=0.53?$3:1/0):2 w l ls 3 dt 2, \
+    SAF using ($2>=0.655?$2:1/0):1 w l ls 3, \
+    SAF using ($2<=0.655 && $2>=0.58?$2:1/0):1 w l ls 3 dt 5, \
+    AF_SAF using 1:($2<=1.5?$2:1/0) w l ls 3 dt 5, \
+    "<echo '.655 1.94347'" with points ls 1#, \
+    
     #SD_PM using ($1>=0.48 && $1<=0.55?$1:1/0):2 w l ls 3 dt 2, \
     #SD_SAF using 1:($2<=0.859?$2:1/0) w l ls 3 dt 2, \
     #AF_SD using 1:($2<=.751?$2:1/0) w l ls 3 dt 2, \
