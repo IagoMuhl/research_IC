@@ -2,21 +2,21 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   integer:: mJ
-   real(kind=db), parameter:: J2=0.61d0,J3=0.0d0
+   integer:: mTol
+   real(kind=db), parameter:: J2=1.d0,J3=0.0d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
    real(kind=db):: Z,T,m,step,tol,error,tolJ,F
    character(len=5) :: nameFileJ2, nameFileJ3
    character(len=3) :: state
 
-   state = 'PM'
-   mJ = 1
-   m = 0.d0
-   T = 1.d0
-   step = (10.d0)**(-3)
-   tol = (10.d0)**(-5)
-   tolJ = (10.d0)**(-3)
+   state = 'SAF'
+   mTol = 1      ! parametro !
+   m = 1.d0    ! chute magnetização!
+   T = 1.5d0
+   step = (10.d0)**(-5)   ! STEP DA AUTO-CONSISTENCIA
+   tol = (10.d0)**(-3)    !  TOLERANCIA DA AUTO-CONSISTENCIA
+   tolJ = (10.d0)**(-3)    ! TOLERANCIA P/ IDENTIFICAR QUANDO M=0
 
 
    call base(s)
@@ -27,12 +27,12 @@ program normal
    WRITE (nameFileJ3, '(F5.2)') j3
 
 
-   open(unit=20, file=trim(state) // "_T-m-mJ_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
-
-   do while (T<=4.0d0)
-
-      m_guess = [m,-m,m,-m]
+   !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
+   open(unit=20, file=trim(state) // "_T-m.dat")
+   
+   do while (T<=4.d0)
       call mag_vetor(state,m,m_guess)
+
 
       call HAM_INTRA(J2,s,H_intra)
 
@@ -43,8 +43,9 @@ program normal
       call partition(H,T,Z)
 
       call magnetization(H,Z,s,T,m)
-      m = abs(m)
+
       error = abs(m - m_guess(1))
+         !AUTO-CONSISTÊNCIA
 
       do while (error >= tol)
          !ATUALIZANDO O CHUTE
@@ -61,18 +62,16 @@ program normal
 
          error = abs(m - m_guess(1))
 
-         if ( error <= tol ) exit
-
       enddo
 
       if ( m<=tolJ ) then
-         mJ = m 
+         mTol = int(m) 
 
       end if
 
-      call F_helm(Z,F)
+      call F_helm(T,Z,F)
 
-      write(20,*) T,F
+      write(20,*) T,mTol
 
       !print*, m_guess
       T = T + step

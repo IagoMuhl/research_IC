@@ -11,11 +11,11 @@ program normal
    character(len=5) :: nameFileT, nameFileJ3
    character(len=3) :: state
 
-   state = 'SAF'
+   state = 'AF'
    mJ = 1
    m = 1.d0
    step = (10.d0)**(-5)
-   tol = (10.d0)**(-5)
+   tol = (10.d0)**(-3)
    !tolJ = (10.d0)**(-3)
 
 
@@ -31,10 +31,14 @@ program normal
    WRITE (nameFileT, '(F5.2)') T
    WRITE (nameFileJ3, '(F5.2)') j3
 
+   ! AF --> (J2<0.6d0)
+   ! SAF --> (J2>0.4d0)
 
-   open(unit=20, file=trim(state) // "_J2-F_T(" // trim(adjustl(nameFileT)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
 
-   do while (J2>0.4d0)
+   !open(unit=20, file=trim(state) // "-PM_J2-F_T(" // trim(adjustl(nameFileT)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
+   open(unit=20, file=trim(state) // "_J2-F.dat")
+
+   do while (J2<0.6d0)
 
       m_guess = [m,-m,m,-m]
       call mag_vetor(state,m,m_guess)
@@ -72,14 +76,16 @@ program normal
 
 
 
-      call F_helm(Z,F)
+      call F_helm(T,Z,F)
 
       write(20,*) J2,F
 
       if ( state=='AF' ) then
          J2 = J2 + step
-      else 
+      else if (state=='SAF') then
          J2 = J2 - step
+      else if (state=='PM') then
+         J2 = J2 + step
       end if
 
   

@@ -177,17 +177,19 @@ contains
       else if (state=='SAF') then
          m = [sigma, -sigma, sigma, -sigma]
       else if (state=='PM') then
-         m = [0.d0, 0.d0, 0.d0, 0.d0]
+         m = 0.d0
       end if
 
    end subroutine
 
-   subroutine F_helm(Z,F)
+   subroutine F_helm(T,Z,F)
       implicit none
-      real(kind=db), intent(in):: Z
+      real(kind=db), intent(in):: Z,T
       real(kind=db), intent(out):: F
 
-      F = dlog(Z)
+      F = -T*dlog(Z)
 
    end subroutine
+
+
 end module CMF
