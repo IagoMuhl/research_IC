@@ -1,7 +1,7 @@
 reset
 set terminal pngcairo dashed enhanced size 600,400 font 'arial,12' fontscale 1.0
 set encoding utf8
-set output 'DiagramaClassico-J3(0.00).png'
+set output 'DiagramaClassico-J3(-0.10).png'
 set xlabel "J_{2} / J_{1}"
 set ylabel "T / J_{1}"
 
@@ -40,8 +40,8 @@ set label 3 "SAF" tc rgb '#8313E8'
 #set label 5 "SD" tc rgb '#8313E8'
 
 #Ponto Crítico
-set label 4 at 0.6, 2.25
-set label 4 "0.66" tc rgb '#8313E8'
+set label 4 at 0.52, 2.3
+set label 4 "0.59" tc rgb '#8313E8'
 
 #set label 9 at 0.65, .2
 #set label 9 "0.64" tc rgb '#8313E8'
@@ -53,17 +53,17 @@ set key off
 #set label 6 "b)" tc rgb 'black'
 
 set label 7 at 0.85, 4.5
-set label 7 "J_{3} = 0.00" tc rgb 'black'
+set label 7 "J_{3} = -0.10" tc rgb 'black'
 
 #set label 8 at 0.7, 4
 #set label 8 "h = 1" tc rgb 'black'
 
 #Plot
-plot AF using ($2<=0.52?$2:1/0):1 w l ls 3, \
-    SAF using ($2>=0.655?$2:1/0):1 w l ls 3, \
-    SAF using ($2<=0.655 && $2>=0.58?$2:1/0):1 w l ls 3 dt 5, \
-    AF_SAF using 1:($2<=1.5?$2:1/0) w l ls 3 dt 5, \
-    "<echo '.655 1.94347'" with points ls 1#, \
+plot AF using ($1<=0.53?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.59?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.6 && $1>=0.54?$1:2/0):2 w l ls 3 dt 5, \
+    AF_SAF using 1:($2<=1.8?$2:1/0) w l ls 3 dt 5, \
+    "<echo '.59 2.07631'" with points ls 1#, \
     
     #SD_PM using ($1>=0.48 && $1<=0.55?$1:1/0):2 w l ls 3 dt 2, \
     #SD_SAF using 1:($2<=0.859?$2:1/0) w l ls 3 dt 2, \

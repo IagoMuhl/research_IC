@@ -54,6 +54,8 @@ contains
 
    end subroutine
 
+
+
    subroutine HAM_INTER(J2,J3,s,m_guess,H_inter)
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
@@ -95,6 +97,9 @@ contains
       end function
 
    end subroutine
+
+
+
 
    subroutine print_matrix(row,column,matrix)
       integer, intent(in):: row,column
@@ -139,6 +144,8 @@ contains
       !end do
    end subroutine
 
+
+
    subroutine magnetization(H,Z,s,T,m)
       integer, dimension(maxConfig,num_sites), intent(in) :: s
       real(kind=db):: b
@@ -166,6 +173,8 @@ contains
       !end do
    end subroutine
 
+
+
    subroutine mag_vetor(state,sigma,m)
       implicit none
       character(len=*), intent(in):: state
@@ -180,7 +189,9 @@ contains
          m = 0.d0
       end if
 
+
    end subroutine
+   
 
    subroutine F_helm(T,Z,F)
       implicit none
@@ -191,5 +202,21 @@ contains
 
    end subroutine
 
+
+
+   subroutine print_m(state,J2,m,tol,T,n)
+   real(kind=db), intent(in):: J2,m,tol,T
+   character(len=*):: state
+   integer:: n
+   
+      if (m<tol) then
+         if (n==1) then
+         print *, J2,T,state
+         !write(20,*) J2, T   
+         n =  n + 1
+         endif
+      endif
+
+   end subroutine
 
 end module CMF

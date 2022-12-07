@@ -2,8 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   integer:: mJ
-   real(kind=db), parameter:: J3=0.0d0,T=1.7d0
+   real(kind=db), parameter:: T=1.8d0, J3=-0.1d0
    real(kind=db):: J2
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
@@ -12,10 +11,9 @@ program normal
    character(len=3) :: state
 
    state = 'AF'
-   mJ = 1
    m = 1.d0
-   step = (10.d0)**(-5)
-   tol = (10.d0)**(-3)
+   step = (10.d0)**(-3)
+   tol = (10.d0)**(-8)
    !tolJ = (10.d0)**(-3)
 
 
