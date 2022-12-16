@@ -3,14 +3,15 @@
 
 ## Parâmetros J3 FERROMAGNÉTICO
 
-[x] J3 = 0.10
-[ ] J3 = 0.20
+[x] J3 = -0.10
+[x] J3 = -0.20
+[ ] J3 = -0.30
 
 # 2. Programa Fortran
 
-[ ] Faça um programa Fortra que pela ao usuário para digitar dois números inteiro no teclado, n1 e n2
+[x] Faça um programa Fortra que pela ao usuário para digitar dois números inteiro no teclado, n1 e n2
 
-[ ] Agora leia 5 valores inteiros e diga qual é o maior.
+[x] Agora leia 5 valores inteiros e diga qual é o maior.
 
 
 

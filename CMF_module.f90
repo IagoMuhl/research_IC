@@ -191,7 +191,7 @@ contains
 
 
    end subroutine
-   
+
 
    subroutine F_helm(T,Z,F)
       implicit none
@@ -205,18 +205,46 @@ contains
 
 
    subroutine print_m(state,J2,m,tol,T,n)
-   real(kind=db), intent(in):: J2,m,tol,T
-   character(len=*):: state
-   integer:: n
-   
+      real(kind=db), intent(in):: J2,m,tol,T
+      character(len=*):: state
+      integer:: n
+
       if (m<tol) then
          if (n==1) then
-         print *, J2,T,state
-         !write(20,*) J2, T   
-         n =  n + 1
+            print *, J2,T,state
+            !write(20,*) J2, T
+            n =  n + 1
          endif
       endif
 
    end subroutine
+
+   function condition(state,J2)
+      implicit none
+      logical:: condition
+      character(len=*):: state
+      real(kind=db), intent(in):: J2
+
+      select case (state)
+       case ('AF')
+
+         if ( J2<=0.70d0 ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
+
+      case ('SAF')
+         if ( J2>=0.40d0 ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
+
+
+      end select
+
+
+   end function
 
 end module CMF

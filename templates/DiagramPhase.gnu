@@ -11,8 +11,8 @@ set ylabel "T / J_{1}"
 #AF_SD = "./Gamma1/J3(0.05)/Transition--AF-SD_J3(0.05).dat"
 #SD_SAF = "./Gamma1/J3(0.05)/Transition--SD-SAF_J3(0.05).dat"
 #set title '$J_{3} = +0.0$'
-AF = "./AF_T-J2.dat"
-SAF = "./SAF_T-J2.dat"
+AF = "./AF_J2-T.dat"
+SAF = "./SAF_J2-T.dat"
 AF_SAF = "./J2_fix-T.dat"
 
 set yrange [0:5]
@@ -40,7 +40,7 @@ set label 3 "SAF" tc rgb '#8313E8'
 #set label 5 "SD" tc rgb '#8313E8'
 
 #Ponto Crítico
-set label 4 at 0.52, 2.3
+set label 4 at 0.55, 2.36
 set label 4 "0.59" tc rgb '#8313E8'
 
 #set label 9 at 0.65, .2
@@ -59,11 +59,12 @@ set label 7 "J_{3} = -0.10" tc rgb 'black'
 #set label 8 "h = 1" tc rgb 'black'
 
 #Plot
-plot AF using ($1<=0.53?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.59?$1:2/0):2 w l ls 3, \
-    SAF using ($1<=0.6 && $1>=0.54?$1:2/0):2 w l ls 3 dt 5, \
-    AF_SAF using 1:($2<=1.8?$2:1/0) w l ls 3 dt 5, \
-    "<echo '.59 2.07631'" with points ls 1#, \
+plot AF using ($1<=0.52?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.6?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.5 && $1>=0.5?$1:2/0):2 w l ls 3 dt 3, \
+    AF_SAF using 1:($2<=2.1?$2:1/0) w l ls 3 dt 2, \
+    "<echo '.595 2.11'" with points ls 1, \
+    
     
     #SD_PM using ($1>=0.48 && $1<=0.55?$1:1/0):2 w l ls 3 dt 2, \
     #SD_SAF using 1:($2<=0.859?$2:1/0) w l ls 3 dt 2, \

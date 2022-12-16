@@ -2,7 +2,7 @@ program normal
     use CMF
     implicit none
     integer, dimension(maxConfig,num_sites) :: s
-    real(kind=db), parameter:: J3 = -0.10d0, tol = (10.d0)**(-8)
+    real(kind=db), parameter:: J3 = -0.20d0, tol = (10.d0)**(-8)
     !real(kind=db), parameter:: J2 = 0.51d0, J2second = 0.51d0
     real(kind=db), dimension(maxConfig):: H_intra, H_inter, H, H_intra2, H_inter2, H2
     real(kind=db), dimension(num_sites):: m_guess,m_guess2
@@ -17,14 +17,14 @@ program normal
     state2 = 'PM'
     m = 1.d0    ! chute magnetização!
     m2 = 1.d0
-    T = 2.d0
+    T = 2.1d0
     step = (10.d0)**(-3)   ! STEP DA VARIÁVEL
                          ! Tol = TOLERANCIA DA AUTO-CONSISTENCIA
     stepJ2 = (10.d0)**(-1)
     first_m0 = 1
     first_m02 = 1
  
-    J2 = 0.595d0
+    J2 = 0.525d0
     J2second = J2
  
  
