@@ -2,7 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: T=2.2d0, J3=-0.1d0
+   real(kind=db), parameter:: T=2.663d0, J3=-0.3d0
    real(kind=db):: J2
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess

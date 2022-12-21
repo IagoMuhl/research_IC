@@ -1,7 +1,7 @@
 program tarefa
     implicit none
     integer:: n1,n2,n3,n4,n5
-    !real:: n
+    real, dimension(5):: n
 
 print*, 'Dê o valor para n1:'
 read(*,*) n1
@@ -65,5 +65,7 @@ if (n5>n2) then
         endif
     endif
 endif
+
+
 
 end program tarefa

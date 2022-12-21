@@ -5,7 +5,7 @@
 
 [x] J3 = -0.10
 [x] J3 = -0.20
-[ ] J3 = -0.30
+[x] J3 = -0.30
 
 # 2. Programa Fortran
 
@@ -19,9 +19,9 @@
 
 # 3. Compilar os resultados num documento tex.
 
-[ ] Colocar os diagramas, equações e tal...
+[x] Colocar os diagramas, equações e tal...
 
-[ ] Descrição analítica do modelo de Ising (artigo do Nathan, não esqueça do J3). 
+[x] Descrição analítica do modelo de Ising (artigo do Nathan, não esqueça do J3). 
 Defina a hamiltoniana de Ising, 
 defina a hamiltoniana intra e inter cluster, aproximação de campo médio, 
 eq. da magnetização 
