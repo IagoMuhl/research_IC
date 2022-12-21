@@ -72,6 +72,44 @@ contains
    contains
       real(kind=db) function sumJ1()
          implicit none
+         sumJ1 = s(i,1)*m_guess(2) + m_guess(1)*s(i,2) - m_guess(1)*m_guess(2)/2.+ &
+               & s(i,1)*m_guess(3) + m_guess(1)*s(i,3) - m_guess(1)*m_guess(3)/2.+ &
+               & s(i,4)*m_guess(2) + m_guess(4)*s(i,2) - m_guess(4)*m_guess(2)/2.+ &
+               & s(i,4)*m_guess(3) + m_guess(4)*s(i,3) - m_guess(4)*m_guess(3)/2.
+
+      end function
+      real(kind=db) function sumJ2()
+         implicit none
+         sumJ2 = s(i,1)*m_guess(4) + s(i,4)*m_guess(1) - m_guess(1)*m_guess(4)/2.+ &
+               & s(i,2)*m_guess(3) + s(i,3)*m_guess(2) - m_guess(2)*m_guess(3)/2.
+
+      end function
+      real(kind=db) function sumJ3()
+         implicit none
+         sumJ3 = 2*s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
+               & 2*s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
+               & 2*s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
+               & 2*s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
+      end function
+
+   end subroutine
+
+   subroutine HAM_INTER_SD(J2,J3,s,m_guess,H_inter_SD)
+      integer, dimension(maxConfig,num_sites), intent(in):: s
+      integer :: i
+      real(kind=db), intent(in):: J2,J3
+      real(kind=db), dimension(num_sites), intent(in):: m_guess
+      real(kind=db), dimension(maxConfig), intent(out):: H_inter_SD
+
+
+
+      do i = 1, maxConfig
+         H_inter_SD(i) = 4*(J3*sumJ3()) + 3*(J2*sumJ2()) + J1*sumJ1()
+
+      end do
+   contains
+      real(kind=db) function sumJ1()
+         implicit none
          sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
          & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
          & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
