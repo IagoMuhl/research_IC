@@ -72,24 +72,28 @@ contains
    contains
       real(kind=db) function sumJ1()
          implicit none
-         sumJ1 = s(i,1)*m_guess(2) + m_guess(1)*s(i,2) - m_guess(1)*m_guess(2)/2.+ &
-               & s(i,1)*m_guess(3) + m_guess(1)*s(i,3) - m_guess(1)*m_guess(3)/2.+ &
-               & s(i,4)*m_guess(2) + m_guess(4)*s(i,2) - m_guess(4)*m_guess(2)/2.+ &
-               & s(i,4)*m_guess(3) + m_guess(4)*s(i,3) - m_guess(4)*m_guess(3)/2.
-
+         sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
+               & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
+               & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
+               & s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.+ &
+               & s(i,3)*m_guess(1)-m_guess(3)*m_guess(1)/2.+ &
+               & s(i,3)*m_guess(4)-m_guess(3)*m_guess(4)/2.+ &
+               & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.+ &
+               & s(i,4)*m_guess(3)-m_guess(4)*m_guess(3)/2.
       end function
       real(kind=db) function sumJ2()
          implicit none
-         sumJ2 = s(i,1)*m_guess(4) + s(i,4)*m_guess(1) - m_guess(1)*m_guess(4)/2.+ &
-               & s(i,2)*m_guess(3) + s(i,3)*m_guess(2) - m_guess(2)*m_guess(3)/2.
-
+         sumJ2 = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
+         & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
+         & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
+         & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.
       end function
       real(kind=db) function sumJ3()
          implicit none
-         sumJ3 = 2*s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
-               & 2*s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
-               & 2*s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
-               & 2*s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
+         sumJ3 = s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
+         & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
+         & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
+         & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
       end function
 
    end subroutine
