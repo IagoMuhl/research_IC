@@ -2,7 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: T=2.663d0, J3=-0.3d0
+   real(kind=db), parameter:: T=1.14d0, J3=0.1d0
    real(kind=db):: J2
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
@@ -13,7 +13,7 @@ program normal
 
    !  não faça a cagada de mudar o STEP. Ass.: Matheus
 
-   stateOne = 'AF'
+   stateOne = 'SD'
    stateTwo = 'SAF'
 
    step = (10.d0)**(-5)
@@ -24,7 +24,7 @@ program normal
    do i = 1, 2
       if ( i==1 ) then
          state = stateOne
-         J2 = 0.4d0
+         J2 = 0.5d0
       else
          state = stateTwo
          J2 = 0.7d0
@@ -53,53 +53,61 @@ program normal
 
 
 
-         do while (condition(state,J2))
+      do while (condition(state,J2))
 
 
-            m_guess = [m,-m,m,-m]
+         m_guess = [m,-m,m,-m]
+         call mag_vetor(state,m,m_guess)
+
+         call HAM_INTRA(J2,s,H_intra)
+
+         if ( state=='SD' ) then
+            call HAM_INTER_SD(J2,J3,s,m_guess,H_inter)
+         else
+            call HAM_INTER(J2,J3,s,m_guess,H_inter)
+         end if
+
+         H = H_intra + H_inter
+
+         call partition(H,T,Z)
+
+         call magnetization(H,Z,s,T,m)
+         m = abs(m)
+         error = abs(m - m_guess(1))
+
+         do while (error >= tol)
+            !ATUALIZANDO O CHUTE
+
             call mag_vetor(state,m,m_guess)
 
-            call HAM_INTRA(J2,s,H_intra)
-
-            call HAM_INTER(J2,J3,s,m_guess,H_inter)
+            if ( state=='SD' ) then
+               call HAM_INTER_SD(J2,J3,s,m_guess,H_inter)
+            else
+               call HAM_INTER(J2,J3,s,m_guess,H_inter)
+            end if
 
             H = H_intra + H_inter
 
             call partition(H,T,Z)
 
             call magnetization(H,Z,s,T,m)
-            m = abs(m)
+
             error = abs(m - m_guess(1))
 
-            do while (error >= tol)
-               !ATUALIZANDO O CHUTE
-
-               call mag_vetor(state,m,m_guess)
-
-               call HAM_INTER(J2,J3,s,m_guess,H_inter)
-
-               H = H_intra + H_inter
-
-               call partition(H,T,Z)
-
-               call magnetization(H,Z,s,T,m)
-
-               error = abs(m - m_guess(1))
-
-            enddo
-
-
-            call F_helm(T,Z,F)
-
-            write(20,*) J2,F,m
-            !write(27,*) J2,m
-
-
-
-            J2 = J2 + step
-
-
          enddo
+
+
+         call F_helm(T,Z,F)
+
+         write(20,*) J2,F,m
+         !write(27,*) J2,m
+
+
+
+         J2 = J2 + step
+
+
+      enddo
 
       close(20)
    end do

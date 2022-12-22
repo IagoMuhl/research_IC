@@ -104,38 +104,57 @@ contains
       real(kind=db), intent(in):: J2,J3
       real(kind=db), dimension(num_sites), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter_SD
+      real(kind=db), dimension(num_sites):: m_prime
 
-
+      m_prime = (-1)*m_guess
 
       do i = 1, maxConfig
-         H_inter_SD(i) = 4*(J3*sumJ3()) + 3*(J2*sumJ2()) + J1*sumJ1()
+         H_inter_SD(i) = 2*J3*(sumJ3_Y() + sumJ3_X()) + J2*(sumJ2_SD()) + J1*(sumJ1_Y() + sumJ1_X())
 
       end do
    contains
-      real(kind=db) function sumJ1()
+      real(kind=db) function sumJ1_Y()
          implicit none
-         sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
-         & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
+         sumJ1_Y = s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
          & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
-         & s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.+ &
          & s(i,3)*m_guess(1)-m_guess(3)*m_guess(1)/2.+ &
-         & s(i,3)*m_guess(4)-m_guess(3)*m_guess(4)/2.+ &
-         & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.+ &
-         & s(i,4)*m_guess(3)-m_guess(4)*m_guess(3)/2.
+         & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.
       end function
-      real(kind=db) function sumJ2()
+
+      real(kind=db) function sumJ1_X()
+      implicit none
+      sumJ1_X = s(i,1)*m_prime(2)-m_guess(1)*m_prime(2)/2.+ &
+      & s(i,2)*m_prime(1)-m_guess(2)*m_prime(1)/2.+ &
+      & s(i,3)*m_prime(4)-m_guess(3)*m_prime(4)/2.+ &
+      & s(i,4)*m_prime(3)-m_guess(4)*m_prime(3)/2.
+   end function
+
+      real(kind=db) function sumJ2_SD()
          implicit none
-         sumJ2 = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
-         & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
-         & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
-         & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.
+         sumJ2_SD = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
+               & 2*(s(i,1)*m_prime(4)-m_guess(1)*m_prime(4)/2.)+ &
+                  & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
+               & 2*(s(i,2)*m_prime(3)-m_guess(2)*m_prime(3)/2.)+ &
+                  & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
+               & 2*(s(i,3)*m_prime(2)-m_guess(3)*m_prime(2)/2.)+ &
+                  & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.+ &
+               & 2*(s(i,4)*m_prime(1)-m_guess(4)*m_prime(1)/2.)
       end function
-      real(kind=db) function sumJ3()
+
+      real(kind=db) function sumJ3_Y()
          implicit none
-         sumJ3 = s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
-         & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
-         & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
-         & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
+         sumJ3_Y =  s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
+                  & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
+                  & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
+                  & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
+      end function
+
+      real(kind=db) function sumJ3_X()
+         implicit none
+         sumJ3_X = s(i,1)*m_prime(1)-(m_guess(1)*m_prime(1))/2.+ &
+                 & s(i,2)*m_prime(2)-(m_guess(2)*m_prime(2))/2.+ &
+                 & s(i,3)*m_prime(3)-(m_guess(3)*m_prime(3))/2.+ &
+                 & s(i,4)*m_prime(4)-(m_guess(4)*m_prime(4))/2.
       end function
 
    end subroutine
@@ -229,6 +248,8 @@ contains
          m = [sigma, -sigma, sigma, -sigma]
       else if (state=='PM') then
          m = 0.d0
+      else if (state=='SD') then
+         m = [sigma, sigma, -sigma, -sigma]
       end if
 
 
@@ -268,7 +289,7 @@ contains
       real(kind=db), intent(in):: J2
 
       select case (state)
-       case ('AF')
+       case ('SD')
 
          if ( J2<=0.70d0 ) then
             condition = .true.
@@ -277,7 +298,7 @@ contains
          end if
 
       case ('SAF')
-         if ( J2>=0.40d0 ) then
+         if ( J2>=0.50d0 ) then
             condition = .true.
          else
             condition = .false.
