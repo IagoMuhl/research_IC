@@ -289,16 +289,16 @@ contains
       real(kind=db), intent(in):: J2
 
       select case (state)
-       case ('SD')
+       case ('AF')
 
-         if ( J2<=0.70d0 ) then
+         if ( J2<=0.40d0 ) then
             condition = .true.
          else
             condition = .false.
          end if
 
-      case ('SAF')
-         if ( J2>=0.50d0 ) then
+      case ('SD')
+         if ( J2>=0.20d0 ) then
             condition = .true.
          else
             condition = .false.

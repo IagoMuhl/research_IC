@@ -2,7 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: T=1.14d0, J3=0.1d0
+   real(kind=db), parameter:: T=0.825d0, J3=0.2d0
    real(kind=db):: J2
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
@@ -13,8 +13,8 @@ program normal
 
    !  não faça a cagada de mudar o STEP. Ass.: Matheus
 
-   stateOne = 'SD'
-   stateTwo = 'SAF'
+   stateOne = 'AF'
+   stateTwo = 'SD'
 
    step = (10.d0)**(-5)
    tol = (10.d0)**(-8)
@@ -24,10 +24,10 @@ program normal
    do i = 1, 2
       if ( i==1 ) then
          state = stateOne
-         J2 = 0.5d0
+         J2 = 0.2d0
       else
          state = stateTwo
-         J2 = 0.7d0
+         J2 = 0.4d0
          step = step*(-1)
       end if
 

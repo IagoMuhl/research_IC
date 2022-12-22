@@ -2,7 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J3 = 0.1d0, tol = (10.d0)**(-8)
+   real(kind=db), parameter:: J3 = 0.2d0, tol = (10.d0)**(-8)
    !real(kind=db), parameter:: J2 = 0.51d0, J2second = 0.51d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    ! H_intra2, H_inter2, H2
@@ -15,10 +15,10 @@ program normal
    character(len=3) :: state, stateOne, stateTwo
    integer:: first_m0,i
 
-   step = (10.d0)**(-5)
+   step = (10.d0)**(-3)
 
-   stateOne = 'SAF'
-   stateTwo = 'PM'
+   stateOne = 'AF'
+   stateTwo = 'SD'
    
    do
 
@@ -47,7 +47,7 @@ program normal
       WRITE (nameFileJ3, '(F5.2)') j3
 
       !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
-      open(unit=20, file=trim(state) // "_T-F.dat")
+      open(unit=20, file=trim(state) // "_T-F-m.dat")
       !open(unit=21, file=trim(state2) // "_T-m.dat")
 
       !do while (J2<1.d0)
@@ -151,7 +151,7 @@ program normal
          ! stop
          !end if
          !---------------------------
-         write(20,*) T,F
+         write(20,*) T,F,m
          ! write(21,*) T,m2
          !print*, m_guess
          T = T + step
