@@ -1,14 +1,14 @@
 reset
-set terminal lua tikz linewidth 2 standalone
+set terminal lua tikz linewidth 3 standalone
 set output 'dash.tex' 
 set encoding utf8
 
 #Set color line
 set style line 1 lc rgb 'black' pt 7   # circle
 set style line 2 lc rgb '#E8991E'
-set style line 3 lc rgb '#070BE8'
-set style line 5 lc rgb '#070BE8' dt 4
-set style line 4 lc rgb '#8313E8'
+set style line 3 lc rgb '#1E90FF'
+set style line 5 lc rgb '#1E90FF' dt 4
+set style line 4 lc rgb '#0000CD'
 unset key
 
 # Enable the use of macros
@@ -56,124 +56,127 @@ RMARGIN = "set lmargin at screen 0.69; set rmargin at screen 0.99"
 set multiplot layout 2,3 rowsfirst
 
 # --- GRAPH a
-AF = "./DiagramasDeFase(J3-0.0)/AF(J3-0_0)_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramasDeFase(J3-0.0)/SAF(J3-0_0)_mZero-Temp-J2-Z.dat"
-AF_SAF = "./DiagramasDeFase(J3-0.0)/Transition(J3-0_0)--AF-SAF.dat"
+AF = "J3=0.20/AF_J2-T.dat"
+SAF = "J3=0.20/SAF_J2-T.dat"
+AF_SD = "J3=0.20/AF-SD(J2-T).dat"
+SAF_SD = "J3=0.20/SAF-SD(J2-T).dat"
+SD = "J3=0.20/SD_J2-T.dat"
 
 @NOXTICS; @YTICS; @TMARGIN; ; @LMARGIN
 set label 1 '$a)$' @POS
-set label 2 '$\phantom{-}J_{3} = 0.0$' @POS_J3
+set label 2 '$\phantom{-}J_{3} = 0.2$' @POS_J3
 set label 3 "$PM$" @POS_PM
+set label 3 "$SD$" @POS_SD
 set label 4 "$AF$" @POS_AF
 set label 5 "$SAF$" @POS_SAF
-set label 6 at 0.49, 2.3
-set label 6 "$0.66$" font ',9' tc rgb '#8313E8'
+set label 6 at 0.6, 2.
+set label 6 "$0.78$" font ',9' tc rgb '#1C1C1C'
 
-plot AF using ($3<=0.51?$3:1/0):2 w l ls 3, \
-    SAF using ($3>0.66?$3:1/0):2 w l ls 3, \
-    SAF using ($3<=0.66 && $3>=0.5?$3:1/0):2 w l ls 5, \
-    AF_SAF using 2:($1<=0.7?$1:1/0) w l ls 5, \
-    "<echo '.66 1.96'" with points ls 1
+plot AF using ($1<=0.32?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.78?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.78 && $1>=0.6?$1:2/0):2 w l ls 3 dt 4, \
+    "<echo '.78 1.61763'" with points ls 1, \
+    SD using ($1>=0.32?$1:2/0):2 w l ls 3 dt 4,\
+    AF_SD using 1:2 w l ls 3 dt 4,\
+    SAF_SD using ($1<=0.72?$1:2/0):2 w l ls 3 dt 4,\
     
 
 
 
 # --- GRAPH b
-AF = "./DiagramaDeFase(J3-0.1)/AF_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramaDeFase(J3-0.1)/SAF_mZero-Temp-J2-Z.dat"
-AF_SD = "./DiagramaDeFase(J3-0.1)/Transition--AF-SD.dat"
-SD_SAF = "./DiagramaDeFase(J3-0.1)/Transition--SD-SAF.dat"
-SD_PM = "./DiagramaDeFase(J3-0.1)/Transition--SD-PM.dat"
+AF = "J3=0.10/AF_J2-T.dat"
+SAF = "J3=0.10/SAF_J2-T.dat"
+SD = "J3=0.10/SD_J2-T.dat"
+AF_SD = "J3=0.10/AF-SD(J2-T).dat"
+SAF_SD = "J3=0.10/SAF-SD(J2-T).dat"
 
 @NOXTICS; @NOYTICS; @TMARGIN; @CMARGIN 
 set label 1 '$b)$' @POS
 set label 2 '$\phantom{-}J_{3} = 0.1$' @POS_J3
 set label 6 at 0.55, 2.15
-set label 6 "$0.72$" tc rgb '#8313E8'
-set label 7 '$SD$' @POS_SD
+set label 6 "$0.72$" tc rgb '#1C1C1C'
 
-plot AF using ($3<=0.423?$3:1/0):2 w l ls 3, \
-    SAF using ($3>=0.72?$3:1/0):2 w l ls 3, \
-    SAF using ($3<=0.72 && $3>=0.635?$3:1/0):2 w l ls 5, \
-    AF_SD w l ls 5, \
-    SD_PM using ($2<=0.6 && $2>=0.415?$2:1/0):1 w l ls 5, \
-    SD_SAF using 2:($1<=1.1?$1:1/0) w l ls 5,\
-    SD_SAF using 2:($1>=1.1 && $1<=1.40?$1:1/0) w l ls 5, \
-    "<echo '.72 1.82'" with points ls 1
+
+plot AF using ($1<=0.43?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.72?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.72 && $1>=0.6?$1:2/0):2 w l ls 3 dt 4, \
+    AF_SD using 1:2 w l ls 3 dt 4, \
+    SD using ($1<=0.6 && $1>=0.415?$1:2/0):2 w l ls 3 dt 4, \
+    SAF_SD using 1:2 w l ls 3 dt 4,\
+    "<echo '.72 1.79470'" with points ls 1, \
 
 
 # --- GRAPH c
-AF = "./DiagramaDeFase(J3-0.2)/AF_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramaDeFase(J3-0.2)/SAF_mZero-Temp-J2-Z.dat"
-AF_SD = "./DiagramaDeFase(J3-0.2)/Transition(J3-0_2)--AF-SD.dat"
-SD_SAF = "./DiagramaDeFase(J3-0.2)/Transition(J3-0_2)--SD-SAF.dat"
-SD_PM = "./DiagramaDeFase(J3-0.2)/Transition(J3-0_2)--SD-PM.dat"
+AF = "J3=0.00/AF_J2-T.dat"
+SAF = "J3=0.00/SAF_J2-T.dat"
+AF_SAF = "J3=0.00/J2_fix-T.dat"
 
 @TMARGIN; @RMARGIN; @NOXTICS; @NOYTICS
 set label 1 '$c)$' @POS
-set label 2 '$\phantom{-}J_{3} = 0.2$' @POS_J3
-set label 6 at 0.605, 1.95
-set label 6 "$0.78$" tc rgb '#8313E8'
+set label 2 '$\phantom{-}J_{3} = 0.0$' @POS_J3
+set label 3 "$$" @POS_SD
+set label 6 at 0.48, 2.35
+set label 6 "$0.66$" tc rgb '#1C1C1C'
 
-plot AF using ($3<=0.32?$3:1/0):2 w l ls 3, \
-    SAF using ($3>=0.78?$3:1/0):2 w l ls 3, \
-    SAF using ($3<=0.78 && $3>=0.72?$3:1/0):2 w l ls 5, \
-    AF_SD w l ls 5, \
-    SD_PM using ($1<=0.7 && $1>=0.3?$1:1/0):2 w l ls 5, \
-    SD_SAF using 2:($1<=1.3?$1:1/0) w l ls 5,\
-    "<echo '.78 1.63'" with points ls 1
+
+plot AF using ($1<=0.52?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.66?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.78 && $1>=0.72?$1:2/0):2 w l ls 3 dt 4, \
+    AF_SAF using 1:2 w l ls 3 dt 4, \
+    "<echo '.655 1.94347'" with points ls 1, \
 
 
 # --- GRAPH d
-AF = "./DiagramaDeFase(J3--0.1)/AF_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramaDeFase(J3--0.1)/SAF_mZero-Temp-J2-Z.dat"
-AF_SAF = "./DiagramaDeFase(J3--0.1)/Transition--AF-SAF.dat"
+AF = "J3=-0.10/AF_J2-T.dat"
+SAF = "J3=-0.10/SAF_J2-T.dat"
+AF_SAF = "J3=-0.10/J2_fix-T.dat"
 
 @BMARGIN; @LMARGIN; @XTICS; @YTICS
 set label 1 '$d)$' @POS
 set label 2 '$J_{3} = -0.1$' @POS_J3
 set label 7 '' @POS_SD
-set label 6 at 0.43, 2.4
-set label 6 "$0.59$" tc rgb '#8313E8'
+set label 6 at 0.4, 2.45
+set label 6 "$0.59$" tc rgb '#1C1C1C'
 
-plot AF using ($3<=0.52?$3:1/0):2 w l ls 3, \
-    SAF using ($3>=0.59?$3:1/0):2 w l ls 3, \
-    SAF using ($3<=0.59 && $3>=0.52?$3:1/0):2 w l ls 5, \
-    AF_SAF w l ls 5, \
-    "<echo '.59 2.09057'" with points ls 1
+plot AF using ($1<=0.52?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.59?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.59 && $1>=0.52?$1:2/0):2 w l ls 3 dt 4, \
+    AF_SAF w l ls 3 dt 4, \
+    "<echo '.595 2.11885'" with points ls 1
 
 
 
 # --- GRAPH e
-AF = "./DiagramaDeFase(J3--0.2)/AF_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramaDeFase(J3--0.2)/SAF_mZero-Temp-J2-Z.dat"
-AF_SAF = "./DiagramaDeFase(J3--0.2)/Transition--AF-SAF.dat"
+AF = "J3=-0.20/AF_J2-T.dat"
+SAF = "J3=-0.20/SAF_J2-T.dat"
+AF_SAF = "J3=-0.20/J2_fix-T.dat"
 
 @BMARGIN; @CMARGIN; @XTICS; @NOYTICS
 set label 1 '$e)$' @POS
 set label 2 '$J_{3} = -0.2$' @POS_J3
 set label 6 at 0.405, 2.8
-set label 6 "$0.53$" tc rgb '#8313E8'
+set label 6 "$0.53$" tc rgb '#1C1C1C'
 
-plot AF using ($3<=0.518?$3:1/0):2 w l ls 3, \
-    SAF using ($3>=0.53?$3:1/0):2 w l ls 3, \
-    SAF using ($3<=0.53 && $3>=0.52?$3:1/0):2 w l ls 5, \
-    AF_SAF w l ls 5, \
+plot AF using ($1<=0.518?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.53?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.53 && $1>=0.52?$1:2/0):2 w l ls 3 dt 4, \
+    AF_SAF using 1:2 w l ls 3 dt 4, \
     "<echo '.53 2.26435'" with points ls 1
+    
 
 # --- GRAPH f
-AF = "./DiagramaDeFase(J3--0.3)/AF_mZero-Temp-J2-Z.dat"
-SAF = "./DiagramaDeFase(J3--0.3)/SAF_mZero-Temp-J2-Z.dat"
-AF_SAF = "./DiagramaDeFase(J3--0.3)/Transition--AF-SAF.dat"
+AF = "J3=-0.30/AF_J2-T.dat"
+SAF = "J3=-0.30/SAF_J2-T.dat"
+AF_SAF = "J3=-0.30/J2_fix-T.dat"
 
 @BMARGIN; @RMARGIN; @XTICS; @NOYTICS
 set label 1 '$f)$' @POS
 set label 2 '$J_{3} = -0.3$' @POS_J3
 set label 6 ""
 
-plot AF using ($3<=0.518?$3:1/0):2 w l ls 3, \
-    SAF using ($3>=0.51?$3:1/0):2 w l ls 3, \
-    AF_SAF using 1:($2<=2.9?$2:1/0) w l ls 5
+plot AF using ($1<=0.518?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.51?$1:2/0):2 w l ls 3, \
+    AF_SAF using 1:($2<=2.9?$2:1/0) w l ls 3 dt 4
 
 unset multiplot
 ### End multiplot
