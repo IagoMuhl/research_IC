@@ -2,7 +2,7 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J3 = 0.2d0, tol = (10.d0)**(-8)
+   real(kind=db), parameter:: J3 = 0.0d0, tol = (10.d0)**(-8)
    !real(kind=db), parameter:: J2 = 0.51d0, J2second = 0.51d0
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    ! H_intra2, H_inter2, H2
@@ -65,7 +65,7 @@ program normal
 
 
 
-      do while (T<=4.0d0)
+      do while (T<=5.0d0)
          !print*, m2, T
          !read(*,*)
          !call print_m(state,J2,m,tol,T,first_m0) !SAF
