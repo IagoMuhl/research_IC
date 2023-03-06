@@ -68,18 +68,17 @@ subroutine  QUESTION_2(res)
    k = 0
 
    do i = 1, res
-      if (mod(res,i)==0) then
+      if (mod(res,i)==0.d0) then
          k = k+1
-
-         if(k>2) then
-            print*, res,'não é um número primo'
-         else
-            print*, res,'é um número primo'
-            exit
-         endif
-
       endif
    end do
+   
+      if(k>2) then
+         print*, res,'não é um número primo'
+      else
+         print*, res,'é um número primo'
+      endif
+   
 
 end subroutine
 

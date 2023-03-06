@@ -56,111 +56,6 @@ contains
 
 
 
-   subroutine HAM_INTER(J2,J3,s,m_guess,H_inter)
-      integer, dimension(maxConfig,num_sites), intent(in):: s
-      integer :: i
-      real(kind=db), intent(in):: J2,J3
-      real(kind=db), dimension(num_sites), intent(in):: m_guess
-      real(kind=db), dimension(maxConfig), intent(out):: H_inter
-
-
-
-      do i = 1, maxConfig
-         H_inter(i) = 4*(J3*sumJ3()) + 3*(J2*sumJ2()) + J1*sumJ1()
-
-      end do
-   contains
-      real(kind=db) function sumJ1()
-         implicit none
-         sumJ1 = s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.+ &
-               & s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
-               & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
-               & s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.+ &
-               & s(i,3)*m_guess(1)-m_guess(3)*m_guess(1)/2.+ &
-               & s(i,3)*m_guess(4)-m_guess(3)*m_guess(4)/2.+ &
-               & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.+ &
-               & s(i,4)*m_guess(3)-m_guess(4)*m_guess(3)/2.
-      end function
-      real(kind=db) function sumJ2()
-         implicit none
-         sumJ2 = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
-         & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
-         & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
-         & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.
-      end function
-      real(kind=db) function sumJ3()
-         implicit none
-         sumJ3 = s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
-         & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
-         & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
-         & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
-      end function
-
-   end subroutine
-
-   subroutine HAM_INTER_SD(J2,J3,s,m_guess,H_inter_SD)
-      integer, dimension(maxConfig,num_sites), intent(in):: s
-      integer :: i
-      real(kind=db), intent(in):: J2,J3
-      real(kind=db), dimension(num_sites), intent(in):: m_guess
-      real(kind=db), dimension(maxConfig), intent(out):: H_inter_SD
-      real(kind=db), dimension(num_sites):: m_prime
-
-      m_prime = (-1)*m_guess
-
-      do i = 1, maxConfig
-         H_inter_SD(i) = 2*J3*(sumJ3_Y() + sumJ3_X()) + J2*(sumJ2_SD()) + J1*(sumJ1_Y() + sumJ1_X())
-
-      end do
-   contains
-      real(kind=db) function sumJ1_Y()
-         implicit none
-         sumJ1_Y = s(i,1)*m_guess(3)-m_guess(1)*m_guess(3)/2.+ &
-         & s(i,2)*m_guess(4)-m_guess(2)*m_guess(4)/2.+ &
-         & s(i,3)*m_guess(1)-m_guess(3)*m_guess(1)/2.+ &
-         & s(i,4)*m_guess(2)-m_guess(4)*m_guess(2)/2.
-      end function
-
-      real(kind=db) function sumJ1_X()
-      implicit none
-      sumJ1_X = s(i,1)*m_prime(2)-m_guess(1)*m_prime(2)/2.+ &
-      & s(i,2)*m_prime(1)-m_guess(2)*m_prime(1)/2.+ &
-      & s(i,3)*m_prime(4)-m_guess(3)*m_prime(4)/2.+ &
-      & s(i,4)*m_prime(3)-m_guess(4)*m_prime(3)/2.
-   end function
-
-      real(kind=db) function sumJ2_SD()
-         implicit none
-         sumJ2_SD = s(i,1)*m_guess(4)-m_guess(1)*m_guess(4)/2.+ &
-               & 2*(s(i,1)*m_prime(4)-m_guess(1)*m_prime(4)/2.)+ &
-                  & s(i,2)*m_guess(3)-m_guess(2)*m_guess(3)/2.+ &
-               & 2*(s(i,2)*m_prime(3)-m_guess(2)*m_prime(3)/2.)+ &
-                  & s(i,3)*m_guess(2)-m_guess(3)*m_guess(2)/2.+ &
-               & 2*(s(i,3)*m_prime(2)-m_guess(3)*m_prime(2)/2.)+ &
-                  & s(i,4)*m_guess(1)-m_guess(4)*m_guess(1)/2.+ &
-               & 2*(s(i,4)*m_prime(1)-m_guess(4)*m_prime(1)/2.)
-      end function
-
-      real(kind=db) function sumJ3_Y()
-         implicit none
-         sumJ3_Y =  s(i,1)*m_guess(1)-(m_guess(1)*m_guess(1))/2.+ &
-                  & s(i,2)*m_guess(2)-(m_guess(2)*m_guess(2))/2.+ &
-                  & s(i,3)*m_guess(3)-(m_guess(3)*m_guess(3))/2.+ &
-                  & s(i,4)*m_guess(4)-(m_guess(4)*m_guess(4))/2.
-      end function
-
-      real(kind=db) function sumJ3_X()
-         implicit none
-         sumJ3_X = s(i,1)*m_prime(1)-(m_guess(1)*m_prime(1))/2.+ &
-                 & s(i,2)*m_prime(2)-(m_guess(2)*m_prime(2))/2.+ &
-                 & s(i,3)*m_prime(3)-(m_guess(3)*m_prime(3))/2.+ &
-                 & s(i,4)*m_prime(4)-(m_guess(4)*m_prime(4))/2.
-      end function
-
-   end subroutine
-
-
-
 
    subroutine print_matrix(row,column,matrix)
       integer, intent(in):: row,column
@@ -191,18 +86,11 @@ contains
       b = 1.d0/T
       Z = 0.d0
 
-      !T = 0.1d0
-      ! do while (T<=0.999d0)
-
 
       do i = 1, maxConfig
          Z = Z + (dexp(-b*(H(i))))
       end do
-      !print*, Z,T
-
-      !T = T + 0.1d0
-
-      !end do
+      
    end subroutine
 
 
@@ -241,6 +129,7 @@ contains
       character(len=*), intent(in):: state
       real(kind=db), intent(in):: sigma
       real(kind=db), dimension(num_sites), intent(out):: m
+
 
       if ( state=='AF' ) then
          m = [sigma, -sigma, -sigma, sigma]
@@ -304,10 +193,44 @@ contains
             condition = .false.
          end if
 
+      case default
+         print *, 'State inválido'
 
       end select
 
-
    end function
+
+subroutine Ham_inter_state(state,J2,J3,s,m_guess,H_inter)
+implicit none
+      integer, dimension(maxConfig,num_sites), intent(in):: s
+      integer :: i
+      real(kind=db), intent(in):: J2,J3
+      real(kind=db), dimension(num_sites), intent(in):: m_guess
+      real(kind=db), dimension(maxConfig), intent(out):: H_inter
+      real(kind=db), dimension(num_sites):: m_prime
+      character(len=3), intent(in) :: state
+
+      m_prime = (-1)*m_guess
+
+select case (state)
+case ('AF')
+   do i = 1, maxConfig
+      H_inter(i) = (-2*J1 + J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+   enddo
+case ('SAF')
+   do i = 1, maxConfig
+      H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+   enddo
+case ('SD')
+   do i = 1, maxConfig
+      H_inter(i) = (-2*J1+3*J2+4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
+   enddo
+case ('PM')
+   H_inter = 0
+case default
+   print *, 'State inválido'
+end select
+
+   end subroutine
 
 end module CMF
