@@ -2,29 +2,35 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: J3 = 0.1d0, tol = (10.d0)**(-8)
+   real(kind=db), parameter:: J3 = -0.2d0, tol = (10.d0)**(-8)
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
-   real(kind=db):: Z,T,m,step,error,F
+   real(kind=db):: Z,T,m,step,error,F,Tfinal
    real(kind=db):: J2 
    character(len=5) :: nameFileJ2, nameFileJ3
    character(len=3) :: state
+   integer::i
    !REAL:: time_begin, time_end
 
-   step = (10.d0)**(-3)
-
+   step = (10.d0)**(-5)
 
    
+   
    do
+
+      J2 = 0.0
 
       print*, 'Entre com J2'
       read(*,*) J2
       if ( J2==-1 ) stop 'Fim da rotina'
          
-      print*, 'Entre com a fase (AF,SAF,SD)'
+      print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
 
-           
+      print*, 'Entre com T final'
+      read(*,*)   Tfinal
+
+      i = 0      
 
   !CALL CPU_TIME ( time_begin )
       !-----COMPUTA O TEMPO DE COMPILAÇÃO--------- 
@@ -47,8 +53,8 @@ program normal
       T = 0.1d0
       m = 1.d0    ! chute magnetização!
       
-      do while (T<=4.0d0)
-
+      do while (T<=Tfinal)
+         !print *, T
 
          call mag_vetor(state,m,m_guess)
 
@@ -84,13 +90,26 @@ program normal
 
          call F_helm(T,Z,F)
 
+         !if (m<=tol) then
+            !i = i + 1
+            !if (i==1) then
+           ! print *, T,m
+            !endif
+         !endif
+
+         
+
          write(20,*) T,F,m
 
          T = T + step
 
       enddo
 
-
+      write(*,*) '---------------'
+      print*, 'J2:',J2
+      print*, 'T', T
+      print*, 'Fase', state
+      write(*,*) '------FIM------'
       !-----COMPUTA O TEMPO DE COMPILAÇÃO--------- 
       !CALL CPU_TIME ( time_end )
       !WRITE (*,*) 'Time of operation was ', time_end - time_begin, ' seconds'

@@ -2,8 +2,8 @@ program normal
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites) :: s
-   real(kind=db), parameter:: T=0.825d0, J3=0.2d0
-   real(kind=db):: J2
+   real(kind=db), parameter:: T=1.d0, J3=0.0d0
+   real(kind=db):: J2, J2Final,J2Inicial
    real(kind=db), dimension(maxConfig):: H_intra, H_inter, H
    real(kind=db), dimension(num_sites):: m_guess
    real(kind=db):: Z,m,step,tol,error,F
@@ -13,21 +13,32 @@ program normal
 
    !  não faça a cagada de mudar o STEP. Ass.: Matheus
 
-   stateOne = 'AF'
-   stateTwo = 'SD'
 
    step = (10.d0)**(-5)
    tol = (10.d0)**(-8)
+
+   print*, 'Entre com a fase crescente(AF,SAF,SD)'
+      read(*,*)   stateOne
+
+      print*, 'Entre com J2 inicial'
+      read(*,*)   J2Inicial
+
+      print*, 'Entre com J2 final'
+      read(*,*)   J2Final
+
+   print*, 'Entre com a fase decrescente(AF,SAF,SD)'
+      read(*,*)   stateTwo
+
 
    call base(s)
 
    do i = 1, 2
       if ( i==1 ) then
          state = stateOne
-         J2 = 0.2d0
+         J2 = J2Inicial
       else
          state = stateTwo
-         J2 = 0.4d0
+         J2 = J2Final
          step = step*(-1)
       end if
 
@@ -53,7 +64,7 @@ program normal
 
 
 
-      do while (condition(state,J2))
+      do while (condition(stateOne,stateTwo,J2,J2Final,J2Inicial))
 
 
          m_guess = [m,-m,m,-m]
@@ -61,11 +72,7 @@ program normal
 
          call HAM_INTRA(J2,s,H_intra)
 
-         if ( state=='SD' ) then
-            call HAM_INTER_SD(J2,J3,s,m_guess,H_inter)
-         else
-            call HAM_INTER(J2,J3,s,m_guess,H_inter)
-         end if
+         call  Ham_inter_state(state,J2,J3,s,m_guess,H_inter)
 
          H = H_intra + H_inter
 
@@ -80,11 +87,7 @@ program normal
 
             call mag_vetor(state,m,m_guess)
 
-            if ( state=='SD' ) then
-               call HAM_INTER_SD(J2,J3,s,m_guess,H_inter)
-            else
-               call HAM_INTER(J2,J3,s,m_guess,H_inter)
-            end if
+            call  Ham_inter_state(state,J2,J3,s,m_guess,H_inter)
 
             H = H_intra + H_inter
 
@@ -100,6 +103,8 @@ program normal
          call F_helm(T,Z,F)
 
          write(20,*) J2,F,m
+         !print*, F,m
+         !read(*,*)
          !write(27,*) J2,m
 
 

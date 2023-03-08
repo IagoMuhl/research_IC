@@ -171,23 +171,37 @@ contains
 
    end subroutine
 
-   function condition(state,J2)
+   function condition(stateOne,stateTwo,J2,J2Final,J2Inicial)
       implicit none
       logical:: condition
-      character(len=*):: state
-      real(kind=db), intent(in):: J2
+      character(len=*):: stateOne,stateTwo
+      real(kind=db), intent(in):: J2,J2Final,J2Inicial
 
-      select case (state)
+      select case (stateOne)
        case ('AF')
 
-         if ( J2<=0.40d0 ) then
+         if ( J2<=J2Final) then
             condition = .true.
          else
             condition = .false.
          end if
 
       case ('SD')
-         if ( J2>=0.20d0 ) then
+         if ( J2<=J2Final ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
+
+      case ('PM')
+         if ( J2<=J2Final ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
+
+      case ('SAF')
+         if ( J2<=J2Final ) then
             condition = .true.
          else
             condition = .false.
@@ -198,6 +212,41 @@ contains
 
       end select
 
+      select case (stateTwo)
+      case ('AF')
+
+        if ( J2>=J2Inicial) then
+           condition = .true.
+        else
+           condition = .false.
+        end if
+
+     case ('SD')
+        if ( J2>=J2Inicial ) then
+           condition = .true.
+        else
+           condition = .false.
+        end if
+
+     case ('PM')
+        if ( J2>=J2Inicial ) then
+           condition = .true.
+        else
+           condition = .false.
+        end if
+
+     case ('SAF')
+        if ( J2>=J2Inicial ) then
+           condition = .true.
+        else
+           condition = .false.
+        end if
+
+     case default
+        print *, 'State inválido'
+
+     end select
+
    end function
 
 subroutine Ham_inter_state(state,J2,J3,s,m_guess,H_inter)
@@ -207,15 +256,13 @@ implicit none
       real(kind=db), intent(in):: J2,J3
       real(kind=db), dimension(num_sites), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
-      real(kind=db), dimension(num_sites):: m_prime
       character(len=3), intent(in) :: state
 
-      m_prime = (-1)*m_guess
 
 select case (state)
 case ('AF')
    do i = 1, maxConfig
-      H_inter(i) = (-2*J1 + J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+      H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
    enddo
 case ('SAF')
    do i = 1, maxConfig
@@ -223,7 +270,7 @@ case ('SAF')
    enddo
 case ('SD')
    do i = 1, maxConfig
-      H_inter(i) = (-2*J1+3*J2+4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
+      H_inter(i) = (-2*J1+J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
    enddo
 case ('PM')
    H_inter = 0
