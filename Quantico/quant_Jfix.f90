@@ -1,12 +1,12 @@
-program quant
+program quant_J
    use QUANTICO
    implicit none
 
    real*8, parameter:: J3 = 0.45d0
-   real*8, dimension(2,2):: sigma_z, Id
-   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id
+   real*8, dimension(2,2):: sigma_z, Id, sigma_x
+   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id ! sigma_x_Id, Id_sigma_x
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham
-   real*8, dimension(2**4,2**4):: s1, s2, s3, s4
+   real*8, dimension(2**4,2**4):: s1, s2, s3, s4 !s1_x, s2_x, s3_x, s4_x, s_x, D_x, V_x
    real*8 :: Z, T, T_final, step, m, tol, erro, m_guess, J2, F_helm
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
@@ -15,11 +15,13 @@ program quant
 
    H_1 = 0; H_2 = 0; dim = 2;
 
-   step = 10.d0**(-5); tol = 10.d0**(-8)
+   step = 10.d0**(-5); tol = 10.d0**(-10)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
    sigma_z = reshape([1,0,0,-1],[dim,dim])
+
+   sigma_x = reshape([0,1,1,0],[dim,dim])
 
    Id = reshape([1,0,0,1],[dim,dim])
 
@@ -28,10 +30,18 @@ program quant
    call tensorial(sigma_z,Id,dim,sig_z_Id)
    call tensorial(Id,sigma_z,dim,Id_sig_z)
 
+   ! call tensorial(sigma_x,Id,dim,sigma_x_Id)
+   ! call tensorial(Id,sigma_x,dim,Id_sigma_x)
+
    call tensorial(sig_z_Id,Id_2,dim*dim,s1)
    call tensorial(Id_sig_z,Id_2,dim*dim,s2)
    call tensorial(Id_2,sig_z_Id,dim*dim,s3)
    call tensorial(Id_2,Id_sig_z,dim*dim,s4)
+
+   ! call tensorial(sigma_x_Id,Id_2,dim*dim,s1_x)
+   ! call tensorial(Id_sigma_x,Id_2,dim*dim,s2_x)
+   ! call tensorial(Id_2,sigma_x_Id,dim*dim,s3_x)
+   ! call tensorial(Id_2,Id_sigma_x,dim*dim,s4_x)
 
    call tensorial(Id_2,Id_2,dim*dim,Id_4)
 !---------------- HAMILTONIANA J1-------------------------
@@ -72,6 +82,8 @@ program quant
 
 
 !---------------------------------------------------------
+
+
 
    do
 
@@ -132,10 +144,10 @@ program quant
       end do
 
 
-       if (m<=10.d0**(-5)) then
-          print*, T, m
-          exit
-       end if
+      !  if (m<=10.d0**(-5)) then
+      !     print*, T, m
+      !     exit
+      !  end if
 
       call Free_nrg(T,Z,F_helm)
 
