@@ -4,18 +4,19 @@ program quant_J
 
    real*8, parameter:: J3 = 0.45d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
-   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id ! sigma_x_Id, Id_sigma_x
+   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id!,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham
-   real*8, dimension(2**4,2**4):: s1, s2, s3, s4 !s1_x, s2_x, s3_x, s4_x, s_x, D_x, V_x
+   real*8, dimension(2**4,2**4):: s1, s2, s3, s4 !,s1_x, s2_x, s3_x, s4_x, s_x, D_x, V_x
    real*8 :: Z, T, T_final, step, m, tol, erro, m_guess, J2, F_helm
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
    integer:: dim
 
 
+
    H_1 = 0; H_2 = 0; dim = 2;
 
-   step = 10.d0**(-5); tol = 10.d0**(-10)
+   step = 10.d0**(-5); tol = 10.d0**(-8)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -44,6 +45,9 @@ program quant_J
    ! call tensorial(Id_2,Id_sigma_x,dim*dim,s4_x)
 
    call tensorial(Id_2,Id_2,dim*dim,Id_4)
+
+   !call print_matrix(Id_2,dim*2)
+   
 !---------------- HAMILTONIANA J1-------------------------
 
    !S1*S2
@@ -85,6 +89,16 @@ program quant_J
 
 
 
+   print*, 'cheguei aqui'
+
+
+   ! do i=1,16
+   ! print*, W(i)
+   ! read(*,*)
+   ! enddo
+
+   !call print_matrix ( W, dim**4)
+
    do
 
       J2 = 0.0
@@ -111,7 +125,7 @@ program quant_J
    WRITE (nameFileJ2, '(F5.2)') j2
    WRITE (nameFileJ3, '(F5.2)') j3
 
-   open(unit=20, file=trim(state) // "_T-F_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
+   open(unit=20, file=trim(state) // "_J3(" // trim(adjustl(nameFileJ3)) // ")_T-F-m.dat")
    !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
 
    do while (T<=T_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
