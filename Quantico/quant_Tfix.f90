@@ -116,6 +116,9 @@ program quant_T
 
    do while (J2<=J2_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
+      print*, m_guess
+      read(*,*)
+
       H_intra = J1*H_1 + J2*H_2
 
       call Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
@@ -146,14 +149,14 @@ program quant_T
       end do
 
 
-       if (m<=10.d0**(-5)) then
-          print*, J2, m
-          exit
-       end if
+      !  if (m<=10.d0**(-5)) then
+      !     print*, J2, m
+      !     exit
+      !  end if
 
       call Free_nrg(T,Z,F_helm)
 
-      write(20,*) J2, F_helm, m
+      !write(20,*) J2, F_helm, m
 
       J2 = J2 + step
 

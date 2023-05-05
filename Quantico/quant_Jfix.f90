@@ -2,21 +2,23 @@ program quant_J
    use QUANTICO
    implicit none
 
-   real*8, parameter:: J3 = 0.45d0
+   real*8, parameter:: J3 = 0.0d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
-   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id!,Id_sigma_x, sigma_x_Id
-   real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham
-   real*8, dimension(2**4,2**4):: s1, s2, s3, s4 !,s1_x, s2_x, s3_x, s4_x, s_x, D_x, V_x
-   real*8 :: Z, T, T_final, step, m, tol, erro, m_guess, J2, F_helm
+   real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
+   real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
+   real*8, dimension(2**4,2**4):: s1, s2, s3, s4 ,s1_x, s2_x, s3_x,s4_x,s_x,V!,H,H_prime
+   real*8 :: Z, T, Gama_final, step, m, tol, erro, m_guess, J2, F_helm, F_prime
+   real*8, dimension(16):: W
+   real*8:: Gama,Alfa
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
-   integer:: dim
+   integer:: dim!,i,j
 
 
 
-   H_1 = 0; H_2 = 0; dim = 2;
+   H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   step = 10.d0**(-5); tol = 10.d0**(-8)
+   step = 10.d0**(-3); tol = 10.d0**(-12); T = 10.d0**(-5)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -31,22 +33,27 @@ program quant_J
    call tensorial(sigma_z,Id,dim,sig_z_Id)
    call tensorial(Id,sigma_z,dim,Id_sig_z)
 
-   ! call tensorial(sigma_x,Id,dim,sigma_x_Id)
-   ! call tensorial(Id,sigma_x,dim,Id_sigma_x)
+
+   call tensorial(sigma_x,Id,dim,sigma_x_Id)
+   call tensorial(Id,sigma_x,dim,Id_sigma_x)
 
    call tensorial(sig_z_Id,Id_2,dim*dim,s1)
    call tensorial(Id_sig_z,Id_2,dim*dim,s2)
    call tensorial(Id_2,sig_z_Id,dim*dim,s3)
    call tensorial(Id_2,Id_sig_z,dim*dim,s4)
 
-   ! call tensorial(sigma_x_Id,Id_2,dim*dim,s1_x)
-   ! call tensorial(Id_sigma_x,Id_2,dim*dim,s2_x)
-   ! call tensorial(Id_2,sigma_x_Id,dim*dim,s3_x)
-   ! call tensorial(Id_2,Id_sigma_x,dim*dim,s4_x)
+    call tensorial(sigma_x_Id,Id_2,dim*dim,s1_x)
+    call tensorial(Id_sigma_x,Id_2,dim*dim,s2_x)
+    call tensorial(Id_2,sigma_x_Id,dim*dim,s3_x)
+    call tensorial(Id_2,Id_sigma_x,dim*dim,s4_x)
 
    call tensorial(Id_2,Id_2,dim*dim,Id_4)
 
-   !call print_matrix(Id_2,dim*2)
+   s_x = s1_x + s2_x + s3_x + s4_x
+
+
+   !call print_matrix(s_x,dim**4)
+   
    
 !---------------- HAMILTONIANA J1-------------------------
 
@@ -86,18 +93,7 @@ program quant_J
 
 
 !---------------------------------------------------------
-
-
-
-   print*, 'cheguei aqui'
-
-
-   ! do i=1,16
-   ! print*, W(i)
-   ! read(*,*)
-   ! enddo
-
-   !call print_matrix ( W, dim**4)
+   !call print_matrix(s1,dim**4)
 
    do
 
@@ -113,65 +109,80 @@ program quant_J
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-         T = 0.1d0; T_final = 2.d0;
-      
+         Gama = 0.5d0; Gama_final = 4.d0;
+
          m_guess = 1.d0;
+      
+!---------------------------------------------------------
 
-!-----------------------------------------
+         H_intra = J1*H_1 + J2*H_2
 
-   H_intra = J1*H_1 + J2*H_2
-
-
+!------------------------ OPEN UNIT -----------------
    WRITE (nameFileJ2, '(F5.2)') j2
    WRITE (nameFileJ3, '(F5.2)') j3
 
-   open(unit=20, file=trim(state) // "_J3(" // trim(adjustl(nameFileJ3)) // ")_T-F-m.dat")
+   open(unit=20, file=trim(state) // "GAMA_J3(" // trim(adjustl(nameFileJ3)) // ")_G-F-m.dat")
    !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
+!----------------------------------------------------
 
-   do while (T<=T_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
+   do while (Gama <= Gama_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
-      call Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+      ERRO = 1.d0
+      
+      H_gama = (-1)*Gama*s_x
 
-      Ham = H_intra + H_inter
-
-      call partition(Ham,T,dim,Z)
-
-      call magnetization(Ham,Z,T,dim,s1,m)
-
-
-      ERRO = abs(m_guess - m)
 
       do while (ERRO >= tol)
 
-         m_guess = m
-
          call Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+ 
 
-         Ham = H_intra + H_inter
+         Ham = H_intra + H_inter + H_gama
 
-         call partition(Ham,T,dim,Z)
+         ! call print_matrix(H_inter,dim**4,dim**4)
+         ! read(*,*)
 
-         call magnetization(Ham,Z,T,dim,s1,m)
+         call diagonalization(Ham,V,W)
+
+
+
+         !---------------------- SHIFT DA HAMILTONIANA ----------------
+
+         Alfa = abs(W(1))
+
+         W = W + Alfa
+
+         !---------------------- SHIFT DA HAMILTONIANA ----------------
+
+
+         call partition(W,T,dim,Z)
+
+         call magnetization_diag(W,Z,T,dim,s1,V,m)
 
          ERRO = abs(m_guess - m)
+
+         ! print*, Gama, m_guess, m, erro
+         ! read(*,*)
+
+         m_guess = m
 
       end do
 
 
-      !  if (m<=10.d0**(-5)) then
-      !     print*, T, m
-      !     exit
-      !  end if
 
       call Free_nrg(T,Z,F_helm)
 
-      write(20,*) T, F_helm, m
+      F_prime = (F_helm - Alfa)
 
-      T = T + step
+         print*, Gama, Erro, m
+
+         write(20,*) Gama, F_prime, m
+
+      Gama = Gama + step
 
    end do
 
-      close(20)
+   close(20)
 
    end do
 

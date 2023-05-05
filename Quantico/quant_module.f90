@@ -1,16 +1,18 @@
 module QUANTICO
    implicit none
-   integer, parameter:: J1=1
+   real, parameter:: J1=1.d0
 contains
 
-subroutine print_matrix(A,dim)
+! 3.9289999999996779
+
+subroutine print_matrix(A,dim,din)
       implicit none
-      integer, intent(in):: dim
-      real*8, dimension(dim,dim), intent(in):: A
+      integer, intent(in):: dim,din
+      real*8, dimension(dim,din), intent(in):: A
       integer:: i, j
       do i=1,dim
-         write(*,20)(A(i,j),j=1,dim) !para numeros inteiros (4(I3))
-      20   format (16(F3.0))
+         write(*,20)(A(i,j),j=1,din) !para numeros inteiros (4(I3))
+      20   format (16(1x, F8.4))
       enddo
 end subroutine
 
@@ -38,11 +40,11 @@ subroutine tensorial(A,B,dim,E)
       end do
 end subroutine
 
-subroutine partition(H,T,dim,Z)
+subroutine partition(W,T,dim,Z)
       implicit none
       real*8, intent(out):: Z
       integer, intent(in):: dim
-      real*8, dimension(dim**4,dim**4), intent(in):: H
+      real*8, dimension(dim**4), intent(in):: W
       real*8, intent(in):: T
       real*8:: b
       integer :: i
@@ -50,15 +52,16 @@ subroutine partition(H,T,dim,Z)
       Z = 0.d0
 
       do i = 1, dim**4
-         Z = Z + (dexp(-b*(H(i,i))))
+         Z = Z + (dexp(-b*(W(i))))
       end do
 
 end subroutine
 
-subroutine magnetization(H,Z,T,dim,s1,m)
+subroutine magnetization(W,Z,T,dim,s1,m)
       implicit none
       integer, intent(in):: dim
-      real*8, dimension(dim**4,dim**4), intent(in):: H,s1
+      real*8, dimension(dim**4,dim**4), intent(in):: s1
+      real*8, dimension(dim**4):: W
       real*8, intent(in):: T, Z
       real*8, intent(out):: m
       integer :: i
@@ -68,7 +71,7 @@ subroutine magnetization(H,Z,T,dim,s1,m)
       m = 0
 
       do i = 1, dim**4
-         m = m + s1(i,i)*(dexp(-b*(H(i,i))))
+         m = m + s1(i,i)*(dexp(-b*(W(i))))
       end do
 
       m = m/Z
@@ -78,7 +81,7 @@ end subroutine
 subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
       implicit none
       character(len=3), intent(in):: state
-      real*8, dimension(16,16), intent(in):: s1,s2,s3,s4, Id_4
+      real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
       real*8, intent(in):: J2, J3, m_guess
       real*8, dimension(16,16), intent(out):: H_inter
 
@@ -111,75 +114,96 @@ subroutine Free_nrg(T,Z,F)
 
 end subroutine
 
-SUBROUTINE diagonalization(A, V, D, N)
+subroutine diagonalization(A, V, W)
    IMPLICIT NONE
-   INTEGER, INTENT(IN) :: N
-   REAL*8, INTENT(INOUT) :: A(N,N)
-   REAL*8, INTENT(INOUT) :: V(N,N)
-   REAL*8, INTENT(INOUT) :: D(N,N)
-   INTEGER :: i, j, k, l
-   REAL*8 :: c, s, t, tau, term1, term2
-
-   ! Inicialização das matrizes D e V
-   D = A
-   V = 0.0
-   DO i = 1, N
-       V(i,i) = 1.0
-   END DO
-
-   ! Algoritmo QR com shift de Wilkinson
-   DO l = 1, N-1
-       DO k = 1, 1000*N**2 ! Número máximo de iterações permitidas
-           ! Teste de convergência
-           term1 = ABS(D(l,l)) + ABS(D(l+1,l+1))
-           term2 = 0.0
-           DO i = l+1, N
-               term2 = term2 + ABS(D(i,l))
-           END DO
-           IF (term2 <= 1e-12*term1) EXIT
-           ! Shift de Wilkinson
-           tau = (D(l,l) - D(l+1,l+1))/(2.0*D(l+1,l))
-           IF (tau >= 0.0) THEN
-               t = 1.0/(tau + SQRT(1.0 + tau**2))
-           ELSE
-               t = -1.0/(-tau + SQRT(1.0 + tau**2))
-           END IF
-           c = 1.0/SQRT(1.0 + t**2)
-           s = t*c
-           ! Atualização das matrizes D e V
-           DO i = l+1, N
-               term1 = D(l,i)
-               term2 = D(l+1,i)
-               D(l,i) = c*term1 - s*term2
-               D(l+1,i) = s*term1 + c*term2
-           END DO
-           DO i = 1, N
-               term1 = V(i,l)
-               term2 = V(i,l+1)
-               V(i,l) = c*term1 - s*term2
-               V(i,l+1) = s*term1 + c*term2
-           END DO
-           DO j = l+2, N
-               term1 = D(j,l)
-               term2 = D(j,l+1)
-               D(j,l) = c*term1 - s*term2
-               D(j,l+1) = s*term1 + c*term2
-           END DO
-       END DO
-       IF (k == 1000*N**2) STOP "QR algorithm did not converge"
-   END DO
+   integer, parameter :: dim = 2, LWMAX = 1000
+   real*8, dimension (dim**4,dim**4), intent(in) :: A
+   real*8, dimension(dim**4,dim**4), intent(out):: V
+   ! !!! Para diagonalizar !!!!!
+   character(len=1):: JOBZ , UPLO
+   integer:: N , LDA , INFO , lwork!, i, j
+   real*8, dimension (dim**4), intent(out) :: W
+   real*8, dimension (LWMAX):: WORK
 
 
-   call print_matrix(A,N)
-   read(*,*)
 
-   call print_matrix(V,N)
-   read(*,*)
+   ! Consulte o espa ç o de trabalho ideal .
+   JOBZ = 'V'; UPLO = 'U'
+   N = dim**4 ; LDA = dim**4 ; lwork = -1
 
-   call print_matrix(D,N)
-   read(*,*)
+   call dsyev ( JOBZ , UPLO , N , A , LDA , W , WORK , LWORK , INFO )
 
-END SUBROUTINE
+   V = A
 
+   LWORK = MIN ( LWMAX , INT ( WORK (1) ) )
+
+   ! Resolvendo o problema de autovalores .
+   call dsyev ( JOBZ , UPLO , N , V , LDA , W , WORK , LWORK , INFO )
+
+   ! Checando a converg ê ncia .
+   if ( info > 0 ) then
+   write (* ,*) 'O algoritmo falhou em encontrar os autovalores'
+   stop
+   end if
+
+   ! Print autovalores .
+   ! call print_matrix ( 'eigenvalues' , n , 1 , w , 1)
+
+   !read(*,*)
+
+
+
+   ! ! Print autovetores .
+   ! call print_matrix ( 'Eigenvectors' , n , n , A , LDA )
+
+   !call print_matrix(A,dim**4,dim**4)
+   !call print_matrix(D,dim**4,dim**4)
+
+      
+
+end subroutine
+
+subroutine decompSpectral ( dim , A , P , matrixDiagonal )
+    implicit none
+    ! Inputs
+    integer ,intent (in):: dim
+    real*8 ,dimension (dim,dim), intent (in) :: P , A
+    real*8 ,dimension (dim,dim), intent (out) :: matrixDiagonal
+    ! Variables
+    real*8 ,dimension (dim,dim) :: AP
+   
+    AP = matmul (A , P)
+
+    matrixDiagonal = matmul ( transpose ( P ) , AP )
+end subroutine
+
+subroutine magnetization_diag(W,Z,T,dim,s1,V,m)
+   implicit none
+   integer, intent(in):: dim
+   real*8, dimension(dim**4,dim**4), intent(in):: s1,V
+   real*8, dimension(dim**4,dim**4):: m_prime
+   real*8, dimension(dim**4), intent(in):: W
+   real*8, intent(in):: T, Z
+   real*8, intent(out):: m
+   integer :: i
+   real*8:: b
+
+   b = 1.d0/T
+   m = 0
+   m_prime = 0
+
+   m_prime = matmul(transpose(V),matmul(s1,V))
+   !call print_matrix(m_prime,dim**4,dim**4)
+   !read(*,*)
+
+   do i = 1, dim**4
+
+      m = m + m_prime(i,i)*(dexp(-b*(W(i))))
+
+   end do
+
+   m = m/Z
+
+end subroutine
 
 end module QUANTICO
