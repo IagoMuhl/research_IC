@@ -7,9 +7,9 @@ program quant_J
    real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
    real*8, dimension(2**4,2**4):: s1, s2, s3, s4 ,s1_x, s2_x, s3_x,s4_x,s_x,V!,H,H_prime
-   real*8 :: Z, T, Gama_final, step, m, tol, erro, m_guess, J2, F_helm, F_prime
+   real*8 :: Z, T, Gamma_final, step, m, tol, erro, m_guess, J2, F_helm, F_prime
    real*8, dimension(16):: W
-   real*8:: Gama,Alfa
+   real*8:: Gamma,Alfa
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
    integer:: dim!,i,j
@@ -18,7 +18,7 @@ program quant_J
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   step = 10.d0**(-3); tol = 10.d0**(-12); T = 10.d0**(-5)
+   step = 10.d0**(-3); tol = 10.d0**(-8); T = 10.d0**(-5)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -109,7 +109,7 @@ program quant_J
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-         Gama = 0.5d0; Gama_final = 4.d0;
+         Gamma = 0.5d0; Gamma_final = 4.d0;
 
          m_guess = 1.d0;
       
@@ -121,15 +121,16 @@ program quant_J
    WRITE (nameFileJ2, '(F5.2)') j2
    WRITE (nameFileJ3, '(F5.2)') j3
 
-   open(unit=20, file=trim(state) // "GAMA_J3(" // trim(adjustl(nameFileJ3)) // ")_G-F-m.dat")
+   open(unit=20, file=trim(state) // "_J3_gamma-F-m.dat")
+   !open(unit=20, file=trim(state) // "_J3(" // trim(adjustl(nameFileJ3)) // ")_gamma-F-m.dat")
    !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
 !----------------------------------------------------
 
-   do while (Gama <= Gama_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
+   do while (Gamma <= Gamma_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
       ERRO = 1.d0
       
-      H_gama = (-1)*Gama*s_x
+      H_gama = (-1)*Gamma*s_x
 
 
       do while (ERRO >= tol)
@@ -161,7 +162,7 @@ program quant_J
 
          ERRO = abs(m_guess - m)
 
-         ! print*, Gama, m_guess, m, erro
+         ! print*, Gamma, m_guess, m, erro
          ! read(*,*)
 
          m_guess = m
@@ -174,11 +175,11 @@ program quant_J
 
       F_prime = (F_helm - Alfa)
 
-         print*, Gama, Erro, m
+         print*, Gamma, Erro, m
 
-         write(20,*) Gama, F_prime, m
+         write(20,*) Gamma, F_prime, m
 
-      Gama = Gama + step
+      Gamma = Gamma + step
 
    end do
 
