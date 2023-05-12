@@ -2,7 +2,7 @@ program quant_gamma
    use QUANTICO
    implicit none
 
-   real*8, parameter:: J3 = -0.1d0
+   real*8, parameter:: J3 = -0.3d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
    real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gamma
@@ -18,7 +18,7 @@ program quant_gamma
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   step = 10.d0**(-3); tol = 10.d0**(-8); T = 10.d0**(-5)
+   tol = 10.d0**(-8); T = 10.d0**(-5)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -42,9 +42,9 @@ program quant_gamma
    call tensorial(Id_2,sig_z_Id,dim*dim,s3)
    call tensorial(Id_2,Id_sig_z,dim*dim,s4)
 
-    call tensorial(sigma_x_Id,Id_2,dim*dim,s1_x)
-    call tensorial(Id_sigma_x,Id_2,dim*dim,s2_x)
-    call tensorial(Id_2,sigma_x_Id,dim*dim,s3_x)
+   call tensorial(sigma_x_Id,Id_2,dim*dim,s1_x)
+   call tensorial(Id_sigma_x,Id_2,dim*dim,s2_x)
+   call tensorial(Id_2,sigma_x_Id,dim*dim,s3_x)
    call tensorial(Id_2,Id_sigma_x,dim*dim,s4_x)
 
    call tensorial(Id_2,Id_2,dim*dim,Id_4)
@@ -109,7 +109,9 @@ program quant_gamma
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-         J2 = 0.4d0; J2_final = 0.75d0;
+         J2 = 0.48d0; J2_final = 0.6d0;
+
+         step = 10.d0**(-5); 
 
          m_guess = 1.d0;
       
@@ -174,13 +176,16 @@ program quant_gamma
 
       F_prime = (F_helm - Alfa)
 
-         print*, J2, Erro, m
+      write(*,*) J2
 
          write(20,*) J2, F_prime, m
 
       J2 = J2 + step
 
    end do
+
+   print*, '------------'
+   write(*,*) State, Gamma
 
    close(20)
 

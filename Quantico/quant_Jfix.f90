@@ -2,7 +2,7 @@ program quant_J
    use QUANTICO
    implicit none
 
-   real*8, parameter:: J3 = -0.2d0
+   real*8, parameter:: J3 = -0.3d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
    real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
@@ -18,7 +18,7 @@ program quant_J
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   step = 10.d0**(-3); tol = 10.d0**(-8); T = 10.d0**(-5)
+   tol = 10.d0**(-8); T = 10.d0**(-5)
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -109,7 +109,9 @@ program quant_J
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-         Gamma = 0.5d0; Gamma_final = 5.d0;
+         Gamma = 2.5d0; Gamma_final = 3.d0;
+
+         step = 10.d0**(-3); 
 
          m_guess = 1.d0;
       
