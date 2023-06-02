@@ -99,7 +99,7 @@ program quant_J_gamma
 
       T = 0.0
    
-      print*, 'Entre com J2'
+      print*, 'Entre com T'
          read(*,*) T
          if ( T==-1 ) stop 'Fim da rotina'
             
@@ -111,7 +111,7 @@ program quant_J_gamma
 
          Gamma = 0.d0; 
 
-         Gamma_final = 4.d0;
+         Gamma_final = 8.d0;
 
          step = 10.d0**(-3); 
 
@@ -125,7 +125,7 @@ program quant_J_gamma
    WRITE (nameFileJ2, '(F5.2)') j2
    WRITE (nameFileJ3, '(F5.2)') j3
 
-   open(unit=20, file=trim(state) // "_J3_gamma-F-m.dat")
+   open(unit=20, file=trim(state) // "_T_gamma-F-m.dat")
    !open(unit=20, file=trim(state) // "_J3(" // trim(adjustl(nameFileJ3)) // ")_gamma-F-m.dat")
    !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
 !----------------------------------------------------
