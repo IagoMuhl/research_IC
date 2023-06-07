@@ -12,13 +12,13 @@ program quant_T_J3_gamma
     real*8:: Gamma,Alfa
     character(len=3):: state
     character(len=5) :: nameFileJ2, nameFileJ3
-    integer:: dim!,i,j
+    integer:: dim,i!,j
  
+
  
+    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
- 
-    tol = 10.d0**(-8); Gamma = 1.0d0
+    tol = 10.d0**(-8); Gamma = 2.0d0
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -98,6 +98,7 @@ program quant_T_J3_gamma
     do
  
        T = 0.0
+       i = 0
     
        print*, 'Entre com T'
           read(*,*) T
@@ -109,11 +110,11 @@ program quant_T_J3_gamma
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          J2 = 0.45d0; 
+          J2 = 0.72d0; 
  
-          J2_final = 0.55d0;
+          J2_final = 0.68d0;
  
-          step = 10.d0**(-5); 
+          step = -10.d0**(-5); 
  
           m_guess = 1.d0;
        
@@ -130,7 +131,7 @@ program quant_T_J3_gamma
     !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
  !----------------------------------------------------
  
-    do while (J2 <= J2_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
+    do while (J2 >= J2_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
        ERRO = 1.d0
        
@@ -183,13 +184,26 @@ program quant_T_J3_gamma
           write(*,*) J2 
 
           write(20,*) J2, F_prime, m
- 
+
+         !  if (i==0) then
+         !    if (m>=10.d0**(-4)) then
+         !    print*, '------------'
+         !      write(*,18) J2, T
+         !      18   format ((2x, F8.5))
+         !      i = 1
+         !   end if
+         !   end if
+
+         
+
+
           J2 = J2 + step
  
     end do
     
     print*, '------------'
-    write(*,*) State, T
+    write(*,*) 'State =', State, T
+    print*, '----END-----'
  
     close(20)
  
