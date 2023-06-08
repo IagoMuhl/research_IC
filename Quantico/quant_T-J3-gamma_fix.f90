@@ -18,7 +18,7 @@ program quant_T_J3_gamma
  
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); Gamma = 2.0d0
+    tol = 10.d0**(-8); Gamma = 3.0d0
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -110,9 +110,9 @@ program quant_T_J3_gamma
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          J2 = 0.72d0; 
+          J2 = 0.86d0; 
  
-          J2_final = 0.68d0;
+          J2_final = 0.8d0;
  
           step = -10.d0**(-5); 
  
@@ -181,18 +181,18 @@ program quant_T_J3_gamma
  
        F_prime = (F_helm - Alfa)
  
-          write(*,*) J2 
+          !write(*,*) J2 
 
           write(20,*) J2, F_prime, m
 
-         !  if (i==0) then
-         !    if (m>=10.d0**(-4)) then
-         !    print*, '------------'
-         !      write(*,18) J2, T
-         !      18   format ((2x, F8.5))
-         !      i = 1
-         !   end if
-         !   end if
+           if (i==0) then
+             if (m<=10.d0**(-4)) then
+             print*, '------------'
+               write(*,18) J2, T
+               18   format ((2x, F8.5))
+               i = 1
+             end if
+            end if
 
          
 
