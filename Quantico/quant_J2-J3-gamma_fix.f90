@@ -18,7 +18,7 @@ program quant_J2_J3_gamma
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
 
-   tol = 10.d0**(-8); Gamma = 3.d0
+   tol = 10.d0**(-8); Gamma = 2.d0
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -112,7 +112,7 @@ program quant_J2_J3_gamma
 
          T = 0.1d0; 
 
-         T_final = 3.2d0;
+         T_final = 3.9d0;
 
          step = 10.d0**(-3); 
 
