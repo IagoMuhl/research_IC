@@ -3,7 +3,6 @@ module QUANTICO
    real, parameter:: J1=1.d0
 contains
 
-! 3.9289999999996779
 
 subroutine print_matrix(A,dim,din)
       implicit none
@@ -57,10 +56,10 @@ subroutine partition(W,T,dim,Z)
 
 end subroutine
 
-subroutine magnetization(W,Z,T,dim,s1,m)
+subroutine magnetization(W,Z,T,dim,s,m)
       implicit none
       integer, intent(in):: dim
-      real*8, dimension(dim**4,dim**4), intent(in):: s1
+      real*8, dimension(dim**4,dim**4), intent(in):: s
       real*8, dimension(dim**4):: W
       real*8, intent(in):: T, Z
       real*8, intent(out):: m
@@ -71,31 +70,46 @@ subroutine magnetization(W,Z,T,dim,s1,m)
       m = 0
 
       do i = 1, dim**4
-         m = m + s1(i,i)*(dexp(-b*(W(i))))
+         m = m + s(i,i)*(dexp(-b*(W(i))))
       end do
 
       m = m/Z
 
 end subroutine
 
-subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
       implicit none
       character(len=3), intent(in):: state
       real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
-      real*8, intent(in):: J2, J3, m_guess
+      real*8, intent(in):: J2, J3, m1, m2 , H
       real*8, dimension(16,16), intent(out):: H_inter
 
       H_inter = 0.d0
 
+      if (H/=0.0) then
+
       select case (state)
        case ('AF')
-         H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m_guess*Id_4)*(m_guess)
+         H_inter = (2*J1)*(m2*(s1+s4)+m1*(s2+s3)-(2*m1*m2*Id_4))+(3*J2 + 4*J3)*(m1*(s1+s4-(m1*Id_4))+m2*(s2+s3-(m2*Id_4)))
+
+       case ('PM')
+         H_inter = 0
+      
+       case default
+         print *, 'State inválido'
+       end select
+
+      else
+
+      select case (state)
+       case ('AF')
+         H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m1*Id_4)*(m1)
 
        case ('SAF')
-         H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m_guess*Id_4)*(m_guess)
+         H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m1*Id_4)*(m1)
 
        case ('SD')
-         H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m_guess*Id_4)*(m_guess)
+         H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m1*Id_4)*(m1)
 
        case ('PM')
          H_inter = 0
@@ -103,7 +117,11 @@ subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
          print *, 'State inválido'
       end select
 
+       end if
+
 end subroutine
+
+
 
 subroutine Free_nrg(T,Z,F)
       implicit none
@@ -177,10 +195,10 @@ subroutine decompSpectral ( dim , A , P , matrixDiagonal )
     matrixDiagonal = matmul ( transpose ( P ) , AP )
 end subroutine
 
-subroutine magnetization_diag(W,Z,T,dim,s1,V,m)
+subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    implicit none
    integer, intent(in):: dim
-   real*8, dimension(dim**4,dim**4), intent(in):: s1,V
+   real*8, dimension(dim**4,dim**4), intent(in):: s,V
    real*8, dimension(dim**4,dim**4):: m_prime
    real*8, dimension(dim**4), intent(in):: W
    real*8, intent(in):: T, Z
@@ -192,7 +210,7 @@ subroutine magnetization_diag(W,Z,T,dim,s1,V,m)
    m = 0
    m_prime = 0
 
-   m_prime = matmul(transpose(V),matmul(s1,V))
+   m_prime = matmul(transpose(V),matmul(s,V))
    !call print_matrix(m_prime,dim**4,dim**4)
    !read(*,*)
 

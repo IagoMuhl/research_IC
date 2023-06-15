@@ -18,7 +18,7 @@ program quant_T_J3_gamma
  
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); Gamma = 3.0d0
+    tol = 10.d0**(-8); Gamma = 2.0d0
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -110,11 +110,11 @@ program quant_T_J3_gamma
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          J2 = 0.95d0; 
+          J2 = 0.25d0; 
  
-          J2_final = 0.90d0;
+          J2_final = 0.32d0;
  
-          step = -10.d0**(-5); 
+          step = 10.d0**(-3); 
  
           m_guess = 1.d0;
        
@@ -131,7 +131,7 @@ program quant_T_J3_gamma
     !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
  !----------------------------------------------------
  
-    do while (J2 >= J2_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
+    do while (J2 <= J2_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
        ERRO = 1.d0
        
@@ -189,7 +189,7 @@ program quant_T_J3_gamma
              if (m<=10.d0**(-4)) then
              print*, '------------'
                write(*,18) J2, T
-               18   format ((2x, F8.5))
+               18   format ((F8.5))
                i = 1
              end if
             end if
