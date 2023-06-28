@@ -77,6 +77,31 @@ subroutine magnetization(W,Z,T,dim,s,m)
 
 end subroutine
 
+subroutine mag_vector(state,m1,m)
+   implicit none
+   character(len=3), intent(in):: state
+   real*8, dimension(2),intent(out):: m
+   real*8, intent(in):: m1
+
+   select case(state)
+   case('AF')
+      m = [m1,-m1]
+
+   case ('SAF')
+      m = [m1,m1]
+
+   case ('PM')
+      m = 0
+   
+   case default
+      print *, 'State inválido'
+
+end select
+
+
+
+end subroutine
+
 subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
       implicit none
       character(len=3), intent(in):: state
@@ -86,38 +111,39 @@ subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
 
       H_inter = 0.d0
 
-      if (H/=0.0) then
+      ! if (H/=0.0) then
 
       select case (state)
        case ('AF')
+
          H_inter = (2*J1)*(m2*(s1+s4)+m1*(s2+s3)-(2*m1*m2*Id_4))+(3*J2 + 4*J3)*(m1*(s1+s4-(m1*Id_4))+m2*(s2+s3-(m2*Id_4)))
 
        case ('PM')
          H_inter = 0
       
-       case default
-         print *, 'State inválido'
-       end select
+      !  case default
+      !    print *, 'State inválido'
+!
+         !-H*(s1+s2+s3+s4) 
+!
 
-      else
+! !
+!        case ('AF')
+!          H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m1*Id_4)*(m1)
 
-      select case (state)
-       case ('AF')
-         H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m1*Id_4)*(m1)
+      !  case ('SAF')
+      !    H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m1*Id_4)*(m1)
 
-       case ('SAF')
-         H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m1*Id_4)*(m1)
+      !  case ('SD')
+      !    H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m1*Id_4)*(m1)
 
-       case ('SD')
-         H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m1*Id_4)*(m1)
-
-       case ('PM')
-         H_inter = 0
+      !  case ('PM')
+      !    H_inter = 0
        case default
          print *, 'State inválido'
       end select
 
-       end if
+!
 
 end subroutine
 
@@ -213,6 +239,9 @@ subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    m_prime = matmul(transpose(V),matmul(s,V))
    !call print_matrix(m_prime,dim**4,dim**4)
    !read(*,*)
+
+   ! call print_matrix(m_prime,16,16)
+   ! read(*,*)
 
    do i = 1, dim**4
 

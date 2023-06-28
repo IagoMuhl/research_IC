@@ -4,9 +4,9 @@ program quant_TxH
  
     integer, parameter:: L = 2
     real*8, parameter:: J3 = 0.0d0
-    real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama, H_long
+    real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
     real*8, dimension(2**4,2**4)::  s1, s2, s3, s4 ,s_x,V,s_z
-    real*8 :: Z, T, H_final, step, m, m_guess, tol, erro, m1, m2, J2, F_helm, F_prime
+    real*8 :: Z, T, H_final, step, m, m_guess_1, m_guess_2, tol, erro_tot, erro_1, erro_2, m1, m2, J2, F_helm, F_prime
     real*8, dimension(16):: W
     real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
     real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
@@ -17,7 +17,7 @@ program quant_TxH
 
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); J2 = -1.0d0 ; H = 0
+    tol = 10.d0**(-8); J2 = 0.0d0 ; H = 0
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -131,22 +131,21 @@ program quant_TxH
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          H = 0.5d0; 
+          H = 3.5d0; 
  
-          H_final = 5.d0;
+          H_final = 4.5d0;
  
-          step = 10.d0**(-3); 
+          step = 10.d0**(-5); 
  
-          m_guess = 1.d0;
+          m_guess_1 = 1.d0;
+          m_guess_2 = -1.d0
+    
+          m1 = m_guess_1
+          m2 = m_guess_2
 
-          m1 = m_guess
-          m2 = m_guess
  !---------------------------------------------------------
  
-          H_intra = J1*H_1 + J2*H_2
-
-
-
+          
            H_gama = (-1)*Gamma*s_x
  
  !------------------------ OPEN UNIT -----------------
@@ -160,16 +159,16 @@ program quant_TxH
  
     do while (H <= H_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
  
-       ERRO = 1.d0
+       erro_tot = 1.d0
 
-       H_long = (-1)*H*s_z
+       H_intra = J1*H_1 + J2*H_2 - H*(s_z)
 
-       do while (ERRO >= tol)
+       do while (erro_tot >= tol)
  
           call Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
   
  
-          Ham = H_intra + H_inter + H_gama + H_long
+          Ham = H_intra + H_inter + H_gama
  
           ! call print_matrix(H_inter,dim**4,dim**4)
           ! read(*,*)
@@ -193,25 +192,21 @@ program quant_TxH
          !  read(*,*)
  
           call magnetization_diag(W,Z,T,dim,s1,V,m1)
-
-          if (H/=0) then
-
-         call magnetization_diag(W,Z,T,dim,s2,V,m2)
-
-         m = (m1 + m2)/2
-
-          else 
-
-          m = m1
-
-          end if
  
-          ERRO = abs(m_guess - m)
+          call magnetization_diag(W,Z,T,dim,s2,V,m2)
+          
+
+             m = (abs(m1 - m2))/2.d0
+
+             erro_1 = abs(m_guess_1 - m1)
+             erro_2 = abs(m_guess_2 - m2)
  
-          ! print*, Gamma, m_guess, m, erro
-          ! read(*,*)
- 
-          m_guess = m
+             erro_tot = max(erro_1,erro_2)
+
+
+
+          m_guess_1 = m1
+          m_guess_2 = m2
  
        end do
  
@@ -223,7 +218,7 @@ program quant_TxH
  
           !write(*,*) T
  
-          write(20,*) H, F_prime, m
+          write(20,*) H, F_prime, m, m1, m2
  
           if (i==0) then
              if (abs(m)<=10.d0**(-4)) then

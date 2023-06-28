@@ -37,16 +37,16 @@ contains
 
    end subroutine
 
-   subroutine HAM_INTRA(J2,s,H_intra)
+   subroutine HAM_INTRA(J2,H,s,H_intra)
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
-      real(kind=db), intent(in):: J2
+      real(kind=db), intent(in):: J2, H
       real(kind=db), dimension(maxConfig), intent(out):: H_intra
 
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
          H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,3) + s(i,4)*s(i,3) + s(i,2)*s(i,4)) &
-         & + J2*(s(i,1)*s(i,4) + s(i,3)*s(i,2))
+         & + J2*(s(i,1)*s(i,4) + s(i,3)*s(i,2)) - H*(s(i,1)+s(i,2)+s(i,3)+s(i,4))
 
       end do
       !---------------------HAMILTONIANO INTRA-----------------------------
@@ -95,13 +95,13 @@ contains
 
 
 
-   subroutine magnetization(H,Z,s,T,m)
+   subroutine magnetization(H,Z,s,j,T,m)
       integer, dimension(maxConfig,num_sites), intent(in) :: s
       real(kind=db):: b
       real(kind=db), dimension(maxConfig), intent(in):: H
       real(kind=db), intent(out):: m
       real(kind=db), intent(in):: T, Z
-      integer :: i
+      integer :: i, j
       b = 1.d0/T
       m = 0.d0
 
@@ -109,7 +109,7 @@ contains
 
 
       do i = 1, maxConfig
-         m = m + s(i,1)*(dexp(-b*(H(i))))
+         m = m + s(i,j)*(dexp(-b*(H(i))))
 
       end do
 
@@ -124,21 +124,21 @@ contains
 
 
 
-   subroutine mag_vetor(state,sigma,m)
+   subroutine mag_vetor(state,m1,m2,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), intent(in):: sigma
+      real(kind=db), intent(in):: m1,m2
       real(kind=db), dimension(num_sites), intent(out):: m
 
 
       if ( state=='AF' ) then
-         m = [sigma, -sigma, -sigma, sigma]
+         m = [m1, m2, m2, m1]
       else if (state=='SAF') then
-         m = [sigma, -sigma, sigma, -sigma]
+         m = [m1, m2, m1, m2]
       else if (state=='PM') then
-         m = 0.d0
+         m = [m1,m2,m2,m1]
       else if (state=='SD') then
-         m = [sigma, sigma, -sigma, -sigma]
+         m = [m1, m1, m2, m2]
       end if
 
 
@@ -262,10 +262,17 @@ implicit none
 select case (state)
 case ('AF')
    do i = 1, maxConfig
-      H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
+
+      H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
+      & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
+
+      !H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
    enddo
 case ('SAF')
    do i = 1, maxConfig
+      
+      
+
       H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
    enddo
 case ('SD')

@@ -4,7 +4,7 @@ program quant_HxT
 
    integer, parameter:: L = 2
    real*8, parameter:: J3 = 0.0d0
-   real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama, H_long
+   real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
    real*8, dimension(2**4,2**4)::  s1, s2, s3, s4 ,s_x,V,s_z
    real*8 :: Z, T, T_final, step, m, m_guess_1, m_guess_2, tol, erro_tot,erro_1,erro_2, m1, m2, J2, F_helm, F_prime
    real*8, dimension(16):: W
@@ -17,7 +17,7 @@ program quant_HxT
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -1.0d0 ; H = 0
+   tol = 10.d0**(-8); J2 = 0.0d0 ; H = 0
 !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -131,7 +131,7 @@ program quant_HxT
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-      T = 0.5d0;
+      T = 0.005d0;
 
       T_final = 10.d0;
 
@@ -140,13 +140,14 @@ program quant_HxT
       m_guess_1 = 1.d0;
       m_guess_2 = -1.d0
 
+      
       m1 = m_guess_1
       m2 = m_guess_2
 !---------------------------------------------------------
 
-      H_intra = J1*H_1 + J2*H_2
+      H_intra = J1*H_1 + J2*H_2 - H*s_z
 
-      H_long = (-1)*H*s_z
+      ! H_long = (-1)*H*s_z
 
       H_gama = (-1)*Gamma*s_x
 
@@ -168,10 +169,7 @@ program quant_HxT
 
             call Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
 
-
-
-
-            Ham = H_intra + H_inter + H_gama + H_long
+            Ham = H_intra + H_inter + H_gama
 
             ! call print_matrix(H_inter,dim**4,dim**4)
             ! read(*,*)
@@ -197,13 +195,14 @@ program quant_HxT
             ! print*, 'cheguei', m1, m2, T
             ! read(*,*)
 
+
+
             call magnetization_diag(W,Z,T,dim,s1,V,m1)
+ 
+            call magnetization_diag(W,Z,T,dim,s2,V,m2)
+            
 
-            if (H/=0.0) then
-
-               call magnetization_diag(W,Z,T,dim,s2,V,m2)
-
-               m = (abs(m1-m2))/2
+               m = (abs(m1 - m2))/2.d0
 
                erro_1 = abs(m_guess_1 - m1)
                erro_2 = abs(m_guess_2 - m2)
@@ -211,21 +210,14 @@ program quant_HxT
                erro_tot = max(erro_1,erro_2)
 
 
-            else
-
-               m = m1
-               erro_tot = abs(m_guess_1 - m1)
-
-            end if
-
-            ! print*, Gamma, m_guess, m, erro
-            ! read(*,*)
 
             m_guess_1 = m1
             m_guess_2 = m2
 
          end do
 
+         ! print*, m1, m2, erro_tot
+         ! read(*,*)
 
 
          call Free_nrg(T,Z,F_helm)
@@ -234,7 +226,7 @@ program quant_HxT
 
          !write(*,*) T
 
-         write(20,*) T, F_prime, m
+         write(20,*) T, F_prime, m, m1, m2
 
          if (i==0) then
             if (abs(m)<=10.d0**(-4)) then
