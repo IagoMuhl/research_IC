@@ -102,50 +102,77 @@ end select
 
 end subroutine
 
-subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
-      implicit none
-      character(len=3), intent(in):: state
-      real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
-      real*8, intent(in):: J2, J3, m1, m2 , H
-      real*8, dimension(16,16), intent(out):: H_inter
+subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+   implicit none
+   character(len=3), intent(in):: state
+   real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
+   real*8, intent(in):: J2, J3, m_guess
+   real*8, dimension(16,16), intent(out):: H_inter
 
-      H_inter = 0.d0
+   H_inter = 0.d0
 
-      ! if (H/=0.0) then
+   select case (state)
+    case ('AF')
+      H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m_guess*Id_4)*(m_guess)
 
-      select case (state)
-       case ('AF')
+    case ('SAF')
+      H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m_guess*Id_4)*(m_guess)
 
-         H_inter = (2*J1)*(m2*(s1+s4)+m1*(s2+s3)-(2*m1*m2*Id_4))+(3*J2 + 4*J3)*(m1*(s1+s4-(m1*Id_4))+m2*(s2+s3-(m2*Id_4)))
+    case ('SD')
+      H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m_guess*Id_4)*(m_guess)
 
-       case ('PM')
-         H_inter = 0
-      
-      !  case default
-      !    print *, 'State inválido'
-!
-         !-H*(s1+s2+s3+s4) 
-!
-
-! !
-!        case ('AF')
-!          H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m1*Id_4)*(m1)
-
-      !  case ('SAF')
-      !    H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m1*Id_4)*(m1)
-
-      !  case ('SD')
-      !    H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m1*Id_4)*(m1)
-
-      !  case ('PM')
-      !    H_inter = 0
-       case default
-         print *, 'State inválido'
-      end select
-
-!
+    case ('PM')
+      H_inter = 0
+    case default
+      print *, 'State inválido'
+   end select
 
 end subroutine
+
+! subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
+!       implicit none
+!       character(len=3), intent(in):: state
+!       real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
+!       real*8, intent(in):: J2, J3, m1, m2 , H
+!       real*8, dimension(16,16), intent(out):: H_inter
+
+!       H_inter = 0.d0
+
+!       ! if (H/=0.0) then
+
+!       select case (state)
+!        case ('AF')
+
+!          H_inter = (2*J1)*(m2*(s1+s4)+m1*(s2+s3)-(2*m1*m2*Id_4))+(3*J2 + 4*J3)*(m1*(s1+s4-(m1*Id_4))+m2*(s2+s3-(m2*Id_4)))
+
+!        case ('PM')
+!          H_inter = 0
+      
+!       !  case default
+!       !    print *, 'State inválido'
+! !
+!          !-H*(s1+s2+s3+s4) 
+! !
+
+! ! !
+! !        case ('AF')
+! !          H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m1*Id_4)*(m1)
+
+!       !  case ('SAF')
+!       !    H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m1*Id_4)*(m1)
+
+!       !  case ('SD')
+!       !    H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m1*Id_4)*(m1)
+
+!       !  case ('PM')
+!       !    H_inter = 0
+!        case default
+!          print *, 'State inválido'
+!       end select
+
+! !
+
+! end subroutine
 
 
 
