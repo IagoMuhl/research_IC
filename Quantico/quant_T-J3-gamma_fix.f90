@@ -110,7 +110,7 @@ program quant_T_J3_gamma
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          J2 = 0.6d0; 
+          J2 = 0.63d0; 
  
           J2_final = 0.5d0;
  

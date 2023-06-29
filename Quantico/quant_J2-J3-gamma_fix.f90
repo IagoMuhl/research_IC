@@ -112,9 +112,9 @@ program quant_J2_J3_gamma
 
          T = 0.1d0; 
 
-         T_final = 4.d0;
+         T_final = 3.d0;
 
-         step = 10.d0**(-3); 
+         step = 10.d0**(-5); 
 
          m_guess = 1.d0;
       
