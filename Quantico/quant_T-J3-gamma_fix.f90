@@ -2,7 +2,7 @@ program quant_T_J3_gamma
     use QUANTICO
     implicit none
  
-    real*8, parameter:: J3 = -0.2d0
+    real*8, parameter:: J3 = 0.2d0
     real*8, dimension(2,2):: sigma_z, Id, sigma_x
     real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
     real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
@@ -110,9 +110,9 @@ program quant_T_J3_gamma
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          J2 = 0.48d0; 
+          J2 = 0.68d0; 
  
-          J2_final = 0.53d0;
+          J2_final = 0.72d0;
  
           step = 10.d0**(-5); 
  
