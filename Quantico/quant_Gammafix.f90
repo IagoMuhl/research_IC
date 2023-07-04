@@ -2,7 +2,7 @@ program quant_gamma
    use QUANTICO
    implicit none
 
-   real*8, parameter:: J3 = 0.3d0
+   real*8, parameter:: J3 = 0.4d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
    real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gamma
@@ -12,7 +12,7 @@ program quant_gamma
    real*8:: Gamma,Alfa
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
-   integer:: dim!,i,j
+   integer:: dim, i!,i,j
 
 
 
@@ -98,6 +98,7 @@ program quant_gamma
    do
 
       Gamma = 0.0
+      i = 0
    
       print*, 'Entre com Gamma'
          read(*,*) Gamma
@@ -176,9 +177,18 @@ program quant_gamma
 
       F_prime = (F_helm - Alfa)
 
-      write(*,*) J2
+      !write(*,*) J2
 
          write(20,*) J2, F_prime, m
+
+         if (i==0) then
+            if (m<=10.d0**(-4)) then
+            print*, '------------'
+              write(*,18) T, Gamma
+              18   format ((F8.5))
+              i = 1
+           end if
+           end if
 
       J2 = J2 + step
 

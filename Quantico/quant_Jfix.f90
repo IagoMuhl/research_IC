@@ -2,7 +2,7 @@ program quant_J
    use QUANTICO
    implicit none
 
-   real*8, parameter:: J3 = 0.1d0
+   real*8, parameter:: J3 = 0.4d0
    real*8, dimension(2,2):: sigma_z, Id, sigma_x
    real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama
@@ -12,7 +12,7 @@ program quant_J
    real*8:: Gamma,Alfa
    character(len=3):: state
    character(len=5) :: nameFileJ2, nameFileJ3
-   integer:: dim!,i,j
+   integer:: dim, i!,i,j
 
 
 
@@ -98,6 +98,7 @@ program quant_J
    do
 
       J2 = 0.0
+      i = 0
    
       print*, 'Entre com J2'
          read(*,*) J2
@@ -109,9 +110,9 @@ program quant_J
 !---------------------------------------------------------
 !DECLARAÇÃO DE VALORES INICIAIS
 
-         Gamma = 0.6d0; 
+         Gamma = 0.8d0; 
 
-         Gamma_final = 2.8d0;
+         Gamma_final = 1.6d0;
 
          step = 10.d0**(-5); 
 
@@ -179,9 +180,18 @@ program quant_J
 
       F_prime = (F_helm - Alfa)
 
-         write(*,*) Gamma
+         !write(*,*) Gamma
 
          write(20,*) Gamma, F_prime, m
+
+         if (i==0) then
+            if (m<=10.d0**(-4)) then
+            print*, '------------'
+              write(*,18) T, Gamma
+              18   format ((F8.5))
+              i = 1
+           end if
+           end if
 
       Gamma = Gamma + step
 
