@@ -2,7 +2,7 @@ program quant_Gamma_J2_J3
     use QUANTICO
     implicit none
  
-    real*8, parameter:: J3 = 0.0d0
+    real*8, parameter:: J3 = -0.1d0
     real*8, dimension(2,2):: sigma_z, Id, sigma_x
     real*8, dimension(2*2,2*2):: sig_zz, Id_2, Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
     real*8, dimension(2**4,2**4):: F , H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama, H_long
@@ -18,7 +18,7 @@ program quant_Gamma_J2_J3
  
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); J2 = -1.0d0 ;
+    tol = 10.d0**(-8); J2 = 0.55d0 ;
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -109,8 +109,8 @@ program quant_Gamma_J2_J3
           read(*,*) Gamma
           if ( Gamma==-1 ) stop 'Fim da rotina'
 
-          print*, 'Entre com H'
-          read(*,*) H
+          !print*, 'Entre com H'
+          !read(*,*) H
              
           print*, 'Entre com a fase (AF,SAF,SD,PM)'
           read(*,*)   state
@@ -119,11 +119,11 @@ program quant_Gamma_J2_J3
  !DECLARAÇÃO DE VALORES INICIAIS
 
 
-          T = 2.d0; 
+          T = 1.6d0; 
  
-          T_final = 15.d0;
+          T_final = 1.90d0;
  
-          step = 10.d0**(-3); 
+          step = 10.d0**(-5); 
  
           m_guess = 1.d0;
        

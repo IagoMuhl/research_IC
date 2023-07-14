@@ -3,7 +3,7 @@ program quant_T_J2_J3
     implicit none
  
     integer, parameter:: L = 2
-    real*8, parameter:: J3 = 0.0d0
+    real*8, parameter:: J3 = -0.1d0
     real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama, H_long
     real*8, dimension(2**4,2**4)::  s1, s2, s3, s4 ,s_x,V,s_z
     real*8 :: Z, T, Gamma_final, step, m, tol, erro, m_guess, J2, F_helm, F_prime
@@ -17,7 +17,7 @@ program quant_T_J2_J3
 
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); J2 = -1.0d0 ;
+    tol = 10.d0**(-8); J2 = 0.55d0 ;
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -130,9 +130,9 @@ program quant_T_J2_J3
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          Gamma = 0.5d0; 
+          Gamma = 1.8d0; 
  
-          Gamma_final = 10.d0;
+          Gamma_final = 2.5d0;
  
           step = 10.d0**(-3); 
  
