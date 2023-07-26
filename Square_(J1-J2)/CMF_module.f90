@@ -95,13 +95,14 @@ contains
 
 
 
-   subroutine magnetization(H,Z,s,j,T,m)
+   subroutine magnetization(H,Z,s,site1,site2,T,m)
       integer, dimension(maxConfig,num_sites), intent(in) :: s
       real(kind=db):: b
       real(kind=db), dimension(maxConfig), intent(in):: H
       real(kind=db), intent(out):: m
       real(kind=db), intent(in):: T, Z
-      integer :: i, j
+      integer, intent(in)::site1,site2
+      integer :: i
       b = 1.d0/T
       m = 0.d0
 
@@ -109,7 +110,8 @@ contains
 
 
       do i = 1, maxConfig
-         m = m + s(i,j)*(dexp(-b*(H(i))))
+
+         m = m + (s(i,site1)+s(i,site2))*(dexp(-b*(H(i))))/2.d0
 
       end do
 
@@ -131,15 +133,33 @@ contains
       real(kind=db), dimension(num_sites), intent(out):: m
 
 
-      if ( state=='AF' ) then
+      ! if ( state=='AF' ) then
+      !    m = [m1, m2, m2, m1]
+      ! else if (state=='SAF') then
+      !    m = [m1, m2, m1, m2]
+      ! else if (state=='PM') then
+      !    m = [m1,m2,m2,m1]
+      ! else if (state=='SD') then
+      !    m = [m1, m1, m2, m2]
+      ! end if
+
+      select case (state)
+
+      case ('AF')
          m = [m1, m2, m2, m1]
-      else if (state=='SAF') then
+
+      case ('SAF')
          m = [m1, m2, m1, m2]
-      else if (state=='PM') then
+
+      case ('PM')
          m = [m1,m2,m2,m1]
-      else if (state=='SD') then
+
+      case ('SD')
          m = [m1, m1, m2, m2]
-      end if
+
+      case default
+         write(*,*) 'Inaccurate State'
+      end select
 
 
    end subroutine
@@ -263,17 +283,24 @@ select case (state)
 case ('AF')
    do i = 1, maxConfig
 
-      H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
-      & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
+      H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
+                 & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)**2 + m_guess(2)**2))
+
+
+      ! H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
+      ! & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
 
       !H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
    enddo
 case ('SAF')
    do i = 1, maxConfig
-      
-      
 
-      H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+      !H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+
+      H_inter(i) = 2*J1*((s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(1))*m_guess(1) + (s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(2))*m_guess(2) &
+               & - 2*m_guess(1)*m_guess(2)) & 
+               & + 6*J2*((s(i,1)+s(i,2))*m_guess(2) + (s(i,3)+s(i,4))*m_guess(1) - 2*m_guess(1)*m_guess(2))
+
    enddo
 case ('SD')
    do i = 1, maxConfig

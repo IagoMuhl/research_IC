@@ -1,12 +1,12 @@
 reset
-set terminal lua tikz linewidth 3 standalone
+set terminal lua tikz linewidth 2 standalone
 set output 'dash.tex' 
 set encoding utf8
 
 #Set color line
 set style line 1 lc rgb 'black' pt 7   # circle
 set style line 2 lc rgb '#E8991E'
-set style line 3 lc rgb '#1E90FF'
+set style line 3 lc rgb 'black'
 set style line 5 lc rgb '#1E90FF' dt 4
 set style line 4 lc rgb '#0000CD'
 unset key
@@ -19,7 +19,7 @@ set tics scale 0.5
 
 set ytics 1
 set xrange [0:1]
-set yrange [0:5.5]
+set yrange [0:4.5]
 
 # MACROS
 # x- and ytics for each row resp. column
@@ -35,11 +35,11 @@ YTICS = "set ytics font ',9' offset 1,0; set format y '%.0f'; set ylabel '$T / J
 
 # Placement of the a,b,c,d labels in the graphs
 POS = "at graph 0.02,0.94 font ',8'"
-POS_J3 = "at graph 0.58,0.94 font ',8'"
-POS_PM = "at graph 0.41,0.7 font ',10'"
-POS_AF = "at graph 0.106,0.15 font ',10'"
-POS_SAF = "at graph 0.68,0.15 font ',10'"
-POS_SD = "at graph 0.41,0.08 font ',10'"
+POS_J3 = "at graph 0.64,0.92 font ',8'"
+POS_PM = "at graph 0.39,0.65 font ',10'"
+POS_AF = "at graph 0.06,0.15 font ',10'"
+POS_SAF = "at graph 0.70,0.15 font ',10'"
+POS_SD = "at graph 0.4,0.06 font ',10'"
 
 # Margins for each row resp. column
 TMARGIN = "set tmargin at screen .96; set bmargin at screen 0.56"
@@ -56,27 +56,27 @@ RMARGIN = "set lmargin at screen 0.69; set rmargin at screen 0.99"
 set multiplot layout 2,3 rowsfirst
 
 # --- GRAPH a
-AF = "J3=0.20/AF_J2-T.dat"
-SAF = "J3=0.20/SAF_J2-T.dat"
-AF_SD = "J3=0.20/AF-SD(J2-T).dat"
-SAF_SD = "J3=0.20/SAF-SD(J2-T).dat"
-SD = "J3=0.20/SD_J2-T.dat"
+AF = "Quantico-Math/J3=0.2|Gamma/Gamma = 1/AF-PM(J2-T).dat"
+SAF = "Quantico-Math/J3=0.2|Gamma/Gamma = 1/SAF-PM(J2-T).dat"
+AF_SD = "Quantico-Math/J3=0.2|Gamma/Gamma = 1/AF-SD(J2-T).dat"
+SAF_SD = "Quantico-Math/J3=0.2|Gamma/Gamma = 1/SD-SAF(J2-T).dat"
+SD = "Quantico-Math/J3=0.2|Gamma/Gamma = 1/SD-PM(J2-T).dat"
 
 @NOXTICS; @YTICS; @TMARGIN; ; @LMARGIN
 set label 1 '$a)$' @POS
-set label 2 '$\phantom{-}J_{3} = 0.2$' @POS_J3
-set label 3 "$PM$" @POS_PM
+set label 2 '$\phantom{-}h = 1$' @POS_J3
+set label 7 "$PM$" @POS_PM
 set label 3 "$SD$" @POS_SD
 set label 4 "$AF$" @POS_AF
 set label 5 "$SAF$" @POS_SAF
-set label 6 at 0.6, 2.
-set label 6 "$0.78$" font ',9' tc rgb '#1C1C1C'
+set label 6 at 0.57, 1.6
+set label 6 "$0.77$" font ',9' tc rgb '#1C1C1C'
 
 plot AF using ($1<=0.32?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.78?$1:2/0):2 w l ls 3, \
-    SAF using ($1<=0.78 && $1>=0.6?$1:2/0):2 w l ls 3 dt 4, \
-    "<echo '.78 1.61763'" with points ls 1, \
-    SD using ($1>=0.32?$1:2/0):2 w l ls 3 dt 4,\
+    SAF using ($1>=0.77?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.77 && $1>=0.6?$1:2/0):2 w l ls 3 dt 4, \
+    "<echo '0.77    1.37376 '" with points ls 1, \
+    SD using 1:2 w l ls 3 dt 4,\
     AF_SD using 1:2 w l ls 3 dt 4,\
     SAF_SD using ($1<=0.72?$1:2/0):2 w l ls 3 dt 4,\
     
@@ -84,99 +84,111 @@ plot AF using ($1<=0.32?$1:2/0):2 w l ls 3, \
 
 
 # --- GRAPH b
-AF = "J3=0.10/AF_J2-T.dat"
-SAF = "J3=0.10/SAF_J2-T.dat"
-SD = "J3=0.10/SD_J2-T.dat"
-AF_SD = "J3=0.10/AF-SD(J2-T).dat"
-SAF_SD = "J3=0.10/SAF-SD(J2-T).dat"
+AF = "Quantico-Math/J3=0.2|Gamma/Gamma = 2/AF-PM(J2-T).dat"
+SAF = "Quantico-Math/J3=0.2|Gamma/Gamma = 2/SAF-PM(J2-T).dat"
+
+POS_AF = "at graph 0.18,0.25 font ',10'"
+POS_SAF = "at graph 0.53,0.25 font ',10'"
 
 @NOXTICS; @NOYTICS; @TMARGIN; @CMARGIN 
 set label 1 '$b)$' @POS
-set label 2 '$\phantom{-}J_{3} = 0.1$' @POS_J3
+set label 2 '$\phantom{-}h = 2$' @POS_J3
+set label 4 "$AF$" @POS_AF
+set label 5 "$SAF$" @POS_SAF
+set label 3 "$$" @POS_SD
 set label 6 at 0.55, 2.15
-set label 6 "$0.72$" tc rgb '#1C1C1C'
+set label 6 "$$" tc rgb '#1C1C1C'
+set label 7 "$PM$" @POS_PM
 
 
-plot AF using ($1<=0.43?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.72?$1:2/0):2 w l ls 3, \
-    SAF using ($1<=0.72 && $1>=0.6?$1:2/0):2 w l ls 3 dt 4, \
-    AF_SD using 1:2 w l ls 3 dt 4, \
-    SD using ($1<=0.6 && $1>=0.415?$1:2/0):2 w l ls 3 dt 4, \
-    SAF_SD using 1:2 w l ls 3 dt 4,\
-    "<echo '.72 1.79470'" with points ls 1, \
+plot AF using 1:2 w l ls 3, \
+    SAF using 1:2 w l ls 3, \
+    #"<echo '.72 1.79470'" with points ls 1, \
 
 
 # --- GRAPH c
-AF = "J3=0.00/AF_J2-T.dat"
-SAF = "J3=0.00/SAF_J2-T.dat"
-AF_SAF = "J3=0.00/J2_fix-T.dat"
+AF = "Quantico-Math/J3=0.2|Gamma/Gamma = 3/zero.dat"
+SAF = "Quantico-Math/J3=0.2|Gamma/Gamma = 3/zero.dat"
+
+POS_AF = "at graph 0.065,0.23 font ',10'"
+POS_SAF = "at graph 0.65,0.23 font ',10'"
 
 @TMARGIN; @RMARGIN; @NOXTICS; @NOYTICS
 set label 1 '$c)$' @POS
-set label 2 '$\phantom{-}J_{3} = 0.0$' @POS_J3
+set label 2 '$\phantom{-}h = 3$' @POS_J3
 set label 3 "$$" @POS_SD
-set label 6 at 0.48, 2.35
-set label 6 "$0.66$" tc rgb '#1C1C1C'
+set label 4 "$$" @POS_AF
+set label 5 "$$" @POS_SAF
+set label 7 "$PM$" @POS_PM
+
 
 
 plot AF using ($1<=0.52?$1:2/0):2 w l ls 3, \
     SAF using ($1>=0.66?$1:2/0):2 w l ls 3, \
     SAF using ($1<=0.78 && $1>=0.72?$1:2/0):2 w l ls 3 dt 4, \
-    AF_SAF using 1:2 w l ls 3 dt 4, \
-    "<echo '.655 1.94347'" with points ls 1, \
+
 
 
 # --- GRAPH d
-AF = "J3=-0.10/AF_J2-T.dat"
-SAF = "J3=-0.10/SAF_J2-T.dat"
-AF_SAF = "J3=-0.10/J2_fix-T.dat"
+AF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 1/AF-PM(J2-T).dat"
+SAF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 1/SAF-PM(J2-T).dat"
+AF_SAF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 1/AF-SAF(J2-T).dat"
+
+
+POS_AF = "at graph 0.1,0.23 font ',10'"
+POS_SAF = "at graph 0.66,0.23 font ',10'"
+
 
 @BMARGIN; @LMARGIN; @XTICS; @YTICS
 set label 1 '$d)$' @POS
-set label 2 '$J_{3} = -0.1$' @POS_J3
+set label 2 '$\phantom{-}h = 1$' @POS_J3
+set label 4 "$AF$" @POS_AF
+set label 5 "$SAF$" @POS_SAF
 set label 7 '' @POS_SD
-set label 6 at 0.4, 2.45
-set label 6 "$0.59$" tc rgb '#1C1C1C'
+set label 6 at 0.52, 1.95
+set label 6 "$0.52$" tc rgb '#1C1C1C'
+set label 7 "$PM$" @POS_PM
 
 plot AF using ($1<=0.52?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.59?$1:2/0):2 w l ls 3, \
-    SAF using ($1<=0.59 && $1>=0.52?$1:2/0):2 w l ls 3 dt 4, \
+    SAF using ($1>=0.52?$1:2/0):2 w l ls 3, \
+    SAF using ($1<=0.52 && $1>=0.52?$1:2/0):2 w l ls 3 dt 4, \
     AF_SAF w l ls 3 dt 4, \
-    "<echo '.595 2.11885'" with points ls 1
+    "<echo '0.52    2.07211'" with points ls 1
 
 
 
 # --- GRAPH e
-AF = "J3=-0.20/AF_J2-T.dat"
-SAF = "J3=-0.20/SAF_J2-T.dat"
-AF_SAF = "J3=-0.20/J2_fix-T.dat"
+AF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 2/AF-PM(J2-T).dat"
+SAF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 2/SAF-PM(J2-T).dat"
+AF_SAF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 2/AF-SAF(J2-T).dat"
 
 @BMARGIN; @CMARGIN; @XTICS; @NOYTICS
 set label 1 '$e)$' @POS
-set label 2 '$J_{3} = -0.2$' @POS_J3
-set label 6 at 0.405, 2.8
-set label 6 "$0.53$" tc rgb '#1C1C1C'
+set label 2 '$\phantom{-}h = 2$' @POS_J3
+set label 6 "$$" tc rgb '#1C1C1C'
+set label 7 "$PM$" @POS_PM
 
-plot AF using ($1<=0.518?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.53?$1:2/0):2 w l ls 3, \
-    SAF using ($1<=0.53 && $1>=0.52?$1:2/0):2 w l ls 3 dt 4, \
-    AF_SAF using 1:2 w l ls 3 dt 4, \
-    "<echo '.53 2.26435'" with points ls 1
+plot AF using ($1<=0.51?$1:2/0):2 w l ls 3, \
+    SAF using ($1>=0.51?$1:2/0):2 w l ls 3, \
+    AF_SAF using 1:2 w l ls 3 dt 4
+
     
 
 # --- GRAPH f
-AF = "J3=-0.30/AF_J2-T.dat"
-SAF = "J3=-0.30/SAF_J2-T.dat"
-AF_SAF = "J3=-0.30/J2_fix-T.dat"
+AF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 3/AF-PM(J2-T).dat"
+SAF = "Quantico-Math/J3=-0.2|Gamma/Gamma = 3/SAF-PM(J2-T).dat"
+
 
 @BMARGIN; @RMARGIN; @XTICS; @NOYTICS
 set label 1 '$f)$' @POS
-set label 2 '$J_{3} = -0.3$' @POS_J3
+set label 2 '$\phantom{-}h = 3$' @POS_J3
+set label 4 "$AF$" @POS_AF
+set label 5 "$SAF$" @POS_SAF
 set label 6 ""
+set label 7 "$PM$" @POS_PM
 
-plot AF using ($1<=0.518?$1:2/0):2 w l ls 3, \
-    SAF using ($1>=0.51?$1:2/0):2 w l ls 3, \
-    AF_SAF using 1:($2<=2.9?$2:1/0) w l ls 3 dt 4
+plot AF using 1:2 w l ls 3, \
+    SAF using 1:2 w l ls 3, \
 
 unset multiplot
 ### End multiplot
