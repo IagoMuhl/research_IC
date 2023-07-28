@@ -45,7 +45,7 @@ contains
 
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
-         H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,3) + s(i,4)*s(i,3) + s(i,2)*s(i,4)) &
+         H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,3) + s(i,3)*s(i,4) + s(i,2)*s(i,4)) &
          & + J2*(s(i,1)*s(i,4) + s(i,3)*s(i,2)) - H*(s(i,1)+s(i,2)+s(i,3)+s(i,4))
 
       end do
@@ -90,18 +90,18 @@ contains
       do i = 1, maxConfig
          Z = Z + (dexp(-b*(H(i))))
       end do
-      
+
    end subroutine
 
 
 
-   subroutine magnetization(H,Z,s,site1,site2,T,m)
+   subroutine magnetization(H,Z,s,site1,T,m)
       integer, dimension(maxConfig,num_sites), intent(in) :: s
       real(kind=db):: b
       real(kind=db), dimension(maxConfig), intent(in):: H
       real(kind=db), intent(out):: m
       real(kind=db), intent(in):: T, Z
-      integer, intent(in)::site1,site2
+      integer, intent(in)::site1
       integer :: i
       b = 1.d0/T
       m = 0.d0
@@ -111,7 +111,7 @@ contains
 
       do i = 1, maxConfig
 
-         m = m + (s(i,site1)+s(i,site2))*(dexp(-b*(H(i))))/2.d0
+         m = m + s(i,site1)*dexp(-b*(H(i)))
 
       end do
 
@@ -126,11 +126,13 @@ contains
 
 
 
-   subroutine mag_vetor(state,m1,m2,m)
+   subroutine mag_vetor(state,m1,m2,up,down,m,m_order)
       implicit none
       character(len=*), intent(in):: state
       real(kind=db), intent(in):: m1,m2
       real(kind=db), dimension(num_sites), intent(out):: m
+      integer, intent(out):: up, down
+      real(kind=db), intent(out):: m_order
 
 
       ! if ( state=='AF' ) then
@@ -145,19 +147,39 @@ contains
 
       select case (state)
 
-      case ('AF')
+       case ('AF')
          m = [m1, m2, m2, m1]
 
-      case ('SAF')
+         up = 1
+         down = 2
+
+         m_order = abs(m(up) - m(down))/2.d0
+
+       case ('SAF')
          m = [m1, m2, m1, m2]
 
-      case ('PM')
-         m = [m1,m2,m2,m1]
+         up = 1
+         down = 2
 
-      case ('SD')
+         m_order = abs(m(up) - m(down))/2.d0
+
+       case ('PM')
+         m = [m1,m1,m1,m1]
+
+         up = 1
+         down = 1
+
+         m_order = abs(m(up) + m(down))/2.d0
+
+       case ('SD')
          m = [m1, m1, m2, m2]
 
-      case default
+         up = 1
+         down = 3
+
+         m_order = abs(m(up) - m(down))/2.d0
+
+       case default
          write(*,*) 'Inaccurate State'
       end select
 
@@ -206,112 +228,147 @@ contains
             condition = .false.
          end if
 
-      case ('SD')
+       case ('SD')
          if ( J2<=J2Final ) then
             condition = .true.
          else
             condition = .false.
          end if
 
-      case ('PM')
+       case ('PM')
          if ( J2<=J2Final ) then
             condition = .true.
          else
             condition = .false.
          end if
 
-      case ('SAF')
+       case ('SAF')
          if ( J2<=J2Final ) then
             condition = .true.
          else
             condition = .false.
          end if
 
-      case default
+       case default
          print *, 'State inválido'
 
       end select
 
       select case (stateTwo)
-      case ('AF')
+       case ('AF')
 
-        if ( J2>=J2Inicial) then
-           condition = .true.
-        else
-           condition = .false.
-        end if
+         if ( J2>=J2Inicial) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
 
-     case ('SD')
-        if ( J2>=J2Inicial ) then
-           condition = .true.
-        else
-           condition = .false.
-        end if
+       case ('SD')
+         if ( J2>=J2Inicial ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
 
-     case ('PM')
-        if ( J2>=J2Inicial ) then
-           condition = .true.
-        else
-           condition = .false.
-        end if
+       case ('PM')
+         if ( J2>=J2Inicial ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
 
-     case ('SAF')
-        if ( J2>=J2Inicial ) then
-           condition = .true.
-        else
-           condition = .false.
-        end if
+       case ('SAF')
+         if ( J2>=J2Inicial ) then
+            condition = .true.
+         else
+            condition = .false.
+         end if
 
-     case default
-        print *, 'State inválido'
+       case default
+         print *, 'State inválido'
 
-     end select
+      end select
 
    end function
 
-subroutine Ham_inter_state(state,J2,J3,s,m_guess,H_inter)
-implicit none
+   subroutine Ham_inter_state(J2,s,m_guess,H_inter)
+      implicit none
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
-      real(kind=db), intent(in):: J2,J3
+      real(kind=db), intent(in):: J2
       real(kind=db), dimension(num_sites), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
-      character(len=3), intent(in) :: state
+      !character(len=3), intent(in) :: state
 
 
-select case (state)
-case ('AF')
-   do i = 1, maxConfig
+      ! select case (state)
+      !  case ('AF')
+          do i = 1, maxConfig
 
-      H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
-                 & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)**2 + m_guess(2)**2))
+      !        H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
+      !        & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)*m_guess(1) + m_guess(2)*m_guess(1)))
 
 
-      ! H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
-      ! & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
+             H_inter(i) = J1*(s(i,1)*m_guess(2)+s(i,2)*m_guess(1)-m_guess(1)*m_guess(2) &
+                          &  +   s(i,1)*m_guess(3)+s(i,3)*m_guess(1)-m_guess(1)*m_guess(3) &
+                          &  +   s(i,2)*m_guess(4)+s(i,4)*m_guess(2)-m_guess(2)*m_guess(4) &
+                          &  +   s(i,3)*m_guess(4)+s(i,4)*m_guess(3)-m_guess(3)*m_guess(4)) &
+                          &  + 3*J2*(s(i,1)*m_guess(4)+s(i,4)*m_guess(1)-m_guess(1)*m_guess(4) &
+                          &  +   s(i,2)*m_guess(3)+s(i,3)*m_guess(2)-m_guess(2)*m_guess(3))
 
-      !H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
-   enddo
-case ('SAF')
-   do i = 1, maxConfig
+      !       ! H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
+      !       ! & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
 
-      !H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+      !       !H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
+          enddo
+      ! !  case ('SAF')
+      ! !    do i = 1, maxConfig
 
-      H_inter(i) = 2*J1*((s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(1))*m_guess(1) + (s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(2))*m_guess(2) &
-               & - 2*m_guess(1)*m_guess(2)) & 
-               & + 6*J2*((s(i,1)+s(i,2))*m_guess(2) + (s(i,3)+s(i,4))*m_guess(1) - 2*m_guess(1)*m_guess(2))
+      ! !       !H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
 
-   enddo
-case ('SD')
-   do i = 1, maxConfig
-      H_inter(i) = (-2*J1+J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
-   enddo
-case ('PM')
-   H_inter = 0
-case default
-   print *, 'State inválido'
-end select
+      ! !       H_inter(i) = 2*J1*((s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(1))*m_guess(1) + (s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(2))*m_guess(2) &
+      ! !       & - 2*m_guess(1)*m_guess(2)) &
+      ! !       & + 6*J2*((s(i,1)+s(i,2))*m_guess(2) + (s(i,3)+s(i,4))*m_guess(1) - 2*m_guess(1)*m_guess(2))
+
+      ! !    enddo
+      !  case ('SD')
+      !    do i = 1, maxConfig
+      !       H_inter(i) = (-2*J1+J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
+      !    enddo
+      !  case ('PM')
+      !    do i = 1, maxConfig
+      !       ! H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
+      !       ! & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)**2 + m_guess(2)**2))
+
+      !       H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
+      !        & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)*m_guess(1) + m_guess(2)*m_guess(1)))
+      !    enddo
+      !  case default
+      !    print *, 'State inválido'
+      ! end select
 
    end subroutine
+
+   subroutine order_parameter(state,m,m_order)
+   real(kind=db), dimension(num_sites), intent(in):: m
+   character(len=3), intent(in):: state
+   real(kind=db), intent(out):: m_order
+   
+   select case(state)
+
+   case('AF')
+
+   m_order = (m(1)-m(2)-m(3)+m(4))/num_sites
+
+   case('PM')
+   m_order   = (m(1)+m(2)+m(3)+m(4))/num_sites
+
+   case default
+      print*, 'ERRO'
+
+   end select
+
+end subroutine
+      
 
 end module CMF
