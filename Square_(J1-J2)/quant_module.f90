@@ -77,55 +77,72 @@ subroutine magnetization(W,Z,T,dim,s,m)
 
 end subroutine
 
-subroutine mag_vector(state,m1,m)
+subroutine mag_vetor(state,m1,m2,up,down,m,m_order)
    implicit none
-   character(len=3), intent(in):: state
-   real*8, dimension(2),intent(out):: m
-   real*8, intent(in):: m1
+   character(len=*), intent(in):: state
+   real*8, intent(in):: m1,m2
+   real*8, dimension(4), intent(out):: m
+   integer, intent(out):: up, down
+   real*8, intent(out):: m_order
 
-   select case(state)
-   case('AF')
-      m = [m1,-m1]
 
-   case ('SAF')
-      m = [m1,m1]
+   select case (state)
 
-   case ('PM')
-      m = 0
-   
-   case default
-      print *, 'State inválido'
+    case ('AF')
+      m = [m1, m2, m2, m1]
 
-end select
+      up = 1
+      down = 2
 
+      m_order = abs(m(up) - m(down))/2.d0
+
+    case ('SAF')
+      m = [m1, m2, m1, m2]
+
+      up = 1
+      down = 2
+
+      m_order = abs(m(up) - m(down))/2.d0
+
+    case ('PM')
+      m = [m1,m1,m1,m1]
+
+      up = 1
+      down = 1
+
+      m_order = abs(m(up) + m(down))/2.d0
+
+    case ('SD')
+      m = [m1, m1, m2, m2]
+
+      up = 1
+      down = 3
+
+      m_order = abs(m(up) - m(down))/2.d0
+
+    case default
+      write(*,*) 'Inaccurate State'
+   end select
 
 
 end subroutine
 
-subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+
+subroutine Ham_inter_state(J2,s1,s2,s3,s4,m_guess,Id_4,H_inter)
    implicit none
-   character(len=3), intent(in):: state
    real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
-   real*8, intent(in):: J2, J3, m_guess
+   real*8, dimension(4):: m_guess
+   real*8, intent(in):: J2
    real*8, dimension(16,16), intent(out):: H_inter
 
    H_inter = 0.d0
 
-   select case (state)
-    case ('AF')
-      H_inter = (-2*J1 + 3*J2 + 4*J3)*(s1-s2-s3+s4-2*m_guess*Id_4)*(m_guess)
-
-    case ('SAF')
-      H_inter = (-3*J2 + 4*J3)*(s1-s2+s3-s4-2*m_guess*Id_4)*(m_guess)
-
-    case ('SD')
-      H_inter = (-2*J1 + J2)*(s1+s2-s3-s4-2*m_guess*Id_4)*(m_guess)
-
-    case ('PM')
-      H_inter = 0
-    case default
-      print *, 'State inválido'
-   end select
+   H_inter = J1*(s1*m_guess(2)+s2*m_guess(1)-m_guess(1)*m_guess(2)*Id_4 &
+   &  +   s1*m_guess(3)+s3*m_guess(1)-m_guess(1)*m_guess(3)*Id_4 &
+   &  +   s2*m_guess(4)+s4*m_guess(2)-m_guess(2)*m_guess(4)*Id_4 &
+   &  +   s3*m_guess(4)+s4*m_guess(3)-m_guess(3)*m_guess(4))*Id_4 &
+   &  + 3*J2*(s1*m_guess(4)+s4*m_guess(1)-m_guess(1)*m_guess(4)*Id_4 &
+   &  +   s2*m_guess(3)+s3*m_guess(2)-m_guess(2)*m_guess(3)*Id_4)
 
 end subroutine
 
