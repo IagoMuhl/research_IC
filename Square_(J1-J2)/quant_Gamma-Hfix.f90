@@ -115,7 +115,7 @@ program quant_TGammafix
     do
  
        !T = 10.d0**(-5)
-       Gamma = 4.d0
+       Gamma = 6.d0
        i = 0
  
        !print*, 'Entre com T'
@@ -125,12 +125,19 @@ program quant_TGammafix
        print*, 'Entre com H, Step(-5,-3):'
        read(*,*) H, cd
  
-       print*, 'Entre com T_inicial'
-       !read(*,*) T_inicial
+    !    print*, 'Entre com T_inicial'
+    !    read(*,*) T_inicial
+
+    !    print*, 'Entre com T_final'
+    !    read(*,*) T_final
+
+       !-----------------------
+
         T_inicial = 3.d0
-       print*, 'Entre com T_final'
-       !read(*,*) T_final
-        T_final = 7.d0
+        T_final = 6.d0
+
+        !---------------------
+
        print*, 'Entre com a fase (AF,SAF,SD,PM)'
        read(*,*)   state
  
