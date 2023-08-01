@@ -114,16 +114,19 @@ program quant_TGammafix
 
    do
 
-      T = 10.d0**(-5)
-      !Gamma = 0.0
+      !T = 10.d0**(-5)
+      Gamma = 4.d0
       i = 0
 
       !print*, 'Entre com T'
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
 
-      print*, 'Entre com Gamma, Step(-5,-3):'
-      read(*,*) Gamma, cd
+      print*, 'Entre com T, Step(-5,-3):'
+      read(*,*) T, cd
+
+      ! print*, 'Entre com Gamma, Step(-5,-3):'
+      ! read(*,*) Gamma, cd
 
       print*, 'Entre com H_inicial'
       read(*,*) H_inicial
@@ -214,7 +217,7 @@ program quant_TGammafix
 
          F_prime = (F_helm - Alfa)
 
-         !write(*,*) H_inicial, m_order
+         write(*,*) H_inicial, m_order
 
          write(20,*) H_inicial, F_prime, m_order
 
@@ -239,6 +242,7 @@ program quant_TGammafix
       Print*, 'State =','', state 
       print*, 'H =','', H_inicial
       print*, 'Gamma','',Gamma
+      print*, 'T','',T
       print*, '----END-----'
 
       close(20)
