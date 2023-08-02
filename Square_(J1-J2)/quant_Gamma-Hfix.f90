@@ -115,7 +115,7 @@ program quant_TGammafix
     do
  
        !T = 10.d0**(-5)
-       Gamma = 6.d0
+       Gamma = 7.d0
        i = 0
  
        !print*, 'Entre com T'
@@ -133,8 +133,8 @@ program quant_TGammafix
 
        !-----------------------
 
-        T_inicial = 3.d0
-        T_final = 6.d0
+        T_inicial = 2.d0
+        T_final = 5.d0
 
         !---------------------
 
