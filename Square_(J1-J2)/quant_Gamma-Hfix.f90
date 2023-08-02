@@ -115,7 +115,7 @@ program quant_TGammafix
     do
  
        !T = 10.d0**(-5)
-       Gamma = 7.d0
+       Gamma = 5.d0
        i = 0
  
        !print*, 'Entre com T'
@@ -134,7 +134,7 @@ program quant_TGammafix
        !-----------------------
 
         T_inicial = 2.d0
-        T_final = 5.d0
+        T_final = 6.5d0
 
         !---------------------
 
@@ -223,18 +223,21 @@ program quant_TGammafix
  
           F_prime = (F_helm - Alfa)
  
-          !write(*,*) H_inicial, m_order
+          !write(*,*) T_inicial, m_order
  
           write(20,*) T_inicial, F_prime, m_order
- 
+          
+          if (T_inicial>=1.3*print_T) then
           if (i==0) then
              if (m_order<=10.d0**(-4)) then
-                print*, '------------'
+                print*, '\/------------\/'
                 write(*,18) T_inicial, H
+                print*, '/\------------/\'
  18             format ((F8.5))
                 i = 1
              end if
           end if
+         endif
  
           T_inicial = T_inicial + step
  
