@@ -10,7 +10,7 @@ program quant_TGammafix
    real*8, dimension(4):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: H_inicial,H_final, Alfa, Gamma
+   real*8:: H_inicial,H_final, Alfa, Gamma, print_H
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,up,down,cd!,j
@@ -154,6 +154,8 @@ program quant_TGammafix
       m_fe = 0.5d0;
       m_af = -0.5d0
 
+      print_H = H_inicial
+
       !---------------------------------------------------------
 
       H_intra = J1*H_1 + J2*H_2
@@ -220,18 +222,21 @@ program quant_TGammafix
 
          F_prime = (F_helm - Alfa)
 
-         write(*,*) H_inicial, m_order
+         !write(*,*) H_inicial, m_order
 
          write(20,*) H_inicial, F_prime, m_order
 
-         if (i==0) then
-            if (m_order<=10.d0**(-4)) then
-               print*, '------------'
-               write(*,18) H_inicial, Gamma
-18             format ((F8.5))
-               i = 1
+         if (H_inicial>=1.3*print_H) then
+            if (i==0) then
+               if (m_order<=10.d0**(-4)) then
+                  print*, '\/------------\/'
+                  write(*,18) H_inicial, T
+                  print*, '/\------------/\'
+   18             format ((F8.5))
+                  i = 1
+               end if
             end if
-         end if
+           endif
 
          H_inicial = H_inicial + step
 

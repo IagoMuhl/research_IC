@@ -10,7 +10,7 @@ program quant_THfix
    real*8, dimension(4):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: Gamma_inicial,Gamma_final, Alfa, H
+   real*8:: Gamma_inicial,Gamma_final, Alfa, H, print_gamma
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,up,down,cd!,j
@@ -114,7 +114,7 @@ program quant_THfix
 
    do
 
-      T = 10.d0**(-5)
+      !T = 10.d0**(-5)
       H = 0.0
       i = 0
 
@@ -122,14 +122,20 @@ program quant_THfix
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
 
-      print*, 'Entre com H, Step(-5,-3):'
-      read(*,*) H, cd
+      print*, 'Entre com T, Step(-5,-3):'
+      read(*,*) T, cd
 
-      print*, 'Entre com Gamma_inicial'
-      read(*,*) Gamma_inicial
+      ! print*, 'Entre com H, Step(-5,-3):'
+      ! read(*,*) H, cd
 
-      print*, 'Entre com Gamma_final'
-      read(*,*) Gamma_final
+      ! print*, 'Entre com Gamma_inicial'
+      ! read(*,*) Gamma_inicial
+
+      ! print*, 'Entre com Gamma_final'
+      ! read(*,*) Gamma_final
+
+      Gamma_final = 8.d0
+      Gamma_inicial = 1.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -147,6 +153,8 @@ program quant_THfix
 
       m_fe = 1.d0;
       m_af = -1.d0
+
+      print_gamma = Gamma_inicial
 
       !---------------------------------------------------------
 
@@ -224,14 +232,17 @@ program quant_THfix
 
          write(20,*) Gamma_inicial, F_prime, m_order
 
-         if (i==0) then
-            if (m_order<=10.d0**(-4)) then
-               print*, '------------'
-               write(*,18) H, Gamma_inicial
-18             format ((F8.5))
-               i = 1
+         if (Gamma_inicial>=1.1*print_gamma) then
+            if (i==0) then
+               if (m_order<=10.d0**(-4)) then
+                  print*, '\/------------\/'
+                  write(*,18) Gamma_inicial, T
+                  print*, '/\------------/\'
+   18             format ((F8.5))
+                  i = 1
+               end if
             end if
-         end if
+           endif
 
          Gamma_inicial = Gamma_inicial + step
 
