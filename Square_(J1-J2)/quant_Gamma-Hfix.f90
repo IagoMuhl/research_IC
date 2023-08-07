@@ -116,7 +116,7 @@ program quant_TGammafix
  
        !T = 10.d0**(-5)
        !H = 0.d0
-       Gamma = 1.d0
+       Gamma = 3.d0
        i = 0
  
        !print*, 'Entre com T'
