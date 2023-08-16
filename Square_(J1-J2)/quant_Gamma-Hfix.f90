@@ -116,7 +116,7 @@ program quant_TGammafix
  
        !T = 10.d0**(-5)
        !H = 0.d0
-       Gamma = 3.d0
+       Gamma = 3.33d0
        i = 0
  
        !print*, 'Entre com T'
@@ -227,7 +227,7 @@ program quant_TGammafix
  
           F_prime = (F_helm - Alfa)
  
-          !write(*,*) T_inicial, m_order
+          write(*,*) T_inicial, m_order
  
           write(20,*) T_inicial, F_prime, m_order
           

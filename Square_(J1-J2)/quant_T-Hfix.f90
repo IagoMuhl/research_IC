@@ -114,7 +114,7 @@ program quant_THfix
 
    do
 
-      T = 10.d0**(-5)
+      T = 1.8d0
       !H = 0.0
       i = 0
 
