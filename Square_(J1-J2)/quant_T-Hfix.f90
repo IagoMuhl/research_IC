@@ -17,7 +17,7 @@ program quant_THfix
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -1.d0 ;
+   tol = 10.d0**(-8); J2 = 0.d0 ;
    !---------------------------------------------------------
    ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -114,28 +114,28 @@ program quant_THfix
 
    do
 
-      T = 1.8d0
-      !H = 0.0
+      !T = 10.d0**(-5)
+      H = 0.0
       i = 0
 
       !print*, 'Entre com T'
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
 
-      ! print*, 'Entre com T, Step(-5,-3):'
-      ! read(*,*) T, cd
+      print*, 'Entre com T, Step(-5,-3):'
+      read(*,*) T, cd
 
-      print*, 'Entre com H, Step(-5,-3):'
-      read(*,*) H, cd
+      ! print*, 'Entre com H, Step(-5,-3):'
+      ! read(*,*) H, cd
 
-      print*, 'Entre com Gamma_inicial'
-      read(*,*) Gamma_inicial
+      ! print*, 'Entre com Gamma_inicial'
+      ! read(*,*) Gamma_inicial
 
-      print*, 'Entre com Gamma_final'
-      read(*,*) Gamma_final
+      ! print*, 'Entre com Gamma_final'
+      ! read(*,*) Gamma_final
 
-      ! Gamma_final = 8.d0
-      ! Gamma_inicial = 1.d0
+      Gamma_final = 5.d0
+      Gamma_inicial = 1.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -228,7 +228,7 @@ program quant_THfix
 
          F_prime = (F_helm - Alfa)
 
-         write(*,*) Gamma_inicial, m_order
+         !write(*,*) Gamma_inicial, m_order
 
          write(20,*) Gamma_inicial, F_prime, m_order
 
