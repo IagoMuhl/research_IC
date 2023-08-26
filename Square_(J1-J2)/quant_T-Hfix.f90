@@ -10,14 +10,14 @@ program quant_THfix
    real*8, dimension(4):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: Gamma_inicial,Gamma_final, Alfa, H, print_gamma
+   real*8:: Gamma_inicial,Gamma_final, Alfa, H, print_gamma, erro
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,up,down,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = 0.d0 ;
+   tol = 10.d0**(-10); J2 = -0.1d0 ;
    !---------------------------------------------------------
    ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -114,28 +114,29 @@ program quant_THfix
 
    do
 
-      !T = 10.d0**(-5)
-      H = 0.0
+      T = 10.d0**(-5)
+      ! H = 0.0
       i = 0
+      Alfa = 0.d0
 
       !print*, 'Entre com T'
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
 
-      print*, 'Entre com T, Step(-5,-3):'
-      read(*,*) T, cd
+      ! print*, 'Entre com T, Step(-5,-3):'
+      ! read(*,*) T, cd
 
-      ! print*, 'Entre com H, Step(-5,-3):'
-      ! read(*,*) H, cd
+      print*, 'Entre com H, Step(-5,-3):'
+      read(*,*) H, cd
 
-      ! print*, 'Entre com Gamma_inicial'
-      ! read(*,*) Gamma_inicial
+      print*, 'Entre com Gamma_inicial'
+      read(*,*) Gamma_inicial
 
-      ! print*, 'Entre com Gamma_final'
-      ! read(*,*) Gamma_final
+      print*, 'Entre com Gamma_final'
+      read(*,*) Gamma_final
 
-      Gamma_final = 5.d0
-      Gamma_inicial = 1.d0
+      ! Gamma_final = 5.d0
+      ! Gamma_inicial = 1.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -171,18 +172,17 @@ program quant_THfix
       !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
       !----------------------------------------------------
 
+      call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
+
       do while (Gamma_inicial/=Gamma_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
-         erro1 = 1.d0; erro2 = 1.d0
+         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
 
          H_gama = (-1)*Gamma_inicial*s_x
 
-         do while(max(erro1,erro2) >= tol)
-
-
+         do while (erro >= tol)
 
             call Ham_inter_state(J2,s1,s2,s3,s4,m,Id_4,H_inter)
-
 
             Ham = H_intra + H_inter + H_gama + H_long
 
@@ -192,11 +192,15 @@ program quant_THfix
             call diagonalization(Ham,V,W)
 
 
-            !---------------------- SHIFT DA HAMILTONIANA ----------------
+            !---------------------- SHIFT DA HAMILTONIANA (APENAS EM T=0) ----------------
 
-            Alfa = abs(W(1))
+            if (T<=10.d0**(-3)) then
 
-            W = W + Alfa
+               Alfa = abs(W(1))
+
+               W = W + Alfa
+
+            endif
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
@@ -209,30 +213,43 @@ program quant_THfix
             call magnetization_diag(W,Z,T,dim,s1,V,m_fe)
             call magnetization_diag(W,Z,T,dim,s2,V,m_af)
 
-            erro1 = abs(m_fe - m(up))
-            erro2 = abs(m_af - m(down))
+            ! erro1 = abs(m_fe - m(up))
+            ! erro2 = abs(m_af - m(down))
 
-            if(state=='PM') then
-               erro2 = abs(m_fe - m(down))
-            endif
+            ! if(state=='PM') then
+            ! erro1 = abs(m_fe) - abs(m(up))
+            ! erro2 = abs(m_af) - abs(m(down))
+            ! endif
+
+
+            ! m pode ser positivo ou negativo, então tomamos o módulo de cada, e tiramos a diferença
+            ! mas a diferença pode ser um número negativo (up/down)>(fe/af)
+            ! então tomamos novamento o módulo agora do erro1/erro2, 
+            ! e avaliamos qual é o maior valor, o maior erro.
+            erro1 = abs(m_fe) - abs(m(up))
+            erro2 = abs(m_af) - abs(m(down))
+
+
+            erro = max(abs(erro1),abs(erro2))
+
+            call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
 
             ! print*, Gamma_inicial, m_fe, m, erro
             ! read(*,*)
-            call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
-
          end do
 
 
 
          call Free_nrg(T,Z,F_helm)
 
+         ! APENAS EM T = 0
          F_prime = (F_helm - Alfa)
 
          !write(*,*) Gamma_inicial, m_order
 
          write(20,*) Gamma_inicial, F_prime, m_order
 
-         if (Gamma_inicial>=1.1*print_gamma) then
+
             if (i==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '\/------------\/'
@@ -242,7 +259,7 @@ program quant_THfix
                   i = 1
                end if
             end if
-           endif
+
 
          Gamma_inicial = Gamma_inicial + step
 

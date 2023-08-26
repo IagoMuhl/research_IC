@@ -10,14 +10,14 @@ program quant_TGammafix
     real*8, dimension(4):: m
     real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
     real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-    real*8:: T_inicial,T_final, Alfa, Gamma, print_T
+    real*8:: T_inicial,T_final, Alfa, Gamma, print_T, erro
     character(len=3):: state
     character(len=5) :: nameFileJ2
     integer:: dim,i,up,down,cd!,j
  
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
  
-    tol = 10.d0**(-8); J2 = 0.d0 ;
+    tol = 10.d0**(-8); J2 = -0.1d0 ;   
     !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -115,30 +115,31 @@ program quant_TGammafix
     do
  
        !T = 10.d0**(-5)
-       H = 0.d0
-       !Gamma = 0.d0
+       !H = 0.d0
+       Gamma = 10.d0**(-5)
        i = 0
+       Alfa = 0.d0
  
        !print*, 'Entre com T'
        !read(*,*) T
        !if ( T==-1 ) stop 'Fim da rotina'
  
-      !  print*, 'Entre com H, Step(-5,-3):'
-      !  read(*,*) H, cd
+       print*, 'Entre com H, Step(-5,-3):'
+       read(*,*) H, cd
 
-       print*, 'Entre com Gamma, Step(-5,-3):'
-       read(*,*) Gamma, cd
+      !  print*, 'Entre com Gamma, Step(-5,-3):'
+      !  read(*,*) Gamma, cd
  
-      !  print*, 'Entre com T_inicial'
-      !  read(*,*) T_inicial
+       print*, 'Entre com T_inicial'
+       read(*,*) T_inicial
 
-      !  print*, 'Entre com T_final'
-      !  read(*,*) T_final
+       print*, 'Entre com T_final'
+       read(*,*) T_final
 
        !-----------------------
 
-         T_inicial = 2.1d0
-         T_final = 4.d0
+         ! T_inicial = 2.1d0
+         ! T_final = 4.d0
 
         !---------------------
 
@@ -177,12 +178,14 @@ program quant_TGammafix
        !open(unit=20, file=trim(state) // "_J3(" // trim(adjustl(nameFileJ3)) // ")_gamma-F-m.dat")
        !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
        !----------------------------------------------------
+
+       call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
  
        do while (T_inicial/=T_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
  
-          erro1 = 1.d0; erro2 = 1.d0
+          erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
  
-          do while(max(erro1,erro2) >= tol)
+          do while(erro >= tol)
  
              call Ham_inter_state(J2,s1,s2,s3,s4,m,Id_4,H_inter)
  
@@ -195,9 +198,9 @@ program quant_TGammafix
  
              !---------------------- SHIFT DA HAMILTONIANA ----------------
  
-             Alfa = abs(W(1))
+            !  Alfa = abs(W(1))
  
-             W = W + Alfa
+            !  W = W + Alfa
  
              !---------------------- SHIFT DA HAMILTONIANA ----------------
  
@@ -208,16 +211,16 @@ program quant_TGammafix
  
              call magnetization_diag(W,Z,T_inicial,dim,s1,V,m_fe)
              call magnetization_diag(W,Z,T_inicial,dim,s2,V,m_af)
+
  
-             erro1 = abs(m_fe - m(up))
-             erro2 = abs(m_af - m(down))
- 
-             if(state=='PM') then
-                erro2 = abs(m_fe - m(down))
-             endif
+             erro1 = abs((m_fe)) - abs(m(up))
+             erro2 = abs((m_af)) - abs(m(down))
  
              ! print*, Gamma_inicial, m_fe, m, erro
              ! read(*,*)
+            
+             erro = max(abs(erro1),abs(erro2))
+
              call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
  
           end do
@@ -231,7 +234,7 @@ program quant_TGammafix
  
           write(20,*) T_inicial, F_prime, m_order
           
-          if (T_inicial>=1.1*print_T) then
+
           if (i==0) then
              if (m_order<=10.d0**(-4)) then
                 print*, '\/------------\/'
@@ -241,7 +244,7 @@ program quant_TGammafix
                 i = 1
              end if
           end if
-         endif
+
  
           T_inicial = T_inicial + step
  

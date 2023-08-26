@@ -10,14 +10,14 @@ program quant_TGammafix
    real*8, dimension(4):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: H_inicial,H_final, Alfa, Gamma, print_H
+   real*8:: H_inicial,H_final, Alfa, Gamma, print_H, erro
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,up,down,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = 0.d0 ;
+   tol = 10.d0**(-8); J2 = -0.1d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -114,13 +114,16 @@ program quant_TGammafix
 
    do
 
-      !T = 10.d0**(-5)
+       !T = 10.d0**(-5)
       Gamma = 10.d0**(-5)!3.33d0
       i = 0
-
+      Alfa = 0.d0 
       !print*, 'Entre com T'
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
+
+      ! print*, 'Entre com J2, Step(-5,-3):'
+      ! read(*,*) J2, cd
 
       print*, 'Entre com T, Step(-5,-3):'
       read(*,*) T, cd
@@ -128,14 +131,14 @@ program quant_TGammafix
       ! print*, 'Entre com Gamma, Step(-5,-3):'
       ! read(*,*) Gamma, cd
 
-      ! print*, 'Entre com H_inicial'
-      ! read(*,*) H_inicial
+      print*, 'Entre com H_inicial'
+      read(*,*) H_inicial
 
-      ! print*, 'Entre com H_final'
-      ! read(*,*) H_final
+      print*, 'Entre com H_final'
+      read(*,*) H_final
 
-      H_inicial = 2.5d0
-      H_final = 5.d0
+      ! H_inicial = 3.d0
+      ! H_final = 5.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -171,13 +174,15 @@ program quant_TGammafix
       !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
       !----------------------------------------------------
 
+      call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
+
       do while (H_inicial/=H_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
-         erro1 = 1.d0; erro2 = 1.d0
+         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
 
          H_long = (-1)*H_inicial*s_z
 
-         do while(max(erro1,erro2) >= tol)
+         do while(erro >= tol)
 
             call Ham_inter_state(J2,s1,s2,s3,s4,m,Id_4,H_inter)
 
@@ -190,9 +195,13 @@ program quant_TGammafix
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
-            Alfa = abs(W(1))
+            if (T<=10.d0**(-3)) then
 
-            W = W + Alfa
+               Alfa = abs(W(1))
+
+               W = W + Alfa
+
+            endif
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
@@ -204,15 +213,14 @@ program quant_TGammafix
             call magnetization_diag(W,Z,T,dim,s1,V,m_fe)
             call magnetization_diag(W,Z,T,dim,s2,V,m_af)
 
-            erro1 = abs(m_fe - m(up))
-            erro2 = abs(m_af - m(down))
-
-            if(state=='PM') then
-               erro2 = abs(m_fe - m(down))
-            endif
-
-            ! print*, Gamma_inicial, m_fe, m, erro
-            ! read(*,*)
+            erro1 = abs((m_fe)) - abs(m(up))
+            erro2 = abs((m_af)) - abs(m(down))
+ 
+             ! print*, Gamma_inicial, m_fe, m, erro
+             ! read(*,*)
+            
+            erro = max(abs(erro1),abs(erro2))
+ 
             call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
 
          end do
@@ -222,11 +230,11 @@ program quant_TGammafix
 
          F_prime = (F_helm - Alfa)
 
-         !write(*,*) H_inicial, m_order
+         write(*,*) H_inicial, m_order
 
-         write(20,*) H_inicial, F_prime, m_order
+         write(20,*) H_inicial, F_prime, m_order, m(up), m(down)
 
-         if (H_inicial>=1.1*print_H) then
+
             if (i==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '\/------------\/'
@@ -236,7 +244,7 @@ program quant_TGammafix
                   i = 1
                end if
             end if
-           endif
+
 
          H_inicial = H_inicial + step
 
@@ -251,6 +259,7 @@ program quant_TGammafix
       print*, 'H =','', H_inicial
       print*, 'Gamma','',Gamma
       print*, 'T','',T
+      print*, 'J2','',J2
       print*, '----END-----'
 
       close(20)
