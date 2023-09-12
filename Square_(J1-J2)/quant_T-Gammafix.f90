@@ -5,15 +5,15 @@ program quant_TGammafix
    integer, parameter:: L = 2
    real*8, dimension(2**4,2**4):: H_1, H_2, H_intra, Id_4, H_inter, Ham, H_gama, H_long
    real*8, dimension(2**4,2**4)::  s1, s2, s3, s4 ,s_x,V,s_z
-   real*8 :: Z, T, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, F_prime, m_order
+   real*8 :: Z, T, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, F_prime, m_order, m4, m3, m2, m1
    real*8, dimension(16):: W
    real*8, dimension(4):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: H_inicial,H_final, Alfa, Gamma, print_H, erro
+   real*8:: H_inicial,H_final, Alfa, Gamma, print_H, erro, erro4, erro3
    character(len=3):: state
    character(len=5) :: nameFileJ2
-   integer:: dim,i,up,down,cd!,j
+   integer:: dim,i,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
@@ -155,7 +155,7 @@ program quant_TGammafix
       !DECLARAÇÃO DE VALORES INICIAIS
 
       m_fe = 1.0d0;
-      m_af = -1.d0
+      m_af = -1.0d0;
 
       print_H = H_inicial
 
@@ -174,17 +174,17 @@ program quant_TGammafix
       !open(unit=20, file=trim(state) // "_T-F_J2(" // trim(adjustl(nameFileJ2)) // ")_J3(" // trim(adjustl(nameFileJ3)) // ").dat")
       !----------------------------------------------------
 
-      call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
+      call chose(state,m_fe,m_af,m)
 
       do while (H_inicial/=H_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
-         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
+         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0; erro3 = 1.d0; erro4 = 1.d0
 
          H_long = (-1)*H_inicial*s_z
 
          do while(erro >= tol)
 
-            call Ham_inter_state(J2,s1,s2,s3,s4,m,Id_4,H_inter)
+            call Ham_inter_state(state,J2,s1,s2,s3,s4,m,Id_4,H_inter)
 
             Ham = H_intra + H_inter + H_gama + H_long
 
@@ -192,6 +192,9 @@ program quant_TGammafix
             ! read(*,*)
 
             call diagonalization(Ham,V,W)
+
+            !print*, m
+            !read(*,*)
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
@@ -210,18 +213,25 @@ program quant_TGammafix
             !  print*, m
             !  read(*,*)
 
-            call magnetization_diag(W,Z,T,dim,s1,V,m_fe)
-            call magnetization_diag(W,Z,T,dim,s2,V,m_af)
+            call magnetization_diag(W,Z,T,dim,s1,V,m1)
+            call magnetization_diag(W,Z,T,dim,s2,V,m2)
+            call magnetization_diag(W,Z,T,dim,s3,V,m3)
+            call magnetization_diag(W,Z,T,dim,s4,V,m4)
 
-            erro1 = abs((m_fe)) - abs(m(up))
-            erro2 = abs((m_af)) - abs(m(down))
+
+
+
+            erro1 = abs((m1)) - abs(m(1))
+            erro2 = abs((m2)) - abs(m(2))
+            erro3 = abs((m3)) - abs(m(3))
+            erro4 = abs((m4)) - abs(m(4))
  
-             ! print*, Gamma_inicial, m_fe, m, erro
-             ! read(*,*)
-            
-            erro = max(abs(erro1),abs(erro2))
+            ! erro = max(abs(erro1),abs(erro2))
+
+            erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))
+
  
-            call mag_vetor(state,m_fe,m_af,up,down,m,m_order)
+            call mag_vetor(state,m1,m2,m3,m4,m,m_order)
 
          end do
 
@@ -230,9 +240,9 @@ program quant_TGammafix
 
          F_prime = (F_helm - Alfa)
 
-         write(*,*) H_inicial, m_order
+         !write(*,*) H_inicial, m_order
 
-         write(20,*) H_inicial, F_prime, m_order, m(up), m(down)
+         write(20,*) H_inicial, F_prime, m_order, m1, m2, m3, m4
 
 
             if (i==0) then
