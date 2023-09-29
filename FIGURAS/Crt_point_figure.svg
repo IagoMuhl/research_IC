@@ -22,6 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Qt SVG Document</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -41,8 +42,8 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="0.35355339"
-     inkscape:cx="553.99687"
-     inkscape:cy="462.0586"
+     inkscape:cx="463.43953"
+     inkscape:cy="733.05343"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -66,7 +67,7 @@
     <g
        id="g1446">
       <path
-         style="opacity:1;vector-effect:none;fill:#fa7a7b;fill-opacity:0.54901963;stroke:none;stroke-width:0.75000054;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.75000054, 1.50000108000000010;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
+         style="opacity:1;vector-effect:none;fill:#f6fa7a;fill-opacity:0.54901963;stroke:none;stroke-width:0.75000054;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.75000054, 1.50000108000000010;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
          d="M 82.206151,349.56679 450.86482,178.08284 82.227331,422.80941 Z"
          id="rect2382"
          inkscape:connector-curvature="0"
@@ -78,7 +79,7 @@
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="ccccc" />
       <path
-         style="opacity:1;vector-effect:none;fill:#f6fa7a;fill-opacity:0.54901963;stroke:none;stroke-width:0.75000054;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.75000056, 1.50000110999999992;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
+         style="opacity:1;vector-effect:none;fill:#fa7a7b;fill-opacity:0.54901963;stroke:none;stroke-width:0.75000054;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.75000056, 1.50000110999999992;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
          d="M 82.206151,6.7047139 H 820.89262 L 82.206151,349.56679 Z"
          id="rect2382-9"
          inkscape:connector-curvature="0"
