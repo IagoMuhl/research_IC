@@ -20,7 +20,7 @@ subroutine tensorial(A,B,dim,E)
       integer, intent(in):: dim
       real*8, dimension(dim,dim), intent(in):: A
       real*8, dimension(dim,dim), intent(in):: B
-      real*8, dimension(dim**2,dim**2), intent(out):: E
+      real*8, dimension(dim*dim,dim*dim), intent(out):: E
       integer:: i, j, k, l, alfa, beta
 
       do i = 1,dim
@@ -43,61 +43,61 @@ subroutine partition(W,T,dim,Z)
       implicit none
       real*8, intent(out):: Z
       integer, intent(in):: dim
-      real*8, dimension(dim**4), intent(in):: W
+      real*8, dimension(dim), intent(in):: W
       real*8, intent(in):: T
       real*8:: b
       integer :: i
       b = 1.d0/T
       Z = 0.d0
 
-      do i = 1, dim**4
+      do i = 1, dim
          Z = Z + (dexp(-b*(W(i))))
       end do
 
 end subroutine
 
-subroutine magnetization(W,Z,T,dim,s,m)
-      implicit none
-      integer, intent(in):: dim
-      real*8, dimension(dim**4,dim**4), intent(in):: s
-      real*8, dimension(dim**4):: W
-      real*8, intent(in):: T, Z
-      real*8, intent(out):: m
-      integer :: i
-      real*8:: b
+! subroutine magnetization(W,Z,T,dim,s,m)
+!       implicit none
+!       integer, intent(in):: dim
+!       real*8, dimension(4,4), intent(in):: s
+!       real*8, dimension(4):: W
+!       real*8, intent(in):: T, Z
+!       real*8, intent(out):: m
+!       integer :: i
+!       real*8:: b
 
-      b = 1.d0/T
-      m = 0
+!       b = 1.d0/T
+!       m = 0
 
-      do i = 1, dim**4
-         m = m + s(i,i)*(dexp(-b*(W(i))))
-      end do
+!       do i = 1, dim*2
+!          m = m + s(i,i)*(dexp(-b*(W(i))))
+!       end do
 
-      m = m/Z
+!       m = m/Z
 
-end subroutine
+! end subroutine
 
-subroutine mag_vetor(state,m1,m2,m3,m4,m,m_order)
+subroutine mag_vetor(state,m1,m2,m,m_order)
    implicit none
    character(len=*), intent(in):: state
-   real*8, intent(in):: m1,m2,m3,m4
-   real*8, dimension(4), intent(out):: m
+   real*8, intent(in):: m1,m2
+   real*8, dimension(2), intent(out):: m
    real*8, intent(out):: m_order
 
 
    select case (state)
 
     case ('AF')
-      m = [m1, m2, m3, m4]
+      m = [m1, m2]
 
 
-      m_order = abs(m(1) - m(2) - m(3) + m(4))/4.d0
+      m_order = abs(m(1)-m(2))/2.d0
 
       case ('2AF')
-        m = [m1, m2, m3, m4]
+        m = [m1, m2]
 
   
-        m_order = abs(m(1) - m(2) - m(3) + m(4))/4.d0
+        m_order = abs(m(1)-m(2))/2.d0
 
    !  case ('SAF')
    !    m = [m1, m2, m1, m2]
@@ -106,10 +106,10 @@ subroutine mag_vetor(state,m1,m2,m3,m4,m,m_order)
    !    m_order = abs(m(sigma1) - m(sigma2))/2.d0
 
     case ('PM')
-      m = [m1,m2,m3,m4]
+      m = [m1,m2]
 
 
-      m_order = abs(m(1) + m(2) + m(3) + m(4))/4.d0
+      m_order = abs(m(1)+m(2))/2.d0
 
    !  case ('SD')
    !    m = [m1, m1, m2, m2]
@@ -117,10 +117,10 @@ subroutine mag_vetor(state,m1,m2,m3,m4,m,m_order)
 
    !    m_order = abs(m(sigma1) - m(sigma2))/2.d0
 
-    case ('ZIG')
-      m = [m1, m2, m3, m4]
+   !  case ('ZIG')
+   !    m = [m1, m2, m3, m4]
 
-      m_order = abs(m(1) - m(2) - m(3) - m(4))/4.d0
+   !    m_order = abs(m(1) - m(2) - m(3) - m(4))/4.d0
 
     case default
       write(*,*) 'Inaccurate State'
@@ -128,55 +128,28 @@ subroutine mag_vetor(state,m1,m2,m3,m4,m,m_order)
 end subroutine
 
 
-subroutine Ham_inter_state(state,J2,s1,s2,s3,s4,m_guess,Id_4,H_inter)
+subroutine Ham_inter_state(J2,s1,m_guess,Id,H_inter)
    implicit none
-   real*8, dimension(16,16), intent(in):: s1,s2,s3,s4,Id_4
-   real*8, dimension(4):: m_guess, m_reverse
+   real*8, dimension(2,2), intent(in):: s1,Id
+   real*8, dimension(2):: m_guess
    real*8, intent(in):: J2
-   real*8, dimension(16,16), intent(out):: H_inter
-   character(len=3), intent(in):: state
-   integer:: i
+   real*8, dimension(2,2), intent(out):: H_inter
+
 
    H_inter = 0.d0
 
+
+   H_inter =  4*J1*(s1*m_guess(2)-(m_guess(1)*m_guess(2)*Id)/2.d0)
+
+
+   H_inter = H_inter + 4*J2*(s1*m_guess(1)-(m_guess(1)*m_guess(1)*Id)/2.d0) 
    
 
-   if (state=='ZIG') then
-
-      do i=1,4
-         m_reverse(i) = (-1)*m_guess(i)
-      enddo
-
-      H_inter = J2*(s1*m_guess(4)+s4*m_guess(1)-m_guess(1)*m_guess(4)*Id_4 + &
-      & (s1*m_reverse(4)+s4*m_guess(1)-m_guess(1)*m_reverse(4)*Id_4) + &
-      & (s4*m_reverse(1)+s1*m_guess(4)-m_guess(4)*m_reverse(1)*Id_4) + &
-      &  (s2*m_guess(3)+s3*m_guess(2)-m_guess(2)*m_guess(3)*Id_4) + &
-      & (s2*m_reverse(3)+s3*m_guess(2)-m_guess(2)*m_reverse(3)*Id_4) + &
-      & (s3*m_reverse(2)+s2*m_guess(3)-m_guess(3)*m_reverse(2))*Id_4)
-
-      H_inter = H_inter + J1*(s1*m_reverse(2)+s2*m_guess(1)-m_guess(1)*m_reverse(2)*Id_4 &
-      &  +   s1*m_reverse(3)+s3*m_guess(1)-m_guess(1)*m_reverse(3)*Id_4 &
-      &  +   s2*m_reverse(4)+s4*m_guess(2)-m_guess(2)*m_reverse(4)*Id_4 &
-      &  +   s2*m_reverse(1)+s1*m_guess(2)-m_guess(2)*m_reverse(1)*Id_4 &
-      &  +   s3*m_reverse(4)+s4*m_guess(3)-m_guess(3)*m_reverse(4)*Id_4 &
-      &  +   s3*m_reverse(1)+s1*m_guess(3)-m_guess(3)*m_reverse(1)*Id_4 &
-      &  +   s4*m_reverse(2)+s2*m_guess(4)-m_guess(4)*m_reverse(2)*Id_4 &
-      &  +   s4*m_reverse(3)+s3*m_guess(4)-m_guess(4)*m_reverse(3)*Id_4)
- 
-      
-   else
-
-   H_inter =  J1*(s1*m_guess(2)+s2*m_guess(1)-m_guess(1)*m_guess(2)*Id_4 &
-   &  +   s1*m_guess(3)+s3*m_guess(1)-m_guess(1)*m_guess(3)*Id_4 &
-   &  +   s2*m_guess(4)+s4*m_guess(2)-m_guess(2)*m_guess(4)*Id_4 &
-   &  +   s3*m_guess(4)+s4*m_guess(3)-m_guess(3)*m_guess(4))*Id_4 
-   
-   H_inter = H_inter + 3*J2*(s1*m_guess(4)+s4*m_guess(1)-m_guess(1)*m_guess(4)*Id_4 &
-   &  +   s2*m_guess(3)+s3*m_guess(2)-m_guess(2)*m_guess(3)*Id_4)!&
    ! &  + 3*J2*(s1*m_guess(4)+s4*m_guess(1)-m_guess(1)*m_guess(4)*Id_4 &
    ! &  +   s2*m_guess(3)+s3*m_guess(2)-m_guess(2)*m_guess(3)*Id_4)
-   end if
 
+      !  H_inicial = 1.5d0
+      !  H_final = 8.d0
 end subroutine
 
 ! subroutine Ham_inter_state(state,J2,J3,s1,s2,s3,s4,H,m1,m2,Id_4,H_inter)
@@ -226,22 +199,22 @@ end subroutine
 
 subroutine chose(state,m_fe,m_af,m_guess)
 real*8, intent(in):: m_fe, m_af
-real*8, dimension(4),intent(out):: m_guess
+real*8, dimension(2),intent(out):: m_guess
 character(len=3), intent(in):: state
 
 select case(state)
 
 case('AF')
-m_guess = [m_fe,m_af,m_af,m_fe]
+m_guess = [m_fe,m_af]
 
 case('2AF')
-m_guess = [m_fe,m_af,m_af,m_fe]
+m_guess = [m_fe,m_af]
 
 case('PM')
-m_guess = [m_fe,m_fe,m_fe,m_fe]
+m_guess = [m_fe,m_fe]
 
-case('ZIG')
-m_guess = [m_fe,m_af,m_af,m_af]
+! case('ZIG')
+! m_guess = [m_fe,m_af,m_af,m_af]
 
 case default
    print*, 'Estado não encontrado'
@@ -262,19 +235,19 @@ end subroutine
 subroutine diagonalization(A, V, W)
    IMPLICIT NONE
    integer, parameter :: dim = 2, LWMAX = 1000
-   real*8, dimension (dim**4,dim**4), intent(in) :: A
-   real*8, dimension(dim**4,dim**4), intent(out):: V
+   real*8, dimension (2,2), intent(in) :: A
+   real*8, dimension(2,2), intent(out):: V
    ! !!! Para diagonalizar !!!!!
    character(len=1):: JOBZ , UPLO
    integer:: N , LDA , INFO , lwork!, i, j
-   real*8, dimension (dim**4), intent(out) :: W
+   real*8, dimension (2), intent(out) :: W
    real*8, dimension (LWMAX):: WORK
 
 
 
    ! Consulte o espa ç o de trabalho ideal .
    JOBZ = 'V'; UPLO = 'U'
-   N = dim**4 ; LDA = dim**4 ; lwork = -1
+   N = 2 ; LDA = 2 ; lwork = -1
 
    call dsyev ( JOBZ , UPLO , N , A , LDA , W , WORK , LWORK , INFO )
 
@@ -308,26 +281,26 @@ subroutine diagonalization(A, V, W)
 
 end subroutine
 
-subroutine decompSpectral ( dim , A , P , matrixDiagonal )
-    implicit none
-    ! Inputs
-    integer ,intent (in):: dim
-    real*8 ,dimension (dim,dim), intent (in) :: P , A
-    real*8 ,dimension (dim,dim), intent (out) :: matrixDiagonal
-    ! Variables
-    real*8 ,dimension (dim,dim) :: AP
+! subroutine decompSpectral ( dim , A , P , matrixDiagonal )
+!     implicit none
+!     ! Inputs
+!     integer ,intent (in):: dim
+!     real*8 ,dimension (dim,dim), intent (in) :: P , A
+!     real*8 ,dimension (dim,dim), intent (out) :: matrixDiagonal
+!     ! Variables
+!     real*8 ,dimension (dim,dim) :: AP
    
-    AP = matmul (A , P)
+!     AP = matmul (A , P)
 
-    matrixDiagonal = matmul ( transpose ( P ) , AP )
-end subroutine
+!     matrixDiagonal = matmul ( transpose ( P ) , AP )
+! end subroutine
 
 subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    implicit none
    integer, intent(in):: dim
-   real*8, dimension(dim**4,dim**4), intent(in):: s,V
-   real*8, dimension(dim**4,dim**4):: m_prime
-   real*8, dimension(dim**4), intent(in):: W
+   real*8, dimension(dim,dim), intent(in):: s,V
+   real*8, dimension(dim,dim):: m_prime
+   real*8, dimension(dim), intent(in):: W
    real*8, intent(in):: T, Z
    real*8, intent(out):: m
    integer :: i
@@ -344,7 +317,7 @@ subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    ! call print_matrix(m_prime,16,16)
    ! read(*,*)
 
-   do i = 1, dim**4
+   do i = 1, dim
 
       m = m + m_prime(i,i)*(dexp(-b*(W(i))))
 
