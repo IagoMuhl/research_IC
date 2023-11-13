@@ -3,7 +3,7 @@ program quant_HGammafix
    implicit none
 
    integer, parameter:: L = 2
-   real*8, dimension(2,2):: H_1, H_2, H_intra, H_inter_1,H_inter_2, H_gama, H_long
+   real*8, dimension(2,2):: H_1, H_2, H_intra, H_inter_1,H_inter_2, H_gamma, H_long
    real*8, dimension(2,2)::  V,V2!s_x
    real*8 :: Z, H, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, F_prime, m_order, m2, m1
    real*8, dimension(2):: W,W2
@@ -17,7 +17,7 @@ program quant_HGammafix
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -0.6d0 ;  
+   tol = 10.d0**(-8); J2 = -1.d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -112,8 +112,8 @@ program quant_HGammafix
 
    do
 
-       !T = 10.d0**(-5)
-      Gamma = 10.d0**(-5)!3.33d0
+      Gamma = 3.d0
+      !H = 10.d0**(-5)!3.33d0
       i = 0
       Alfa = 0.d0 
       Alfa2 = 0.d0 
@@ -132,14 +132,14 @@ program quant_HGammafix
       ! print*, 'Entre com Gamma, Step(-5,-3):'
       ! read(*,*) Gamma, cd
 
-      print*, 'Entre com T_inicial'
-      read(*,*) T_inicial
+      ! print*, 'Entre com T_inicial'
+      ! read(*,*) T_inicial
 
-      print*, 'Entre com T_final'
-      read(*,*) T_final
+      ! print*, 'Entre com T_final'
+      ! read(*,*) T_final
 
-      ! T_inicial = 4.5d0
-      ! T_final = 8.d0
+      T_inicial = 1.d0
+      T_final = 10.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -155,23 +155,21 @@ program quant_HGammafix
       !---------------------------------------------------------
       !DECLARAÇÃO DE VALORES INICIAIS
 
+   if(state/='2AF') then
       m_fe = 1.0d0;
       m_af = -1.0d0;
+     else
+        m_fe = 0.99099828895786968 !Para transições AF-->AF
+        m_af =  0.44969820018918100 
+     endif
 
 
 
-      ! print_H = H_inicial
 
-      ! call print_matrix(s1,4,4)
-      ! print*, '------------------'
-      ! read(*,*)
-      ! call print_matrix(s2,4,4)
-      ! read(*,*)
-      !---------------------------------------------------------
 
       H_intra = 0.d0
 
-       H_gama = 0.d0!(-1)*Gamma*s_x
+       H_gamma = (-1)*Gamma*sigma_x
 
 
 
@@ -201,7 +199,7 @@ program quant_HGammafix
             ! print*, m, erro1
             !  read(*,*)
 
-            !!Ham = H_intra + H_inter_1 + H_gama + H_long !+ H_inter_2
+            !!Ham = H_intra + H_inter_1 + H_gamma + H_long !+ H_inter_2
 
             !  call print_matrix(H_inter_1,dim,dim)
             !  read(*,*)
@@ -209,8 +207,8 @@ program quant_HGammafix
             !  call print_matrix(H_inter_2,dim,dim)
             !  read(*,*)
 
-            H_inter_1 = H_inter_1 + H_long
-            H_inter_2 = H_inter_2 + H_long
+            H_inter_1 = H_inter_1 + H_long + H_gamma
+            H_inter_2 = H_inter_2 + H_long + H_gamma
 
 
             call diagonalization(H_inter_1,V,W)

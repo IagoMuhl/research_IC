@@ -13,11 +13,11 @@ program quant_T_J2_J3
     real*8:: Gamma, Alfa, H
     character(len=3):: state
     character(len=5) :: nameFileJ2, nameFileJ3
-    integer:: dim,i!,j
+    integer:: dim,i,cd!,j
 
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2; 
  
-    tol = 10.d0**(-8); J2 = 0.55d0 ;
+    tol = 10.d0**(-8);
  !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -111,18 +111,27 @@ program quant_T_J2_J3
  !---------------------------------------------------------
 
  
-    do
+   !  do
  
-       T = 0.0
+       T = 10.d0**(-5)
        H = 0.0
        i = 0
  
-       print*, 'Entre com T'
-          read(*,*) T
-          if ( T==-1 ) stop 'Fim da rotina'
+      !  print*, 'Entre com T'
+      !     read(*,*) T
+         !  if ( T==-1 ) stop 'Fim da rotina'
 
       !   print*, 'Entre com H'
       !      read(*,*) H
+             
+          print*, 'Entre com J2, step'
+          read(*,*)   J2, cd
+
+          print*, 'Entre com Gamma'
+          read(*,*)   Gamma
+
+          print*, 'Entre com Gamma_final'
+          read(*,*)   Gamma_final
              
           print*, 'Entre com a fase (AF,SAF,SD,PM)'
           read(*,*)   state
@@ -130,11 +139,11 @@ program quant_T_J2_J3
  !---------------------------------------------------------
  !DECLARAÇÃO DE VALORES INICIAIS
  
-          Gamma = 1.8d0; 
+         !  Gamma = 1.8d0; 
  
-          Gamma_final = 2.5d0;
+         !  Gamma_final = 2.5d0;
  
-          step = 10.d0**(-3); 
+          step = 10.d0**(-cd); 
  
           m_guess = 1.d0;
        
@@ -227,7 +236,7 @@ program quant_T_J2_J3
  
     close(20)
  
-    end do
+   !  end do
  
  
  end program
