@@ -112,7 +112,7 @@ program quant_HGammafix
 
    do
 
-      Gamma = 3.d0
+      Gamma = 5.d0
       !H = 10.d0**(-5)!3.33d0
       i = 0
       Alfa = 0.d0 

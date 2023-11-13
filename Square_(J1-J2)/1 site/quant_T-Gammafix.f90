@@ -113,7 +113,7 @@ program quant_TGammafix
    do
 
        !T = 10.d0**(-5)
-      Gamma = 3.d0
+      Gamma = 5.d0
       i = 0
       Alfa = 0.d0 
       Alfa2 = 0.d0 
