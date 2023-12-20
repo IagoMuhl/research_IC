@@ -17,7 +17,7 @@ program quant_HGammafix
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -0.55d0 ;  
+   tol = 10.d0**(-8); J2 = -0.54d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -262,16 +262,25 @@ program quant_HGammafix
 
          end do
 
+         !W0 = ((W+W2)/2.d0)
+         !Z0 = ((Z+Z2)/2.d0)
+
+
+         !call int_energy(dim,W0,T_inicial,Z0,U0)
 
 
          call Free_nrg(T_inicial,Z,F_helm)
          call Free_nrg(T_inicial,Z2,F_prime)
 
          !F_prime = (F_helm - Alfa)
-         F = (F_helm + F_prime)/2.d0
+         F = (F_helm + F_prime)/2.d0 - (Alfa + Alfa2)/2.d0
+
+
          !write(*,*) T_inicial, m_order
 
-         write(20,*) T_inicial, F, m_order, m1, m2
+         !call entropy (U0, F, T_inicial, S0)
+
+         write(20,*)  T_inicial, F, m_order, m1, m2
 
 
             if (i==0) then

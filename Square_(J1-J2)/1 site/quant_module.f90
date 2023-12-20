@@ -327,6 +327,41 @@ subroutine magnetization_diag(W,Z,T,dim,s,V,m)
 
 end subroutine
 
+subroutine int_energy(dim,W,T,Z,U)
+integer, intent(in):: dim
+real*8, dimension (dim), intent(in) :: W
+real*8, intent(in):: T, Z
+real*8, intent(out):: U
+integer:: i
+U = 0.d0
 
+   do i = 1,dim
+
+   U = U + W(i)*(dexp(-W(i)/T))
+
+   enddo
+
+   U = U/Z
+
+end subroutine
+
+
+subroutine especific_heat(step,T,U,Uo,Cv)
+real*8, intent(in):: step, T, U, Uo
+real*8, intent(out):: Cv
+
+
+Cv = (U-Uo)/(T -(step/2.d0))
+
+
+end subroutine
+
+subroutine entropy(U,F,T,S)
+real*8, intent(in):: U,F,T
+real*8, intent(out):: S
+
+S = (U - F)/T
+
+end subroutine
 
 end module QUANTICO

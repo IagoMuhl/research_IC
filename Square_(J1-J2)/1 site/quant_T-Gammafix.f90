@@ -10,14 +10,16 @@ program quant_TGammafix
    real*8, dimension(2):: m
    real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id
    !real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-   real*8:: H_inicial,H_final, Alfa, Alfa2, Gamma, erro,Z2,F
+   real*8:: H_inicial,H_final, Alfa, Alfa2, Gamma, erro,Z2,F,U,U2
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -0.55d0 ;  
+   U = 0.d0; U2 = 0.d0; 
+
+   tol = 10.d0**(-8); J2 = -0.54d0 ;
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -275,15 +277,25 @@ program quant_TGammafix
 
          end do
 
+         ! W0 = ((W+W2)/2.d0)
+         ! Z0 = ((Z+Z2)/2.d0)
 
+         ! call int_energy(dim,W0,T,Z0,U0)
+      
          call Free_nrg(T,Z,F_helm)
          call Free_nrg(T,Z2,F_prime)
 
          !F_prime = (F_helm - Alfa)
          F = (F_helm + F_prime)/2.d0 - (Alfa + Alfa2)/2.d0
-         !write(*,*) H_inicial, m_order
 
-         write(20,*) H_inicial, F, m_order, m1, m2
+
+         F = F - (Alfa + Alfa2)/2.d0
+
+         !call entropy (U0, F, T, S0)
+
+         !write(*,*) H_inicial, U0, S0
+
+         write(20,*) H_inicial, F, m_order
 
 
             if (i==0) then
