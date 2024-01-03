@@ -19,7 +19,7 @@ program quant_TGammafix
 
    U = 0.d0; U2 = 0.d0; 
 
-   tol = 10.d0**(-8); J2 = -0.54d0 ;
+   tol = 10.d0**(-8); J2 = -0.55d0 ;
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -134,14 +134,14 @@ program quant_TGammafix
       ! print*, 'Entre com Gamma, Step(-5,-3):'
       ! read(*,*) Gamma, cd
 
-      print*, 'Entre com H_inicial'
-      read(*,*) H_inicial
+      ! print*, 'Entre com H_inicial'
+      ! read(*,*) H_inicial
 
-      print*, 'Entre com H_final'
-      read(*,*) H_final
+      ! print*, 'Entre com H_final'
+      ! read(*,*) H_final
 
-      ! H_inicial = 1.d0
-      ! H_final = 4.8d0
+      H_inicial = 3.5d0
+      H_final = 4.1d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -161,8 +161,10 @@ program quant_TGammafix
     m_fe = 1.0d0;
     m_af = -1.0d0;
    else
-      m_fe = 0.99099828895786968!1.0d0;
-      m_af =  0.44969820018918100 !-1.0d0;
+      m_fe = 0.82735945899962615       
+      m_af = 0.69796771850355432 
+      ! m_fe = 0.99099828895786968!1.0d0;
+      ! m_af =  0.44969820018918100 !-1.0d0;
    endif
 
 
@@ -295,7 +297,7 @@ program quant_TGammafix
 
          !write(*,*) H_inicial, U0, S0
 
-         write(20,*) H_inicial, F, m_order
+         write(20,*) H_inicial, F, m_order!, m1, m2
 
 
             if (i==0) then
