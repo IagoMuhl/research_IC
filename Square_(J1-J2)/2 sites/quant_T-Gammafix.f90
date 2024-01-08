@@ -3,21 +3,20 @@ program quant_TGammafix
    implicit none
 
    integer, parameter:: L = 2
-   real*8, dimension(4,4)::  H_2, H_intra, H_inter, H_gamma, H_long
+   real*8, dimension(4,4)::  H_1,H_2, H_intra, H_inter, H_gamma, H_long
    real*8, dimension(4,4)::  V!s_x
    real*8 :: Z, T, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, m_order, m2, m1
    real*8, dimension(4):: W
    real*8, dimension(2):: m
-   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, H_1
-   real*8, dimension(:,:), allocatable:: s1_x, s2_x, s1, s2, s_x, s_z, Id_2
-   real*8:: H_inicial,H_final, Alfa, Alfa2, Gamma, erro,F,U,U2
+   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, Id_2
+   real*8, dimension(:,:), allocatable:: s1_x, s2_x, s1, s2, s_x, s_z
+   real*8:: H_inicial,H_final, Alfa, Alfa2, Gamma, erro,F
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
-
-   U = 0.d0; U2 = 0.d0; 
+ 
 
    tol = 10.d0**(-8); J2 = 0.d0 ;
    !---------------------------------------------------------
@@ -49,7 +48,7 @@ program quant_TGammafix
 
 
    !---------------- HAMILTONIANA J1-------------------------
-   allocate(H_1(4,4))
+
    !S1*S2
    call tensorial(sigma_z,sigma_z,dim,H_1)
 
@@ -57,7 +56,7 @@ program quant_TGammafix
 
    ! call print_matrix(H_1,4,4)
 
-   deallocate (sigma_x, sigma_z, Id,H_1)
+   deallocate (sigma_x, sigma_z, Id)
 !---------------------------------------------------------
 
 
@@ -84,14 +83,14 @@ program quant_TGammafix
       ! print*, 'Entre com Gamma, Step(-5,-3):'
       ! read(*,*) Gamma, cd
 
-      print*, 'Entre com H_inicial'
-      read(*,*) H_inicial
+      ! print*, 'Entre com H_inicial'
+      ! read(*,*) H_inicial
 
-      print*, 'Entre com H_final'
-      read(*,*) H_final
+      ! print*, 'Entre com H_final'
+      ! read(*,*) H_final
 
-      ! H_inicial = 1.d0
-      ! H_final = 5.d0
+      H_inicial = 0.5d0
+      H_final = 5.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -227,7 +226,7 @@ program quant_TGammafix
             if (i==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '\/------------\/'
-                  write(*,18) H_inicial, Gamma
+                  write(*,18) H_inicial, T
                   print*, '/\------------/\'
    18             format ((F8.5))
                   i = 1

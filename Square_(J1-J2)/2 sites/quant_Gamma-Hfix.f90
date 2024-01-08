@@ -3,21 +3,21 @@ program quant_HGammafix
    implicit none
 
    integer, parameter:: L = 2
-   real*8, dimension(8,8):: H_2, H_intra, H_inter, H_gamma, H_long
-   real*8, dimension(8,8)::  V!s_x
+   real*8, dimension(4,4):: H_1, H_2, H_intra, H_inter, H_gamma, H_long
+   real*8, dimension(4,4)::  V!s_x
    real*8 :: Z, H, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, m_order, m2, m1
-   real*8, dimension(8):: W
+   real*8, dimension(4):: W
    real*8, dimension(2):: m
-   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, H_1, Id_2
-   real*8, dimension(:,:), allocatable:: s1_x, s2_x, s1, s2, s_z, s_x
-   real*8:: T_inicial,T_final, Alfa, Alfa2, Gamma, erro,F
+   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, Id_2
+   real*8, dimension(:,:), allocatable:: s1_x, s2_x, s1, s2, s_x, s_z
+   real*8:: T_inicial,T_final, Alfa, Gamma, erro,F
    character(len=3):: state
    character(len=5) :: nameFileJ2
    integer:: dim,i,cd!,j
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -0.33d0 ;  
+   tol = 10.d0**(-8); J2 = 0.0d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -47,7 +47,7 @@ program quant_HGammafix
 
 
    !---------------- HAMILTONIANA J1-------------------------
-   allocate(H_1(4,4))
+
    !S1*S2
    call tensorial(sigma_z,sigma_z,dim,H_1)
 
@@ -55,7 +55,7 @@ program quant_HGammafix
 
    ! call print_matrix(H_1,4,4)
 
-   deallocate (sigma_x, sigma_z, Id, H_1)
+   deallocate (sigma_x, sigma_z, Id, s1_x, s2_x)
 !---------------------------------------------------------
 
 
@@ -66,7 +66,6 @@ program quant_HGammafix
       !H = 10.d0**(-5)!3.33d0
       i = 0
       Alfa = 0.d0 
-      Alfa2 = 0.d0 
       !print*, 'Entre com T'
       !read(*,*) T
       !if ( T==-1 ) stop 'Fim da rotina'
@@ -88,7 +87,7 @@ program quant_HGammafix
       ! print*, 'Entre com T_final'
       ! read(*,*) T_final
 
-      T_inicial = 3.d0
+      T_inicial = 2.d0
       T_final = 8.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
@@ -113,15 +112,9 @@ program quant_HGammafix
         m_af =  0.44969820018918100 
      endif
 
-
-
-
-
-
-
        H_gamma = (-1)*Gamma*s_x
 
-
+       H_long = (-1)*H*s_z
 
       !------------------------ OPEN UNIT -----------------
       WRITE (nameFileJ2, '(F5.2)') j2
@@ -134,7 +127,6 @@ program quant_HGammafix
 
       call chose(state,m_fe,m_af,m)
 
-      H_long = (-1)*H*s_z
 
       do while (T_inicial/=T_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
@@ -173,10 +165,6 @@ program quant_HGammafix
                Alfa = abs(W(1))
 
                W = W + Alfa
-
-               ! Alfa2 = abs(W2(1))
-
-               ! W2 = W2 + Alfa2
 
             endif
 

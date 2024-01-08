@@ -3,12 +3,12 @@ program quant_THfix
    implicit none
 
    integer, parameter:: L = 2
-   real*8, dimension(4,4)::  H_2, H_intra, H_inter, H_gamma, H_long
+   real*8, dimension(4,4)::  H_1,H_2, H_intra, H_inter, H_gamma, H_long
    real*8, dimension(4,4)::  V!s_x
    real*8 :: Z, H, step, tol, erro1,erro2, m_fe, m_af, J2, F_helm, m_order, m2, m1
    real*8, dimension(4):: W
    real*8, dimension(2):: m
-   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, Id_2, H_1
+   real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, Id_2
    real*8, dimension(:,:), allocatable:: s1_x, s2_x, s1, s2, s_x, s_z
    real*8:: Gamma_inicial,Gamma_final, Alfa, Alfa2, T, erro,F
    character(len=3):: state
@@ -36,26 +36,18 @@ program quant_THfix
    ! call tensorial(sigma_z,sigma_z,dim,sig_zz)
    call tensorial(Id,Id,dim,Id_2)
 
-   read(*,*)
-
    call tensorial(sigma_z,Id,dim,s1)
    call tensorial(Id,sigma_z,dim,s2)
-
-   read(*,*)
 
    call tensorial(sigma_x,Id,dim,s1_x)
    call tensorial(Id,sigma_x,dim,s2_x)
 
-   read(*,*)
-
     s_z = s1 + s2
     s_x = s1_x + s2_x
 
-    read(*,*)
-
 
    !---------------- HAMILTONIANA J1-------------------------
-   allocate(H_1(4,4))
+
    !S1*S2
    call tensorial(sigma_z,sigma_z,dim,H_1)
 
@@ -63,7 +55,7 @@ program quant_THfix
 
    ! call print_matrix(H_1,4,4)
 
-   deallocate (sigma_x, sigma_z, Id,H_1)
+   deallocate (sigma_x, sigma_z, Id)
 !---------------------------------------------------------
 
 
