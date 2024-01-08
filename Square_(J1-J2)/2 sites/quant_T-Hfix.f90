@@ -36,29 +36,34 @@ program quant_THfix
    ! call tensorial(sigma_z,sigma_z,dim,sig_zz)
    call tensorial(Id,Id,dim,Id_2)
 
+   read(*,*)
+
    call tensorial(sigma_z,Id,dim,s1)
    call tensorial(Id,sigma_z,dim,s2)
+
+   read(*,*)
 
    call tensorial(sigma_x,Id,dim,s1_x)
    call tensorial(Id,sigma_x,dim,s2_x)
 
+   read(*,*)
+
     s_z = s1 + s2
     s_x = s1_x + s2_x
 
-
-   deallocate (sigma_x, sigma_z, Id)
+    read(*,*)
 
 
    !---------------- HAMILTONIANA J1-------------------------
    allocate(H_1(4,4))
    !S1*S2
-   call tensorial(sigma_z,-sigma_z,dim*2,H_1)
+   call tensorial(sigma_z,sigma_z,dim,H_1)
 
    H_intra = J1*H_1
 
-   deallocate(H_1)
+   ! call print_matrix(H_1,4,4)
 
-
+   deallocate (sigma_x, sigma_z, Id,H_1)
 !---------------------------------------------------------
 
 
@@ -178,13 +183,13 @@ program quant_THfix
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
-            call partition(W,T,dim,Z)
+            call partition(W,T,dim*2,Z)
 
             !   print*, m, erro
             !   read(*,*)
 
-            call magnetization_diag(W,Z,T,dim,s1,V,m1)
-            call magnetization_diag(W,Z,T,dim,s2,V,m2)
+            call magnetization_diag(W,Z,T,dim*2,s1,V,m1)
+            call magnetization_diag(W,Z,T,dim*2,s2,V,m2)
 
 
             erro1 = abs((m1)) - abs(m(1))

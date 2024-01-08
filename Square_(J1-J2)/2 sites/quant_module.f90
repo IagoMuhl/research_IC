@@ -298,9 +298,9 @@ end subroutine
 subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    implicit none
    integer, intent(in):: dim
-   real*8, dimension(dim*2,dim*2), intent(in):: s,V
-   real*8, dimension(dim*2,dim*2):: m_prime
-   real*8, dimension(dim*2), intent(in):: W
+   real*8, dimension(dim,dim), intent(in):: s,V
+   real*8, dimension(dim,dim):: m_prime
+   real*8, dimension(dim), intent(in):: W
    real*8, intent(in):: T, Z
    real*8, intent(out):: m
    integer :: i
@@ -317,7 +317,7 @@ subroutine magnetization_diag(W,Z,T,dim,s,V,m)
    ! call print_matrix(m_prime,16,16)
    ! read(*,*)
 
-   do i = 1, dim*2
+   do i = 1, dim
 
       m = m + m_prime(i,i)*(dexp(-b*(W(i))))
 

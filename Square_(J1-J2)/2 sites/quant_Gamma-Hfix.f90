@@ -46,19 +46,16 @@ program quant_HGammafix
     s_x = s1_x + s2_x
 
 
-   deallocate (sigma_x, sigma_z, Id)
-
-
    !---------------- HAMILTONIANA J1-------------------------
    allocate(H_1(4,4))
    !S1*S2
-   call tensorial(sigma_z,-sigma_z,dim*2,H_1)
+   call tensorial(sigma_z,sigma_z,dim,H_1)
 
    H_intra = J1*H_1
 
-   deallocate(H_1)
+   ! call print_matrix(H_1,4,4)
 
-
+   deallocate (sigma_x, sigma_z, Id, H_1)
 !---------------------------------------------------------
 
 
@@ -185,13 +182,13 @@ program quant_HGammafix
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
-            call partition(W,T_inicial,dim,Z)
+            call partition(W,T_inicial,dim*2,Z)
             ! call partition(W2,T_inicial,dim,Z2)
             !   print*, m, erro
             !   read(*,*)
 
-            call magnetization_diag(W,Z,T_inicial,dim,s1,V,m1)
-            call magnetization_diag(W,Z,T_inicial,dim,s2,V,m2)
+            call magnetization_diag(W,Z,T_inicial,dim*2,s1,V,m1)
+            call magnetization_diag(W,Z,T_inicial,dim*2,s2,V,m2)
 
 
             erro1 = abs((m1)) - abs(m(1))
@@ -221,7 +218,7 @@ program quant_HGammafix
 
          !call entropy (U0, F, T_inicial, S0)
 
-         write(20,*)  T_inicial, F, m_order!, m1, m2
+         write(20,*)  T_inicial, F, m_order, m1, m2
 
 
             if (i==0) then

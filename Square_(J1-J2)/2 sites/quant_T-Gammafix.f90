@@ -47,25 +47,25 @@ program quant_TGammafix
     s_z = s1 + s2
     s_x = s1_x + s2_x
 
-   deallocate (sigma_x, sigma_z, Id)
 
    !---------------- HAMILTONIANA J1-------------------------
    allocate(H_1(4,4))
    !S1*S2
-   call tensorial(sigma_z,-sigma_z,dim*2,H_1)
+   call tensorial(sigma_z,sigma_z,dim,H_1)
 
    H_intra = J1*H_1
 
-   deallocate(H_1)
+   ! call print_matrix(H_1,4,4)
 
-
+   deallocate (sigma_x, sigma_z, Id,H_1)
 !---------------------------------------------------------
+
 
 
    do
 
-       T = 10.d0**(-5)
-      ! Gamma = 1.5d0
+      !  T = 10.d0**(-5)
+      Gamma = 0.d0
       i = 0
       Alfa = 0.d0 
       Alfa2 = 0.d0 
@@ -76,22 +76,22 @@ program quant_TGammafix
       ! print*, 'Entre com J2, Step(-5,-3):'
       ! read(*,*) J2, cd
 
-      ! print*, 'Entre com T, Step(-5,-3):'
-      ! read(*,*) T, cd
+      print*, 'Entre com T, Step(-5,-3):'
+      read(*,*) T, cd
 
       !H = 10.d0**(-5)
 
-      print*, 'Entre com Gamma, Step(-5,-3):'
-      read(*,*) Gamma, cd
+      ! print*, 'Entre com Gamma, Step(-5,-3):'
+      ! read(*,*) Gamma, cd
 
-      ! print*, 'Entre com H_inicial'
-      ! read(*,*) H_inicial
+      print*, 'Entre com H_inicial'
+      read(*,*) H_inicial
 
-      ! print*, 'Entre com H_final'
-      ! read(*,*) H_final
+      print*, 'Entre com H_final'
+      read(*,*) H_final
 
-      H_inicial = 1.d0
-      H_final = 5.d0
+      ! H_inicial = 1.d0
+      ! H_final = 5.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -159,7 +159,8 @@ program quant_TGammafix
 
             H_inter = H_inter + H_long + H_gamma + H_intra
 
-
+            ! call print_matrix(H_inter,4,4)
+            ! read(*,*)
 
             call diagonalization(H_inter,V,W)
 
@@ -181,13 +182,13 @@ program quant_TGammafix
             ! print*, W, W2
             ! read(*,*)
 
-            call partition(W,T,dim,Z)
+            call partition(W,T,dim*2,Z)
 
             !   print*, m, erro
             !   read(*,*)
 
-            call magnetization_diag(W,Z,T,dim,s1,V,m1)
-            call magnetization_diag(W,Z,T,dim,s2,V,m2)
+            call magnetization_diag(W,Z,T,dim*2,s1,V,m1)
+            call magnetization_diag(W,Z,T,dim*2,s2,V,m2)
 
 
 
