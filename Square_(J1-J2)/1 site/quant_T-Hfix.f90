@@ -17,7 +17,7 @@ program quant_THfix
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -1.d0 ;  
+   tol = 10.d0**(-8); J2 = 0.d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
@@ -112,9 +112,9 @@ program quant_THfix
 
    do
 
-      !  T = 10.d0**(-5)
+       T = 10.d0**(-5)
       ! Gamma = 10.d0**(-5)!3.33d0
-      H = 10.d0**(-5)
+      ! H = 0.d0
       i = 0
       Alfa = 0.d0 
       Alfa2 = 0.d0 
@@ -125,11 +125,11 @@ program quant_THfix
       ! print*, 'Entre com J2, Step(-5,-3):'
       ! read(*,*) J2, cd
 
-      ! print*, 'Entre com H, Step(-5,-3):'
-      ! read(*,*) H, cd
+      print*, 'Entre com H, Step(-5,-3):'
+      read(*,*) H, cd
 
-      print*, 'Entre com T, Step(-5,-3):'
-      read(*,*) T, cd
+      ! print*, 'Entre com T, Step(-5,-3):'
+      ! read(*,*) T, cd
 
       !H = 10.d0**(-5)
 
@@ -143,7 +143,7 @@ program quant_THfix
       ! read(*,*) Gamma_final
 
       Gamma_inicial = 2.d0
-      Gamma_final = 10.d0
+      Gamma_final = 5.d0
 
       print*, 'Entre com a fase (AF,SAF,SD,PM)'
       read(*,*)   state
@@ -188,7 +188,7 @@ program quant_THfix
 
       call chose(state,m_fe,m_af,m)
 
-      H_long = 0.d0!(-1)*H*sigma_z
+      H_long = (-1.d0)*H*sigma_z
 
       do while (Gamma_inicial/=Gamma_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
 
@@ -282,7 +282,7 @@ program quant_THfix
             if (i==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '\/------------\/'
-                  write(*,18) Gamma_inicial, T
+                  write(*,18) Gamma_inicial, H
                   print*, '/\------------/\'
    18             format ((F8.5))
                   i = 1
