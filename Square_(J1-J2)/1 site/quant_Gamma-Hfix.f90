@@ -17,7 +17,7 @@ program quant_HGammafix
 
    H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
 
-   tol = 10.d0**(-8); J2 = -0.5d0 ;  
+   tol = 10.d0**(-8); J2 = -0.7d0 ;  
    !---------------------------------------------------------
 ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
 
