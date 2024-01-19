@@ -10,14 +10,14 @@ program quant_TGammafix
     real*8, dimension(4):: m
     real*8, dimension(:,:), allocatable:: sigma_x, sigma_z, Id, sig_zz, Id_2,Id_sig_z, sig_z_Id,Id_sigma_x, sigma_x_Id
     real*8, dimension(:,:), allocatable:: s1_x, s2_x, s3_x, s4_x, F
-    real*8:: T_inicial,T_final, Alfa, Gamma, print_T, erro, erro3, erro4
+    real*8:: T_inicial,T_final, Alfa, Gamma, print_T, erro
     character(len=3):: state
     character(len=5) :: nameFileJ2
     integer:: dim,i,cd!,j
  
     H_1 = 0; H_2 = 0; W = 0; V = 0; dim = 2;
  
-    tol = 10.d0**(-8); J2 = -0.2d0 ;   
+    tol = 10.d0**(-8); J2 = -0.42d0 ;   
     !---------------------------------------------------------
  ! CALCULO DAS POSSIBILIDADES DE SIGMA-Z E IDENTIDADE
  
@@ -130,16 +130,16 @@ program quant_TGammafix
       !  print*, 'Entre com Gamma, Step(-5,-3):'
       !  read(*,*) Gamma, cd
  
-       print*, 'Entre com T_inicial'
-       read(*,*) T_inicial
+      !  print*, 'Entre com T_inicial'
+      !  read(*,*) T_inicial
 
-       print*, 'Entre com T_final'
-       read(*,*) T_final
+      !  print*, 'Entre com T_final'
+      !  read(*,*) T_final
 
        !-----------------------
 
-         ! T_inicial = 2.1d0
-         ! T_final = 4.d0
+         T_inicial = 3.0d0
+         T_final = 6.d0
 
         !---------------------
 
@@ -157,8 +157,15 @@ program quant_TGammafix
        !---------------------------------------------------------
        !DECLARAÇÃO DE VALORES INICIAIS
  
-       m_fe = 1.d0;
-       m_af = -1.d0
+    if(state/='2AF') then
+      m_fe = 1.0d0;
+      m_af = -1.0d0;
+     else
+        m_fe = 0.84719110987579493
+        m_af = 0.65197042353076307
+   !      m_fe = 0.99099828895786968!1.0d0;
+   !      m_af =  0.44969820018918100 !-1.0d0;
+      endif
 
        print_T = T_inicial
  
@@ -183,7 +190,7 @@ program quant_TGammafix
  
        do while (T_inicial/=T_final) !FUNÇÃO DE PARTIÇÃO/ LOOP TEMPERATURA
  
-         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0; erro3 = 1.d0; erro4 = 1.d0
+         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
  
           do while(erro >= tol)
  
@@ -217,18 +224,20 @@ program quant_TGammafix
 
             call magnetization_diag(W,Z,T_inicial,dim,s1,V,m1)
             call magnetization_diag(W,Z,T_inicial,dim,s2,V,m2)
-            call magnetization_diag(W,Z,T_inicial,dim,s3,V,m3)
-            call magnetization_diag(W,Z,T_inicial,dim,s4,V,m4)
+            ! call magnetization_diag(W,Z,T,dim,s3,V,m3)
+            ! call magnetization_diag(W,Z,T,dim,s4,V,m4)
+
+            m3 = m2; m4 = m1
 
 
             erro1 = abs((m1)) - abs(m(1))
             erro2 = abs((m2)) - abs(m(2))
-            erro3 = abs((m3)) - abs(m(3))
-            erro4 = abs((m4)) - abs(m(4))
+            ! erro3 = abs((m3)) - abs(m(3))
+            ! erro4 = abs((m4)) - abs(m(4))
  
-            ! erro = max(abs(erro1),abs(erro2))
+            erro = max(abs(erro1),abs(erro2))
 
-            erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))
+            ! erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))
 
  
             call mag_vetor(state,m1,m2,m3,m4,m,m_order)
@@ -242,7 +251,7 @@ program quant_TGammafix
  
           !write(*,*) T_inicial, m_order
  
-          write(20,*) T_inicial, F_prime, m_order, m1, m2, m3, m4
+          write(20,*) T_inicial, F_prime, m_order, m1, m2
           
 
           if (i==0) then
@@ -264,13 +273,13 @@ program quant_TGammafix
  
        end do
  
-       print*, '------------'
-       print*, 'State =','', state 
-       print*, '------ H | Gamma------'
-       write(*,18) H, Gamma
-       print*, '-----Delta T-----'
-       write(*,18) print_T,T_final
-       print*, '----END-----'
+      print*, '------------'
+      Print*, 'State =','', state 
+      print*, 'H =','', H
+      print*, 'Gamma','',Gamma
+      print*, 'T','',T_final
+      print*, 'J2','',J2
+      print*, '----END-----'
  
        close(20)
  
