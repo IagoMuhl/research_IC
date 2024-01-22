@@ -10,7 +10,7 @@ program square_T
    integer:: j, up, down, cd,i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.1d0
+   tol = 10.d0**(-8); J2 = -0.35d0
 
    call base(s)
 !--------------------------------------------------------------
@@ -103,8 +103,8 @@ program square_T
             call magnetization(H_total,Z,s,down,T_inicial,m2)
 
 
-            erro1 = abs(m1 - m(1))
-            erro2 = abs(m2 - m(2))
+            erro1 = abs(m(1) - m1)
+            erro2 = abs(m(2) - m2)
 
             erro = max(abs(erro1),abs(erro2))
 

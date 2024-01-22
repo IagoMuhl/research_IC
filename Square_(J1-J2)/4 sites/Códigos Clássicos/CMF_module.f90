@@ -140,7 +140,7 @@ contains
          m_order = abs(m(1) - m(2))/2.d0
 
        case ('2AF')
-         m = [m1, m2, m1, m2]
+         m = [m1, m2, m2, m1]
 
          m_order = abs(m(1) - m(2))/2.d0
 

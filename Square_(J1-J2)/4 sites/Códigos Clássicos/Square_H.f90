@@ -10,7 +10,7 @@ program square_H
    integer:: j, up, down, cd, i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.1d0
+   tol = 10.d0**(-8); J2 = -0.35d0
 
    call base(s)
 !--------------------------------------------------------------
@@ -52,8 +52,10 @@ program square_H
       else
          m_fe = 0.84719110987579493
          m_af = 0.65197042353076307
-         !   m_fe = 0.99099828895786968!1.0d0;
-         !   m_af =  0.44969820018918100 !-1.0d0;
+         !   m_fe = 0.99099828895786968
+         !   m_af =  0.44969820018918100
+         ! m_fe = 1.0d0;
+         ! m_af = -1.0d0;
       endif
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,8 +107,8 @@ program square_H
             call magnetization(H_total,Z,s,down,T,m2)
 
 
-            erro1 = abs(m1 - m(1))
-            erro2 = abs(m2 - m(2))
+            erro1 = abs(m(1) - m1)
+            erro2 = abs(m(2) - m2)
 
             ! if(state=='PM') then
             !    erro2 = abs(m_fe - m(down))
