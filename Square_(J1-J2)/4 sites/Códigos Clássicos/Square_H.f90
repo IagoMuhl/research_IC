@@ -10,30 +10,26 @@ program square_H
    integer:: j, up, down, cd, i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.575d0
-
+   tol = 10.d0**(-8); J2 = -0.42d0
+!---------------------------------------------
    call base(s)
-!--------------------------------------------------------------
    do i = 1, maxConfig
    s_x(i) = s(i,1) + s(i,2) + s(i,3) + s(i,4)
    enddo
-
+!--------------------------------------------
    do
-
-      j = 0
-
-
-      write(*,*) 'Entre com T, step:'
+     
+      write(*,*) 'Entre com T, step:'; j = 0
       read*, T, cd
 
-      write(*,*) 'Entre com H_inicial:'
-      read*, H_inicial
+      ! write(*,*) 'Entre com H_inicial:'
+      ! read*, H_inicial
 
-      write(*,*) 'Entre com H_final:'
-      read*, H_final
+      ! write(*,*) 'Entre com H_final:'
+      ! read*, H_final
 
-      ! H_inicial = 3.8d0
-      ! H_final = 4.25d0
+      H_inicial = 3.8d0
+      H_final = 4.25d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
