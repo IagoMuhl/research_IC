@@ -5,7 +5,7 @@ program square_H
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8, dimension(4):: m
    real*8:: J2, erro, m1, m2, m3, m4
-   real*8:: H_inicial,H_final,T,m_fe,m_af,step,Z,m_order,tol,F,erro1,erro2,erro3,erro4
+   real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F,erro1,erro2,erro3,erro4
    character(len=3):: state
    integer:: j, cd, i,p
 
@@ -32,8 +32,8 @@ program square_H
       ! write(*,*) 'Entre com H_final:'
       ! read*, H_final
 
-      H_inicial = 2.0d0
-      H_final = 5.35d0
+      H_inicial = 1.d0
+      H_final = 3.55d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -47,15 +47,17 @@ program square_H
 !-
 
       if(state/='2AF') then
-         m_fe = 1.0d0;
-         m_af = -1.0d0;
+         m1 = 1.d0
+         m2 = -1.d0
+         m3 = 1.d0
+         m4 = -1.d0
       else
-         m_fe = 0.84719110987579493
-         m_af = 0.65197042353076307
-         !   m_fe = 0.99099828895786968
-         !   m_af =  0.44969820018918100
-         ! m_fe = 1.0d0;
-         ! m_af = -1.0d0;
+         m1 = 0.99982421570227475
+         m2 = 1.4944181483173785E-002
+         m3 = 0.99500816175228535
+         m4 = 3.2426469508950429E-003
+         ! m_fe = 0.84719110987579493
+         ! m_af = 0.65197042353076307
       endif
 
 
@@ -64,7 +66,7 @@ program square_H
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
-      call mag_vetor(state,m_fe,m_af,m_fe,m_af,m,m_order)
+      call mag_vetor(state,m1,m2,m3,m4,m,m_order)
 
       call HAM_INTRA(J2,s,H_intra)
 
@@ -75,7 +77,7 @@ program square_H
 
       do while (H_inicial/=H_final)
 
-         erro1 = 1.d0; erro2 = 1.d0; erro = 1.d0
+         erro1 = 1.d0; erro2 = 1.d0; erro3 = 1.d0; erro4 = 1.d0; erro = 1.d0
 
          do while(erro >= tol)
 
@@ -107,6 +109,10 @@ program square_H
             !    erro2 = abs(m_fe - m(down))
             ! endif
 
+            m1 = m1*0.5 + 0.5*m(1)
+            m2 = m2*0.5 + 0.5*m(2)
+            m3 = m3*0.5 + 0.5*m(3)
+            m4 = m4*0.5 + 0.5*m(4)
 
 
             erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))
@@ -121,7 +127,7 @@ program square_H
 
          call F_helm(T,Z,F)
 
-         print*, H_inicial, m_order
+         !print*, H_inicial, m_order
 
 
          write(20,*) H_inicial, F, m_order, m1, m2, m3, m4

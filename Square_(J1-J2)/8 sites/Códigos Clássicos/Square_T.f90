@@ -5,7 +5,7 @@ program square_T
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8, dimension(4):: m
    real*8:: J2, erro, m1, m2, m3, m4
-   real*8:: T_inicial,T_final,H,m_fe,m_af,step,Z,m_order,tol,F,erro1,erro2,erro3,erro4
+   real*8:: T_inicial,T_final,H,step,Z,m_order,tol,F,erro1,erro2,erro3,erro4
    character(len=3):: state
    integer:: j, cd,i,p
 
@@ -23,16 +23,18 @@ program square_T
    enddo
 !--------------------------------------------------------------
    do
-      
+
       write(*,*) 'Entre com H, step:' ; j = 0
       read*, H, cd
 
-      write(*,*) 'Entre com T_inicial:'
-      read*, T_inicial
+      ! write(*,*) 'Entre com T_inicial:'
+      ! read*, T_inicial
 
-      write(*,*) 'Entre com T_final:'
-      read*, T_final
+      ! write(*,*) 'Entre com T_final:'
+      ! read*, T_final
 
+      T_inicial = 2.4d0
+      T_final = 3.8d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -46,19 +48,23 @@ program square_T
 !-
 
       if(state/='2AF') then
-         m_fe = 1.0d0;
-         m_af = -1.0d0;
+         m1 = 1.d0
+         m2 = -1.d0
+         m3 = 1.d0
+         m4 = -1.d0
       else
-         m_fe = 0.84719110987579493
-         m_af = 0.65197042353076307
-         !   m_fe = 0.99099828895786968!1.0d0;
-         !   m_af =  0.44969820018918100 !-1.0d0;
+         m1 = 0.99982421570227475
+         m2 = 1.4944181483173785E-002
+         m3 = 0.99500816175228535
+         m4 = 3.2426469508950429E-003
+         ! m_fe = 0.84719110987579493
+         ! m_af = 0.65197042353076307
       endif
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
 
-      call mag_vetor(state,m_fe,m_af,m_fe,m_af,m,m_order)
+      call mag_vetor(state,m1,m2,m3,m4,m,m_order)
 
       call HAM_INTRA(J2,s,H_intra)
       ! - - - - - - - - - - - - - - - - - - - - - - -
@@ -91,6 +97,11 @@ program square_T
             erro2 = abs(m(2) - m2)
             erro3 = abs(m(3) - m3)
             erro4 = abs(m(4) - m4)
+
+            ! m1 = m1*0.5 + 0.5*m(1)
+            ! m2 = m2*0.5 + 0.5*m(2)
+            ! m3 = m3*0.5 + 0.5*m(3)
+            ! m4 = m4*0.5 + 0.5*m(4)
 
 
             erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))

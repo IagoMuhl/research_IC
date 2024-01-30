@@ -57,7 +57,7 @@ contains
 
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
-         H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,5)+ s(i,2)*s(i,6) + s(i,5)*s(i,6) + s(i,2)*s(i,3) + &
+         H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,1)*s(i,5 ) + s(i,2)*s(i,6) + s(i,5)*s(i,6) + s(i,2)*s(i,3) + &
          &      s(i,6)*s(i,7) + s(i,3)*s(i,7)+ s(i,3)*s(i,4) + s(i,4)*s(i,8) + s(i,7)*s(i,8)) + &
          &  J2*(s(i,1)*s(i,6) + s(i,2)*s(i,5) + s(i,2)*s(i,7) + s(i,6)*s(i,3) + s(i,3)*s(i,8) + s(i,4)*s(i,7))
 
@@ -232,26 +232,26 @@ contains
 
    end subroutine
 
-   subroutine order_parameter(state,m,m_order)
-      real(kind=db), dimension(minConfig), intent(in):: m
-      character(len=3), intent(in):: state
-      real(kind=db), intent(out):: m_order
+   ! subroutine order_parameter(state,m,m_order)
+   !    real(kind=db), dimension(minConfig), intent(in):: m
+   !    character(len=3), intent(in):: state
+   !    real(kind=db), intent(out):: m_order
 
-      select case(state)
+   !    select case(state)
 
-       case('AF')
+   !     case('AF')
 
-         m_order = (m(1)-m(2))/2.d0
+   !       m_order = (m(1)-m(2))/2.d0
 
-       case('PM')
-         m_order   = (m(1)+m(2))/2.d0
+   !     case('PM')
+   !       m_order   = (m(1)+m(2))/2.d0
 
-       case default
-         print*, 'ERRO'
+   !     case default
+   !       print*, 'ERRO'
 
-      end select
+   !    end select
 
-   end subroutine
+   ! end subroutine
 
 
 end module CMF
