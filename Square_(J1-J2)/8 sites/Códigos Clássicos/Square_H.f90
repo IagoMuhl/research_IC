@@ -3,14 +3,14 @@ program square_H
    implicit none
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8, dimension(4):: m
-   real*8:: J2, erro, m1, m2, m3, m4
-   real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F,erro1,erro2,erro3,erro4
+   real*8, dimension(8):: m, error, mag_prev
+   real*8:: J2, erro
+   real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    character(len=3):: state
    integer:: j, cd, i,p
 
 
-   tol = 10.d0**(-8); J2 = 0.0d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.40d0; s_z = 0
 !---------------------------------------------
    call base(s)
 
@@ -26,14 +26,14 @@ program square_H
       write(*,*) 'Entre com T, step:' ; j = 0
       read*, T, cd
 
-      ! write(*,*) 'Entre com H_inicial:'
-      ! read*, H_inicial
+      write(*,*) 'Entre com H_inicial:'
+      read*, H_inicial
 
-      ! write(*,*) 'Entre com H_final:'
-      ! read*, H_final
+      write(*,*) 'Entre com H_final:'
+      read*, H_final
 
-      H_inicial = 1.d0
-      H_final = 3.55d0
+      ! H_inicial = 1.d0
+      ! H_final = 3.55d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -46,19 +46,19 @@ program square_H
       end if
 !-
 
-      if(state/='2AF') then
-         m1 = 1.d0
-         m2 = -1.d0
-         m3 = 1.d0
-         m4 = -1.d0
-      else
-         m1 = 0.99982421570227475
-         m2 = 1.4944181483173785E-002
-         m3 = 0.99500816175228535
-         m4 = 3.2426469508950429E-003
-         ! m_fe = 0.84719110987579493
-         ! m_af = 0.65197042353076307
-      endif
+      ! if(state/='2AF') then
+      !    m1 = 1.d0
+      !    m2 = -1.d0
+      !    m3 = 1.d0
+      !    m4 = -1.d0
+      ! else
+      !    m1 = 0.99982421570227475
+      !    m2 = 1.4944181483173785E-002
+      !    m3 = 0.99500816175228535
+      !    m4 = 3.2426469508950429E-003
+      !    ! m_fe = 0.84719110987579493
+      !    ! m_af = 0.65197042353076307
+      ! endif
 
 
 
@@ -66,7 +66,7 @@ program square_H
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
-      call mag_vetor(state,m1,m2,m3,m4,m,m_order)
+      call mag_vetor(state,m)
 
       call HAM_INTRA(J2,s,H_intra)
 
@@ -77,7 +77,7 @@ program square_H
 
       do while (H_inicial/=H_final)
 
-         erro1 = 1.d0; erro2 = 1.d0; erro3 = 1.d0; erro4 = 1.d0; erro = 1.d0
+         error = 1.d0; erro = 1.d0
 
          do while(erro >= tol)
 
@@ -92,35 +92,21 @@ program square_H
 
             call partition(H_total,T,Z)
 
-            call magnetization(H_total,Z,s,1,T,m1)
+            do i = 1, num_sites
 
-            call magnetization(H_total,Z,s,2,T,m2)
+               mag_prev(i) = m(i)
 
-            call magnetization(H_total,Z,s,3,T,m3)
+               call magnetization(H_total,Z,s,i,T,m(i))
 
-            call magnetization(H_total,Z,s,4,T,m4)
+               error(i) = abs(mag_prev(i) - m(i))
 
-            erro1 = abs(m(1) - m1)
-            erro2 = abs(m(2) - m2)
-            erro3 = abs(m(3) - m3)
-            erro4 = abs(m(4) - m4)
+               ! m1 = m1*0.5 + 0.5*m(1)
 
-            ! if(state=='PM') then
-            !    erro2 = abs(m_fe - m(down))
-            ! endif
+               erro = maxval(error)
 
-            m1 = m1*0.5 + 0.5*m(1)
-            m2 = m2*0.5 + 0.5*m(2)
-            m3 = m3*0.5 + 0.5*m(3)
-            m4 = m4*0.5 + 0.5*m(4)
+            end do
 
-
-            erro = max(abs(erro1),abs(erro2),abs(erro3),abs(erro4))
-
-            !  print*, m_fe, m_af, m_order
-            !  read(*,*)
-
-            call mag_vetor(state,m1,m2,m3,m4,m,m_order)
+            call order_parameter(state,m,m_order)
 
 
          end do
@@ -130,7 +116,7 @@ program square_H
          !print*, H_inicial, m_order
 
 
-         write(20,*) H_inicial, F, m_order, m1, m2, m3, m4
+         write(20,*) H_inicial, F, m_order,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
          ! print*, T, m_order, m_fe, m_af
 
          if (j==0) then

@@ -138,29 +138,29 @@ contains
 
 
 
-   subroutine mag_vetor(state,m1,m2,m3,m4,m,m_order)
+   subroutine mag_vetor(state,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), intent(in):: m1,m2,m3,m4
-      real(kind=db), dimension(4), intent(out):: m
-      real(kind=db), intent(out):: m_order
+      real(kind=db), dimension(num_sites), intent(out):: m
+      real*8:: m_fe, m_af
+
+      m_fe = 1.d0; m_af = -1.d0
 
       select case (state)
 
        case ('AF')
-         m = [m1, m2, m3, m4]
+         m = [m_fe, m_af, m_fe, m_af, m_af, m_fe, m_af, m_fe]
 
-         m_order = abs(m(1) - m(2) + m(3) - m(4))/4.d0
 
        case ('2AF')
-         m = [m1, m2, m3, m4]
+         m_fe = 0.84719110987579493
+         m_af = 0.65197042353076307
+         m = [m_fe, m_af, m_fe, m_af, m_af, m_fe, m_af, m_fe]
 
-         m_order = abs(m(1) - m(2) + m(3) - m(4))/4.d0
 
        case ('PM')
-         m = [m1,m3,m3,m1]
+         m = [m_fe, m_fe, m_fe, m_fe, m_fe, m_fe, m_fe, m_fe]
 
-         m_order = abs(m(1) + m(2) + m(3) + m(4))/4.d0
 
        case default
          write(*,*) 'Inaccurate State'
@@ -202,7 +202,7 @@ contains
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(4), intent(in):: m_guess
+      real(kind=db), dimension(8), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
       !character(len=3), intent(in) :: state
 
@@ -211,47 +211,51 @@ contains
       do i = 1, maxConfig
 
          H_inter(i) =  J1*(s(i,1)*m_guess(4)+s(i,4)*m_guess(1)-m_guess(1)*m_guess(4)  &
-         &   +   s(i,1)*m_guess(4)+s(i,5)*m_guess(1)-m_guess(1)*m_guess(4)  &
-         &   +   s(i,2)*m_guess(3)+s(i,6)*m_guess(2)-m_guess(1)*m_guess(3)  &
-         &   +   s(i,3)*m_guess(2)+s(i,7)*m_guess(3)-m_guess(2)*m_guess(3)  &
-         &   +   s(i,4)*m_guess(1)+s(i,8)*m_guess(4)-m_guess(1)*m_guess(4)  &
-         &   +   s(i,5)*m_guess(1)+s(i,8)*m_guess(4)-m_guess(1)*m_guess(4)) &
+         &   +   s(i,1)*m_guess(5)+s(i,5)*m_guess(1)-m_guess(1)*m_guess(5)  &
+         &   +   s(i,2)*m_guess(6)+s(i,6)*m_guess(2)-m_guess(2)*m_guess(6)  &
+         &   +   s(i,3)*m_guess(7)+s(i,7)*m_guess(3)-m_guess(7)*m_guess(3)  &
+         &   +   s(i,4)*m_guess(8)+s(i,8)*m_guess(4)-m_guess(8)*m_guess(4)  &
+         &   +   s(i,5)*m_guess(8)+s(i,8)*m_guess(5)-m_guess(5)*m_guess(8)) &
 
 
-         & + J2*(s(i,1)*m_guess(3)+s(i,6)*m_guess(1)-m_guess(1)*m_guess(3)  &
-         &   +   s(i,2)*m_guess(4)+s(i,5)*m_guess(2)-m_guess(2)*m_guess(4) &
-         &   +   s(i,2)*m_guess(2)+s(i,7)*m_guess(2)-m_guess(2)*m_guess(2)  &
-         &   +   s(i,3)*m_guess(3)+s(i,6)*m_guess(3)-m_guess(3)*m_guess(3)   &
-         &   +   s(i,3)*m_guess(1)+s(i,8)*m_guess(3)-m_guess(1)*m_guess(3)   &
-         &   +   s(i,4)*m_guess(2)+s(i,7)*m_guess(4)-m_guess(2)*m_guess(4)  &
-         &  + 2*(s(i,1)*m_guess(1)+s(i,8)*m_guess(1)-m_guess(1)*m_guess(1)   &
-         &   +   s(i,4)*m_guess(2)+s(i,5)*m_guess(2)-m_guess(2)*m_guess(2)))
+         & + J2*(s(i,1)*m_guess(6)+s(i,6)*m_guess(1)-m_guess(1)*m_guess(6)  &
+         &   +   s(i,2)*m_guess(5)+s(i,5)*m_guess(2)-m_guess(2)*m_guess(5) &
+         &   +   s(i,2)*m_guess(7)+s(i,7)*m_guess(2)-m_guess(2)*m_guess(7)  &
+         &   +   s(i,3)*m_guess(6)+s(i,6)*m_guess(3)-m_guess(3)*m_guess(6)   &
+         &   +   s(i,3)*m_guess(8)+s(i,8)*m_guess(3)-m_guess(8)*m_guess(3)   &
+         &   +   s(i,4)*m_guess(7)+s(i,7)*m_guess(4)-m_guess(7)*m_guess(4)  &
+         &  + 2*(s(i,1)*m_guess(8)+s(i,8)*m_guess(1)-m_guess(1)*m_guess(8) + &
+            s(i,4)*m_guess(5)+s(i,5)*m_guess(4)-m_guess(5)*m_guess(4)))
 
       enddo
 
 
    end subroutine
 
-   ! subroutine order_parameter(state,m,m_order)
-   !    real(kind=db), dimension(minConfig), intent(in):: m
-   !    character(len=3), intent(in):: state
-   !    real(kind=db), intent(out):: m_order
+   subroutine order_parameter(state,m,m_order)
+      real(kind=db), dimension(num_sites), intent(in):: m
+      character(len=3), intent(in):: state
+      real(kind=db), intent(out):: m_order
 
-   !    select case(state)
+      select case(state)
 
-   !     case('AF')
+       case('AF')
 
-   !       m_order = (m(1)-m(2))/2.d0
+         m_order = abs((m(1)-m(2)+m(3)-m(4)-m(5)+m(6)-m(7)+m(8))/num_sites)
 
-   !     case('PM')
-   !       m_order   = (m(1)+m(2))/2.d0
+       case('2AF')
 
-   !     case default
-   !       print*, 'ERRO'
+         m_order = abs((m(1)-m(2)+m(3)-m(4)-m(5)+m(6)-m(7)+m(8))/num_sites)
 
-   !    end select
+       case('PM')
+         m_order = abs((m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8))/num_sites)
 
-   ! end subroutine
+       case default
+         print*, 'ERRO'
+
+      end select
+
+   end subroutine
 
 
 end module CMF
