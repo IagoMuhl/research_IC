@@ -10,9 +10,7 @@ program square_T
    integer:: j, cd,i,p
 
 
-   tol = 10.d0**(-8); J2 = -0.35d0; s_z = 0
-
-
+   tol = 10.d0**(-8); J2 = -0.345d0; s_z = 0
 !--------------------------------------------------------------
    call base(s)
 
@@ -155,9 +153,12 @@ program square_T
       !----------------- NOVAS ENTRADAS  -----------------
 
 
-      print*, '------',State,'------'
-      write(*,19) T_inicial, H
-19    format ((F8.5))
+      print*, '------------'
+      Print*, 'State =','', state 
+      print*, 'H =','', H
+      print*, 'T','',T_inicial
+      print*, 'J2','',J2
+      print*, '----END-----'
 
 
 

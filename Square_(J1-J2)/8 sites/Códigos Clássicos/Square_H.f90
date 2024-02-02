@@ -10,7 +10,7 @@ program square_H
    integer:: j, cd, i,p
 
 
-   tol = 10.d0**(-8); J2 = -0.35d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.345d0; s_z = 0
 !---------------------------------------------
    call base(s)
 
@@ -144,9 +144,12 @@ program square_H
 
       close(20)
 
-      print*, '------',State,'------'
-      write(*,19) H_inicial, T
-19    format ((F8.5))
+      print*, '------------'
+      Print*, 'State =','', state 
+      print*, 'H =','', H_inicial
+      print*, 'T','',T
+      print*, 'J2','',J2
+      print*, '----END-----'
 
    enddo
 
