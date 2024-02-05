@@ -6,11 +6,12 @@ program square_T
    real*8, dimension(8):: m, error, mag_prev
    real*8:: J2, erro
    real*8:: T_inicial,T_final,H,step,Z,m_order,tol,F
+   real*4:: tempo_inicial, tempo_final
    character(len=3):: state
    integer:: j, cd,i,p
 
 
-   tol = 10.d0**(-8); J2 = -0.275d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0
 !--------------------------------------------------------------
    call base(s)
 
@@ -25,17 +26,19 @@ program square_T
       write(*,*) 'Entre com H, step:' ; j = 0
       read*, H, cd
 
-      write(*,*) 'Entre com T_inicial:'
-      read*, T_inicial
+      ! write(*,*) 'Entre com T_inicial:'
+      ! read*, T_inicial
 
-      write(*,*) 'Entre com T_final:'
-      read*, T_final
+      ! write(*,*) 'Entre com T_final:'
+      ! read*, T_final
 
-      ! T_inicial = 2.4d0
-      ! T_final = 3.8d0
+      T_inicial = 3.9d0
+      T_final = 4.1d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
+
+      CALL CPU_TIME ( tempo_inicial )
 
       ! -
       if ( T_inicial>T_final ) then
@@ -160,7 +163,9 @@ program square_T
       print*, 'J2','',J2
       print*, '----END-----'
 
-
+      CALL CPU_TIME ( tempo_final )
+      WRITE (*,*) 'Tempo de operação foi de',tempo_final - tempo_inicial,' segundos'
+    
 
    enddo
 

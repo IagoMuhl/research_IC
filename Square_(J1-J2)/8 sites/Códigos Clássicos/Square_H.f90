@@ -6,11 +6,13 @@ program square_H
    real*8, dimension(8):: m, error, mag_prev
    real*8:: J2, erro
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
+   real*4:: tempo_inicial, tempo_final
    character(len=3):: state
    integer:: j, cd, i,p
 
 
-   tol = 10.d0**(-8); J2 = -0.55d0; s_z = 0
+
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0
 !---------------------------------------------
    call base(s)
 
@@ -26,17 +28,19 @@ program square_H
       write(*,*) 'Entre com T, step:' ; j = 0
       read*, T, cd
 
-      write(*,*) 'Entre com H_inicial:'
-      read*, H_inicial
+      ! write(*,*) 'Entre com H_inicial:'
+      ! read*, H_inicial
 
-      write(*,*) 'Entre com H_final:'
-      read*, H_final
+      ! write(*,*) 'Entre com H_final:'
+      ! read*, H_final
 
-      ! H_inicial = 1.d0
-      ! H_final = 3.55d0
+      H_inicial = 4.0d0
+      H_final = 4.1d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
+
+      CALL CPU_TIME ( tempo_inicial )
 
       ! -
       if ( H_inicial>H_final ) then
@@ -150,6 +154,9 @@ program square_H
       print*, 'T','',T
       print*, 'J2','',J2
       print*, '----END-----'
+
+      CALL CPU_TIME ( tempo_final )
+  WRITE (*,*) 'Delta t de',tempo_final - tempo_inicial,'segundos'
 
    enddo
 
