@@ -175,6 +175,14 @@ contains
             m(i) = m_af
          enddo
 
+         ! do i = 1,11,2
+         !    m(i) = m_fe
+         ! enddo
+
+         ! do i = 2,12,2
+         !    m(i) = m_af
+         ! enddo
+
        case ('2AF')
 
          m_fe = 0.84719110987579493
@@ -188,12 +196,24 @@ contains
             m(i) = m_af
          enddo
 
+         ! do i = 1,11,2
+         !    m(i) = m_fe
+         ! enddo
+
+         ! do i = 2,12,2
+         !    m(i) = m_af
+         ! enddo
+
 
        case ('PM')
 
          do i = 1,6
             m(i) = m_fe
          enddo
+
+         ! do i = 1,12
+         !    m(i) = m_fe
+         ! enddo
 
 
        case default
@@ -294,6 +314,8 @@ contains
 
          m_order = abs(2*m_order/num_sites)
 
+         ! m_order = abs(m_order/num_sites)
+
        case('2AF')
 
          do i = 1,5,2
@@ -306,6 +328,8 @@ contains
 
          m_order = abs(2*m_order/num_sites)
 
+         ! m_order = abs(m_order/num_sites)
+
        case('PM')
          
          do i = 1,6
@@ -313,6 +337,12 @@ contains
          enddo
 
          m_order = abs(2*m_order/num_sites)
+
+         ! do i = 1,12
+         !    m_order = m_order + abs(m(i))
+         ! enddo
+
+         ! m_order = abs(m_order/num_sites)
 
        case default
          print*, 'ERRO'

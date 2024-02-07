@@ -12,7 +12,7 @@ program square_H
 
 
 
-   tol = 10.d0**(-8); J2 = 0.00d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0
 !--------------------BASE---------------------
    call base(s)
 
@@ -21,21 +21,21 @@ program square_H
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
-
+   call HAM_INTRA(J2,s,H_intra)
 !--------------------------------------------
    do
       j = 0; Alfa = 0.d0
       write(*,*) 'Entre com T, step:' 
       read*, T, cd
 
-      write(*,*) 'Entre com H_inicial:'
-      read*, H_inicial
+      ! write(*,*) 'Entre com H_inicial:'
+      ! read*, H_inicial
 
-      write(*,*) 'Entre com H_final:'
-      read*, H_final
+      ! write(*,*) 'Entre com H_final:'
+      ! read*, H_final
 
-      ! H_inicial = 4.0d0
-      ! H_final = 4.1d0
+      H_inicial = 2.7d0
+      H_final = 4.4d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -48,12 +48,8 @@ program square_H
       else
          step = 10.d0**(cd)
       end if
-!-
-
 
       call mag_vetor(state,m)
-
-      call HAM_INTRA(J2,s,H_intra)
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -114,7 +110,7 @@ program square_H
 
          F = F + Alfa
 
-         print*, H_inicial, m_order
+         !print*, H_inicial, m_order
 
          write(20,*) H_inicial, F, m_order,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
          ! print*, T, m_order, m_fe, m_af

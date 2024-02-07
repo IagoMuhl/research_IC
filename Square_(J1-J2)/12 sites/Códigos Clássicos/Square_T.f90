@@ -11,7 +11,7 @@ program square_T
    integer:: j, cd,i,p
 
 
-   tol = 10.d0**(-8); J2 = 0.00d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -20,24 +20,26 @@ program square_T
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
+   call HAM_INTRA(J2,s,H_intra)
 !--------------------------------------------------------------
    do
       j = 0; Alfa = 0.d0
       write(*,*) 'Entre com H, step:'
       read*, H, cd
 
-      write(*,*) 'Entre com T_inicial:'
-      read*, T_inicial
+      ! write(*,*) 'Entre com T_inicial:'
+      ! read*, T_inicial
 
-      write(*,*) 'Entre com T_final:'
-      read*, T_final
+      ! write(*,*) 'Entre com T_final:'
+      ! read*, T_final
 
-      ! T_inicial = 3.9d0
-      ! T_final = 4.1d0
+      T_inicial = 2.5d0
+      T_final = 4.1d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
 
+      
       CALL CPU_TIME ( tempo_inicial )
 
       ! -
@@ -50,7 +52,7 @@ program square_T
 
       call mag_vetor(state,m)
 
-      call HAM_INTRA(J2,s,H_intra)
+
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
       open(unit=20, file=trim(state) // "_H_T-F-m.dat")
