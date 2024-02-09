@@ -8,7 +8,7 @@ program square_H
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
    character(len=3):: state
-   integer:: j, cd, i,p
+   integer:: j, cd, i, p, minutos, segundos
 
 
 
@@ -28,14 +28,14 @@ program square_H
       write(*,*) 'Entre com T, step:' 
       read*, T, cd
 
-      ! write(*,*) 'Entre com H_inicial:'
-      ! read*, H_inicial
+      write(*,*) 'Entre com H_inicial:'
+      read*, H_inicial
 
-      ! write(*,*) 'Entre com H_final:'
-      ! read*, H_final
+      write(*,*) 'Entre com H_final:'
+      read*, H_final
 
-      H_inicial = 2.7d0
-      H_final = 4.4d0
+      ! H_inicial = 2.7d0
+      ! H_final = 4.4d0
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -148,7 +148,13 @@ program square_H
       print*, '----END-----'
 
       CALL CPU_TIME ( tempo_final )
-      WRITE (*,*) 'Delta t de',tempo_final - tempo_inicial,'segundos'
+
+      minutos = int(tempo_final - tempo_inicial)/60
+      segundos = int(mod((tempo_final - tempo_inicial),60.0))
+
+      WRITE (*, '(A,I2,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
+
+      call system('paplay Downloads/pica-pau.wav')
 
    enddo
 
