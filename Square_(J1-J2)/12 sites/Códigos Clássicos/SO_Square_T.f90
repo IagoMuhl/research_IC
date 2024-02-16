@@ -32,7 +32,7 @@ program square_T
 
    do
 
-      do while(H>=0.5d0**(-2))
+      do while(H>=0.2)
 
       j = 0; Alfa = 0.d0 ; cd = -3
 
@@ -116,7 +116,7 @@ program square_T
                print*, '/\---------/\'
 18             format ((F8.5))
                j = 1
-               write(20,*) T_inicial, H
+               !write(20,*) T_inicial, H
             end if
          end if
 
