@@ -8,11 +8,11 @@ program square_T
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
    character(len=3):: state
-   character(len=4):: temp
+   character(len=5):: temp
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.38d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -26,7 +26,8 @@ program square_T
    write(*,*) 'Entre com T:'
    read*, T
 
-   state = '2AF'
+   write(*,*) 'Entre com a fase:'
+   read*, state
 
 
    ! open(unit=20, file= trim(temp) // 'SO_H_' // trim(state) // "_T-H.dat")
@@ -35,14 +36,16 @@ program square_T
 
       
 
-      do while(T<=1.35)
+      do while(T<1.619d0)
 
 
 
       j = 0; Alfa = 0.d0 ; cd = -5
 
-      H_inicial = 4.1d0
-      H_final = 3.9d0
+      H_inicial = 3.96432d0
+      H_final = 3.96d0
+      ! H_inicial = 3.95d0
+      ! H_final = 3.98d0
 
       
       CALL CPU_TIME ( tempo_inicial )
@@ -61,7 +64,7 @@ program square_T
 
       !open(unit=20, file=trim(state) // "_H_T-F-m.dat")
 
-      WRITE (temp, '(F4.2)') T
+      WRITE (temp, '(F5.3)') T
 
       open(unit=20, file= trim(temp) // '_SO_H_' // trim(state) // "_T-H.dat")
 
@@ -114,7 +117,7 @@ program square_T
          !print*, T_inicial, m_order
 
 
-         write(20,*) H_inicial, F, m_order,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
+         write(20,*) H_inicial, F, m_order!,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
          ! print*, T, m_order, m_fe, m_af
 
          if (j==0) then
@@ -164,15 +167,16 @@ program square_T
 
       call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
 
-      T = T + 0.05
+      T = T + 0.001
 
    enddo
 
-   close(20)
 
-   call system('paplay Downloads/pica_pau.wav')
+   call system('paplay /usr/share/sounds/sound-icons/trumpet-12.wav')
 
    print*, '=== FIM ==='
+
+   close(20)
    stop
 
    enddo

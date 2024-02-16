@@ -154,7 +154,7 @@ program square_T
 
       WRITE (*, '(A,I2,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
 
-      call system('paplay Downloads/pica-pau.wav')
+      call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
 
    enddo
 

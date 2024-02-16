@@ -11,7 +11,7 @@ program square_T
    integer:: j, cd,i,p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.35d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -25,7 +25,8 @@ program square_T
    write(*,*) 'Entre com H:'
    read*, H
 
-   state = 'AF'
+   write(*,*) 'Entre com a fase:'
+   read*, state
 
    open(unit=20, file= 'SO_T_' // trim(state) // "_T-H.dat")
 
@@ -159,11 +160,11 @@ program square_T
 
    enddo
 
-   close(20)
-
-   call system('paplay Downloads/pica_pau.wav')
+   call system('paplay /usr/share/sounds/sound-icons/trumpet-12.wav')
 
    print*, '=== FIM ==='
+
+   close(20)
    stop
 
    enddo
