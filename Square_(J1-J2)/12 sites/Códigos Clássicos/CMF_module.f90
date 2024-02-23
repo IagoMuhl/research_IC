@@ -264,43 +264,49 @@ contains
 
       do i = 1, maxConfig
 
-         ! H_inter(i) = J1*(2*m_guess(1)*(s(i,6)+s(i,7)-2*m_guess(6)) + &
-         !                &   m_guess(2)*(s(i,5)+s(i,8)-2*m_guess(5)) + &
-         !                &   m_guess(3)*(s(i,4)+s(i,9)-2*m_guess(4)) + &
-         !                &   m_guess(4)*(s(i,3)+s(i,10)) + &
-         !                &   m_guess(5)*(s(i,2)+s(i,11)) + &
-         !                &   2*m_guess(6)*(s(i,1)+s(i,12))) + &
+         H_inter(i) = J1*((2*m_guess(1)*(s(i,6)+s(i,7)) + &
+                      &   m_guess(2)*(s(i,5)+s(i,8)) + &
+                      &   m_guess(3)*(s(i,4)+s(i,9)) + &
+                      &   m_guess(4)*(s(i,3)+s(i,10)) + &
+                      &   m_guess(5)*(s(i,2)+s(i,11)) + &
+                      &   2*m_guess(6)*(s(i,1)+s(i,12))) - &
+                      &   (4*m_guess(1)*m_guess(6) + &
+                      &    2*m_guess(2)*m_guess(5) + &
+                      &    2*m_guess(3)*m_guess(4))) + &
+
+               & J2*(m_guess(1)*(2*s(i,1)+s(i,5)+s(i,8)+2*s(i,12)) + &
+               &     m_guess(2)*(s(i,4)+s(i,6)+s(i,7)+s(i,9)) + &
+               &     m_guess(3)*(s(i,3)+s(i,5)+s(i,8)+s(i,10)) + &
+               &     m_guess(4)*(s(i,2)+s(i,4)+s(i,9)+s(i,11)) + &
+               &     m_guess(5)*(s(i,1)+s(i,3)+s(i,10)+s(i,12)) + &
+               &     m_guess(6)*(s(i,2)+2*s(i,6)+2*s(i,7)+s(i,11)) - &
+               &     (2*m_guess(1)*m_guess(1)+2*m_guess(1)*m_guess(5) + &
+               &      2*m_guess(2)*m_guess(6)+2*m_guess(2)*m_guess(4) + &
+               &      2*m_guess(3)*m_guess(5)+2*m_guess(6)*m_guess(6) + &
+               &      m_guess(3)*m_guess(3) + m_guess(4)*m_guess(4)))
+
+         ! H_inter(i) =  J1*(s(i,1)*m_guess(6)+s(i,6)*m_guess(1)-m_guess(1)*m_guess(6)  &
+         ! &   +   s(i,1)*m_guess(6)+s(i,7)*m_guess(1)-m_guess(1)*m_guess(6)  &
+         ! &   +   s(i,2)*m_guess(5)+s(i,8)*m_guess(2)-m_guess(2)*m_guess(5)  &
+         ! &   +   s(i,3)*m_guess(4)+s(i,9)*m_guess(3)-m_guess(4)*m_guess(3)  &
+         ! &   +   s(i,4)*m_guess(3)+s(i,10)*m_guess(4)-m_guess(3)*m_guess(4)  &
+         ! &   +   s(i,5)*m_guess(2)+s(i,11)*m_guess(5)-m_guess(5)*m_guess(2) &
+         ! &   +   s(i,6)*m_guess(1)+s(i,12)*m_guess(6)-m_guess(6)*m_guess(1) &
+         ! &   +   s(i,7)*m_guess(1)+s(i,12)*m_guess(6)-m_guess(6)*m_guess(1)) &
 
 
-         !       & J2*(m_guess(1)*(2*s(i,1)+s(i,5)+s(i,8)+2*s(i,12)-2*(m_guess(1)+m_guess(5))) + &
-         !       &     m_guess(2)*(s(i,4)+s(i,6)+s(i,7)+s(i,9)-2*(m_guess(6)+m_guess(4))) + &
-         !       &     m_guess(3)*(s(i,3)+s(i,5)+s(i,8)+s(i,10)-2*(m_guess(5)+m_guess(3))) + &
-         !       &     m_guess(4)*(s(i,2)+s(i,4)+s(i,9)+s(i,11)-m_guess(4)) + &
-         !       &     m_guess(5)*(s(i,1)+s(i,3)+s(i,10)+s(i,12)) + &
-         !       &     m_guess(6)*(s(i,2)+2*s(i,6)+2*s(i,7)+s(i,11)-2*m_guess(6)))
-
-         H_inter(i) =  J1*(s(i,1)*m_guess(6)+s(i,6)*m_guess(1)-m_guess(1)*m_guess(6)  &
-         &   +   s(i,1)*m_guess(6)+s(i,7)*m_guess(1)-m_guess(1)*m_guess(6)  &
-         &   +   s(i,2)*m_guess(5)+s(i,8)*m_guess(2)-m_guess(2)*m_guess(5)  &
-         &   +   s(i,3)*m_guess(4)+s(i,9)*m_guess(3)-m_guess(4)*m_guess(3)  &
-         &   +   s(i,4)*m_guess(3)+s(i,10)*m_guess(4)-m_guess(3)*m_guess(4)  &
-         &   +   s(i,5)*m_guess(2)+s(i,11)*m_guess(5)-m_guess(5)*m_guess(2) &
-         &   +   s(i,6)*m_guess(1)+s(i,12)*m_guess(6)-m_guess(6)*m_guess(1) &
-         &   +   s(i,7)*m_guess(1)+s(i,12)*m_guess(6)-m_guess(6)*m_guess(1)) &
-
-
-         & + J2*(s(i,1)*m_guess(5)+s(i,8)*m_guess(1)-m_guess(1)*m_guess(5)  &
-         &   +   s(i,2)*m_guess(6)+s(i,7)*m_guess(2)-m_guess(2)*m_guess(6) &
-         &   +   s(i,2)*m_guess(4)+s(i,9)*m_guess(2)-m_guess(2)*m_guess(4)  &
-         &   +   s(i,3)*m_guess(5)+s(i,8)*m_guess(3)-m_guess(3)*m_guess(5)   &
-         &   +   s(i,3)*m_guess(3)+s(i,10)*m_guess(3)-m_guess(3)*m_guess(3)   &
-         &   +   s(i,4)*m_guess(4)+s(i,9)*m_guess(4)-m_guess(4)*m_guess(4)  &
-         &   +   s(i,4)*m_guess(2)+s(i,11)*m_guess(4)-m_guess(2)*m_guess(4)  &
-         &   +   s(i,5)*m_guess(3)+s(i,10)*m_guess(5)-m_guess(3)*m_guess(5)  &
-         &   +   s(i,5)*m_guess(1)+s(i,12)*m_guess(5)-m_guess(5)*m_guess(1)  &
-         &   +   s(i,6)*m_guess(2)+s(i,11)*m_guess(6)-m_guess(6)*m_guess(2)  &
-         &  + 2*(s(i,1)*m_guess(1)+s(i,12)*m_guess(1)-m_guess(1)*m_guess(1) + &
-            s(i,6)*m_guess(6)+s(i,7)*m_guess(6)-m_guess(6)*m_guess(6)))
+         ! & + J2*(s(i,1)*m_guess(5)+s(i,8)*m_guess(1)-m_guess(1)*m_guess(5)  &
+         ! &   +   s(i,2)*m_guess(6)+s(i,7)*m_guess(2)-m_guess(2)*m_guess(6) &
+         ! &   +   s(i,2)*m_guess(4)+s(i,9)*m_guess(2)-m_guess(2)*m_guess(4)  &
+         ! &   +   s(i,3)*m_guess(5)+s(i,8)*m_guess(3)-m_guess(3)*m_guess(5)   &
+         ! &   +   s(i,3)*m_guess(3)+s(i,10)*m_guess(3)-m_guess(3)*m_guess(3)   &
+         ! &   +   s(i,4)*m_guess(4)+s(i,9)*m_guess(4)-m_guess(4)*m_guess(4)  &
+         ! &   +   s(i,4)*m_guess(2)+s(i,11)*m_guess(4)-m_guess(2)*m_guess(4)  &
+         ! &   +   s(i,5)*m_guess(3)+s(i,10)*m_guess(5)-m_guess(3)*m_guess(5)  &
+         ! &   +   s(i,5)*m_guess(1)+s(i,12)*m_guess(5)-m_guess(5)*m_guess(1)  &
+         ! &   +   s(i,6)*m_guess(2)+s(i,11)*m_guess(6)-m_guess(6)*m_guess(2)  &
+         ! &  + 2*(s(i,1)*m_guess(1)+s(i,12)*m_guess(1)-m_guess(1)*m_guess(1) + &
+         !    s(i,6)*m_guess(6)+s(i,7)*m_guess(6)-m_guess(6)*m_guess(6)))
 
       enddo
 

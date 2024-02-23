@@ -11,7 +11,7 @@ program square_T
    integer:: j, cd,i,p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.35d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.3d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -36,8 +36,8 @@ program square_T
 
       j = 0; Alfa = 0.d0 ; cd = -3
 
-      T_inicial = 3.5d0
-      T_final = 4.8d0
+      T_inicial = 1.2
+      T_final = 1.d0
 
       
       CALL CPU_TIME ( tempo_inicial )
