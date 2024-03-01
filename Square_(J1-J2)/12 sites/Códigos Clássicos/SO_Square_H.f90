@@ -4,7 +4,7 @@ program square_T
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8, dimension(6):: m, error, mag_prev
-   real*8:: J2, erro, Alfa
+   real*8:: J2, erro, Alfa, passo
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
    character(len=3):: state
@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.3d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.275d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -36,17 +36,17 @@ program square_T
 
       
 
-      do while(T<1.19d0)
+      do while(T<1.050d0)
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -5
+      j = 0; Alfa = 0.d0 ; cd = -5; passo = 10.d0**(-3)
 
-      H_inicial = 3.97
-      H_final = 3.985
+      ! H_inicial = 3.995
+      ! H_final = 3.98
 
-      ! H_inicial = 3.985
-      ! H_final = 3.95
+      H_inicial = 3.98
+      H_final = 3.995
 
       
       CALL CPU_TIME ( tempo_inicial )
@@ -168,7 +168,7 @@ program square_T
 
       call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
 
-      T = T + 0.001
+      T = T + passo
 
    enddo
 
