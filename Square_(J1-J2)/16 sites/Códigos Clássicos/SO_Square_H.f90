@@ -3,7 +3,7 @@ program square_T
    implicit none
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(16), error(4), mag_prev(4) 
+   real*8:: m(6), error(4), mag_prev(4) 
    real*8:: J2, erro, Alfa, passo
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = 0.0d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -29,24 +29,23 @@ program square_T
    write(*,*) 'Entre com a fase:'
    read*, state
 
-
-   ! open(unit=20, file= trim(temp) // 'SO_H_' // trim(state) // "_T-H.dat")
+   !open(unit=20, file= 'SO_H_' // trim(state) // "_T-H.dat")
 
    do
 
       
 
-      do while(T< 2.2d0)
+      do while(T< 1.28d0)
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -3; passo = 10.d0**(-1)
+      j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-3)
 
-      ! H_inicial = 3.922
-      ! H_final = 3.925
+      H_inicial = 3.96
+      H_final = 3.97
 
-      H_inicial = 3.0
-      H_final = 4.5
+      ! H_inicial = 3.97
+      ! H_final = 3.96
 
       
       CALL CPU_TIME ( tempo_inicial )
@@ -63,11 +62,11 @@ program square_T
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
-      open(unit=20, file=trim(state) // "_H_T-F-m.dat")
+      !open(unit=20, file=trim(state) // "_H_T-F-m.dat")
 
       WRITE (temp, '(F5.3)') T
 
-      !open(unit=20, file= trim(temp) // '_SO_H_' // trim(state) // "_T-H.dat")
+      open(unit=20, file= trim(temp) // '_SO_H_' // trim(state) // "_T-H.dat")
 
       do while (H_inicial/=H_final)
 
@@ -108,20 +107,14 @@ program square_T
 
          end do
 
-            do i = 13, 14
+            do i = 5, 6
 
-            call magnetization(H_total,Z,s,i,T,m(i))
+               call magnetization(H_total,Z,s,(i+8),T,m(i))
 
             enddo
 
-            m(7) = m(1)
-            m(6) = m(2); m(8) = m(2); m(12) = m(2)
-            m(5) = m(3); m(9) = m(3); m(11) = m(3)
-            m(10) = m(4)
-            m(15) = m(13)
-            m(16) = m(14)
-
             call order_parameter(state,m,m_order)
+         
 
          call F_helm(T,Z,F)
 
@@ -130,7 +123,7 @@ program square_T
          !print*, T_inicial, m_order
 
 
-         !write(20,*) H_inicial, F, m_order!,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
+         write(20,*) H_inicial, F, m_order!,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
          ! print*, T, m_order, m_fe, m_af
 
          if (j==0) then
@@ -140,7 +133,7 @@ program square_T
                print*, '/\---------/\'
 18             format ((F8.5))
                j = 1
-               write(20,*) T, H_inicial
+               !write(20,*) T, H_inicial
             end if
          end if
 
@@ -176,7 +169,7 @@ program square_T
       minutos = int(tempo_final - tempo_inicial)/60
       segundos = int(mod((tempo_final - tempo_inicial),60.0))
 
-      WRITE (*, '(A,I2,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
+      WRITE (*, '(A,I3,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
 
       call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
 

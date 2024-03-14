@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.275d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.075d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -36,17 +36,17 @@ program square_T
 
       
 
-      do while(T<1.050d0)
+      do while(T<0.205d0)
 
 
 
       j = 0; Alfa = 0.d0 ; cd = -5; passo = 10.d0**(-3)
 
-      ! H_inicial = 3.995
-      ! H_final = 3.98
+      ! H_inicial = 3.99
+      ! H_final =  4.05
 
-      H_inicial = 3.98
-      H_final = 3.995
+      H_inicial = 4.1
+      H_final = 3.99
 
       
       CALL CPU_TIME ( tempo_inicial )

@@ -11,7 +11,7 @@ program square_T
    integer:: j, cd,i,p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.275d0; s_z = 0
+   tol = 10.d0**(-8); J2 = -0.075d0; s_z = 0
 !----------------------------BASE-------------------------------
    call base(s)
 

@@ -172,7 +172,7 @@ contains
    subroutine mag_vetor(state,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), dimension(16), intent(out):: m
+      real(kind=db), dimension(6), intent(out):: m
       real*8:: m_fe, m_af
       integer:: i
 
@@ -184,11 +184,11 @@ contains
 
        case ('AF')
 
-         do i = 1,15,2
+         do i = 1,5,2
             m(i) = m_fe
          enddo
 
-         do i = 2,16,2
+         do i = 2,6,2
             m(i) = m_af
          enddo
 
@@ -204,11 +204,11 @@ contains
          m_fe = 0.84719110987579493
          m_af = 0.65197042353076307
 
-         do i = 1,15,2
+         do i = 1,5,2
             m(i) = m_fe
          enddo
 
-         do i = 2,16,2
+         do i = 2,6,2
             m(i) = m_af
          enddo
 
@@ -223,7 +223,7 @@ contains
 
        case ('PM')
 
-         do i = 1,16
+         do i = 1,6
             m(i) = m_fe
          enddo
 
@@ -272,7 +272,7 @@ contains
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(16), intent(in):: m_guess
+      real(kind=db), dimension(6), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
       !character(len=3), intent(in) :: state
 
@@ -280,51 +280,46 @@ contains
 
       do i = 1, maxConfig
 
-         ! H_inter(i) = J1*((2*m_guess(1)*(s(i,6)+s(i,7)) + &
-         ! &   m_guess(2)*(s(i,5)+s(i,8)) + &
-         ! &   m_guess(3)*(s(i,4)+s(i,9)) + &
-         ! &   m_guess(4)*(s(i,3)+s(i,10)) + &
-         ! &   m_guess(5)*(s(i,2)+s(i,11)) + &
-         ! &   2*m_guess(6)*(s(i,1)+s(i,12))) - &
-         ! &   (4*m_guess(1)*m_guess(6) + &
-         ! &    2*m_guess(2)*m_guess(5) + &
-         ! &    2*m_guess(3)*m_guess(4))) + &
-
-         ! & J2*(m_guess(1)*(2*s(i,1)+s(i,5)+s(i,8)+2*s(i,12)) + &
-         ! &     m_guess(2)*(s(i,4)+s(i,6)+s(i,7)+s(i,9)) + &
-         ! &     m_guess(3)*(s(i,3)+s(i,5)+s(i,8)+s(i,10)) + &
-         ! &     m_guess(4)*(s(i,2)+s(i,4)+s(i,9)+s(i,11)) + &
-         ! &     m_guess(5)*(s(i,1)+s(i,3)+s(i,10)+s(i,12)) + &
-         ! &     m_guess(6)*(s(i,2)+2*s(i,6)+2*s(i,7)+s(i,11)) - &
-         ! &     (2*m_guess(1)*m_guess(1)+2*m_guess(1)*m_guess(5) + &
-         ! &      2*m_guess(2)*m_guess(6)+2*m_guess(2)*m_guess(4) + &
-         ! &      2*m_guess(3)*m_guess(5)+2*m_guess(6)*m_guess(6) + &
-         ! &      m_guess(3)*m_guess(3) + m_guess(4)*m_guess(4)))
-
-         H_inter(i) =  J1*(s(i,1)*m_guess(10)+s(i,10)*m_guess(1)-m_guess(1)*m_guess(10)  &
-         &   +   s(i,1)*m_guess(4)+s(i,4)*m_guess(1)-m_guess(1)*m_guess(4)  &
-         &   +   s(i,2)*m_guess(9)+s(i,9)*m_guess(2)-m_guess(2)*m_guess(9)  &
-         &   +   s(i,3)*m_guess(8)+s(i,8)*m_guess(3)-m_guess(3)*m_guess(8)  &
-         &   +   s(i,4)*m_guess(7)+s(i,7)*m_guess(4)-m_guess(4)*m_guess(7)  &
-         &   +   s(i,5)*m_guess(12)+s(i,12)*m_guess(5)-m_guess(5)*m_guess(12) &
-         &   +   s(i,6)*m_guess(11)+s(i,11)*m_guess(6)-m_guess(6)*m_guess(11) &
-         &   +   s(i,7)*m_guess(10)+s(i,10)*m_guess(7)-m_guess(7)*m_guess(10)) &
+          H_inter(i) = J1*(2*m_guess(1)*(s(i,10)+s(i,4)) &
+          &        +        (m_guess(2)*(s(i,3)+s(i,9)+s(i,5)+s(i,11))) &
+          &        +        (m_guess(3)*(s(i,2)+s(i,8)+s(i,6)+s(i,12))) &
+          &        +       2*m_guess(4)*(s(i,7)+s(i,1)) &
+          &        -      4*(m_guess(1)*m_guess(4) + m_guess(2)*m_guess(3))) + &
 
 
-         & + J2*(s(i,1)*m_guess(7)+s(i,7)*m_guess(1)-m_guess(1)*m_guess(7)  &
-         &   +   s(i,1)*m_guess(9)+s(i,9)*m_guess(1)-m_guess(1)*m_guess(9) &
-         &   +   s(i,1)*m_guess(5)+s(i,5)*m_guess(1)-m_guess(1)*m_guess(5)  &
-         &   +   s(i,2)*m_guess(10)+s(i,10)*m_guess(2)-m_guess(2)*m_guess(10)   &
-         &   +   s(i,2)*m_guess(8)+s(i,8)*m_guess(2)-m_guess(2)*m_guess(8)   &
-         &   +   s(i,3)*m_guess(9)+s(i,9)*m_guess(3)-m_guess(3)*m_guess(9)  &
-         &   +   s(i,3)*m_guess(7)+s(i,7)*m_guess(3)-m_guess(3)*m_guess(7)  &
-         &   +   s(i,4)*m_guess(8)+s(i,8)*m_guess(4)-m_guess(4)*m_guess(8)  &
-         &   +   s(i,4)*m_guess(10)+s(i,10)*m_guess(4)-m_guess(4)*m_guess(10)  &
-         &   +   s(i,4)*m_guess(12)+s(i,12)*m_guess(4)-m_guess(4)*m_guess(12)  &
-         &   +   s(i,5)*m_guess(11)+s(i,11)*m_guess(5)-m_guess(5)*m_guess(11)  &
-         &   +   s(i,6)*m_guess(12)+s(i,12)*m_guess(6)-m_guess(6)*m_guess(12)  &
-         &   +   s(i,6)*m_guess(10)+s(i,10)*m_guess(6)-m_guess(6)*m_guess(10)  &
-         &   +   s(i,7)*m_guess(11)+s(i,11)*m_guess(7)-m_guess(7)*m_guess(11))
+         & J2*(m_guess(1)*(s(i,1)+s(i,7)+s(i,9)+s(i,5)+s(i,3)+s(i,11)) + &
+         &     m_guess(2)*(2*s(i,10)+s(i,2)+s(i,8)+2*s(i,4)+s(i,6)+s(i,12)) + &
+         &     m_guess(3)*(2*s(i,1)+s(i,3)+s(i,9)+2*s(i,7)+s(i,5)+s(i,11)) + &
+         &     m_guess(4)*(s(i,2)+s(i,8)+s(i,4)+s(i,10)+s(i,12)+s(i,6)) - &
+         &     (m_guess(1)*m_guess(1)+2*m_guess(2)*m_guess(2) + &
+         &      m_guess(4)*m_guess(4)+2*m_guess(3)*m_guess(3) + &
+         &      4*m_guess(1)*m_guess(3)+4*m_guess(2)*m_guess(4)))
+
+
+         ! H_inter(i) =  J1*(s(i,1)*m_guess(4)+s(i,10)*m_guess(1)-m_guess(1)*m_guess(4)  &
+         ! &   +   s(i,1)*m_guess(4)+s(i,4)*m_guess(1)-m_guess(1)*m_guess(4)  &
+         ! &   +   s(i,2)*m_guess(3)+s(i,9)*m_guess(2)-m_guess(2)*m_guess(3)  &
+         ! &   +   s(i,3)*m_guess(2)+s(i,8)*m_guess(3)-m_guess(3)*m_guess(2)  &
+         ! &   +   s(i,4)*m_guess(1)+s(i,7)*m_guess(4)-m_guess(4)*m_guess(1)  &
+         ! &   +   s(i,5)*m_guess(2)+s(i,12)*m_guess(3)-m_guess(3)*m_guess(2) &
+         ! &   +   s(i,6)*m_guess(3)+s(i,11)*m_guess(2)-m_guess(2)*m_guess(3) &
+         ! &   +   s(i,7)*m_guess(4)+s(i,10)*m_guess(1)-m_guess(1)*m_guess(4)) &
+
+
+         ! & + J2*(s(i,1)*m_guess(1)+s(i,7)*m_guess(1)-m_guess(1)*m_guess(1)  &
+         ! &   +   s(i,1)*m_guess(3)+s(i,9)*m_guess(1)-m_guess(1)*m_guess(3) &
+         ! &   +   s(i,1)*m_guess(3)+s(i,5)*m_guess(1)-m_guess(1)*m_guess(3)  &
+         ! &   +   s(i,2)*m_guess(4)+s(i,10)*m_guess(2)-m_guess(2)*m_guess(4)   &
+         ! &   +   s(i,2)*m_guess(2)+s(i,8)*m_guess(2)-m_guess(2)*m_guess(2)   &
+         ! &   +   s(i,3)*m_guess(3)+s(i,9)*m_guess(3)-m_guess(3)*m_guess(3)  &
+         ! &   +   s(i,3)*m_guess(1)+s(i,7)*m_guess(3)-m_guess(3)*m_guess(1)  &
+         ! &   +   s(i,4)*m_guess(2)+s(i,8)*m_guess(4)-m_guess(4)*m_guess(2)  &
+         ! &   +   s(i,4)*m_guess(4)+s(i,10)*m_guess(4)-m_guess(4)*m_guess(4)  &
+         ! &   +   s(i,4)*m_guess(2)+s(i,12)*m_guess(4)-m_guess(4)*m_guess(2)  &
+         ! &   +   s(i,5)*m_guess(3)+s(i,11)*m_guess(3)-m_guess(3)*m_guess(3)  &
+         ! &   +   s(i,6)*m_guess(2)+s(i,12)*m_guess(2)-m_guess(2)*m_guess(2)  &
+         ! &   +   s(i,6)*m_guess(4)+s(i,10)*m_guess(2)-m_guess(2)*m_guess(4)  &
+         ! &   +   s(i,7)*m_guess(3)+s(i,11)*m_guess(1)-m_guess(1)*m_guess(3))
 
 
       enddo
@@ -333,7 +328,7 @@ contains
    end subroutine
 
    subroutine order_parameter(state,m,m_order)
-      real(kind=db), dimension(16), intent(in):: m
+      real(kind=db), dimension(6), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
       integer:: i
@@ -344,7 +339,7 @@ contains
 
        case('AF')
 
-         do i = 1,15,2
+         do i = 1,5,2
             m_order = m_order + (m(i) - m(i+1))
          enddo
 
@@ -354,11 +349,11 @@ contains
 
          !m_order = abs(2*m_order/num_sites)
 
-          m_order = abs(m_order/num_sites)
+          m_order = abs(m_order/6)
 
        case('2AF')
 
-         do i = 1,15,2
+         do i = 1,5,2
             m_order = m_order + (m(i) - m(i+1))
          enddo
 
@@ -368,11 +363,11 @@ contains
 
          !m_order = abs(2*m_order/num_sites)
 
-          m_order = abs(m_order/num_sites)
+          m_order = abs(m_order/6)
 
        case('PM')
 
-         do i = 1,16
+         do i = 1,6
             m_order = m_order + abs(m(i))
          enddo
 
@@ -382,7 +377,7 @@ contains
          !    m_order = m_order + abs(m(i))
          ! enddo
 
-          m_order = abs(m_order/num_sites)
+          m_order = abs(m_order/6)
 
        case default
          print*, 'ERRO'
