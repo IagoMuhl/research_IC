@@ -5,6 +5,7 @@ module CMF
    integer, parameter:: num_sites= 24
    integer, parameter:: maxConfig= minConfig**num_sites
    real(kind=db), parameter:: J1=1.d0
+
 contains
 
    subroutine base(s)
@@ -98,19 +99,22 @@ contains
 
    end subroutine
 
+
    subroutine HAM_INTRA(J2,s,H_intra)
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
       real(kind=db), intent(in):: J2
       real(kind=db), dimension(maxConfig), intent(out):: H_intra
 
+
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
+
          H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,2)*s(i,3) + s(i,3)*s(i,4) + s(i,4)*s(i,5) + s(i,5)*s(i,6) + &
          &  s(i,16)*s(i,17) + s(i,17)*s(i,18) + s(i,18)*s(i,19) + s(i,19)*s(i,20) + s(i,20)*s(i,7) + s(i,15)*s(i,24) + &
          &  s(i,24)*s(i,23) + s(i,23)*s(i,22) + s(i,22)*s(i,21) + s(i,21)*s(i,8) + s(i,14)*s(i,13) + s(i,13)*s(i,12) + &
          &  s(i,12)*s(i,11) + s(i,11)*s(i,10) + s(i,10)*s(i,9) + s(i,1)*s(i,16) + s(i,2)*s(i,17) + s(i,3)*s(i,18) + &
-         &  s(i,1)*s(i,19) + s(i,5)*s(i,20) + s(i,6)*s(i,7) + s(i,16)*s(i,15) + s(i,17)*s(i,24) + s(i,18)*s(i,23) + &
+         &  s(i,4)*s(i,19) + s(i,5)*s(i,20) + s(i,6)*s(i,7) + s(i,16)*s(i,15) + s(i,17)*s(i,24) + s(i,18)*s(i,23) + &
          &  s(i,19)*s(i,22) + s(i,20)*s(i,21) + s(i,7)*s(i,8) + s(i,15)*s(i,14) + s(i,24)*s(i,13) + s(i,23)*s(i,12) + &
          &  s(i,22)*s(i,11) + s(i,21)*s(i,10) + s(i,8)*s(i,9)) + &
 
@@ -120,9 +124,11 @@ contains
          &  s(i,5)*s(i,19) + s(i,6)*s(i,20) + s(i,17)*s(i,15) + s(i,18)*s(i,24) + s(i,19)*s(i,23) + s(i,20)*s(i,22) + &
          &  s(i,7)*s(i,21) + s(i,24)*s(i,14) + s(i,23)*s(i,13) + s(i,22)*s(i,12) + s(i,21)*s(i,11) + s(i,8)*s(i,10))
 
+         !---------------------HAMILTONIANO INTRA-----------------------------
+
 
       end do
-      !---------------------HAMILTONIANO INTRA-----------------------------
+
 
 
    end subroutine
@@ -183,11 +189,16 @@ contains
 
       do i = 1, maxConfig
 
-         m = m + s(i,inf)*dexp(-b*(H(i)))
+         m = m + (s(i,inf)*dexp(-b*(H(i))))
+
+         ! read*,
 
       end do
 
+
       m = m/Z
+
+      ! print*, m, Z, inf
 
 
       !  print*, Z, m, T
@@ -279,16 +290,16 @@ contains
 
 
 
-   subroutine print_m(state,J2,m,tol,T,n)
+   subroutine print_m(state,J2,m,tol,T,N)
       real(kind=db), intent(in):: J2,m,tol,T
       character(len=*):: state
-      integer:: n
+      integer:: N
 
       if (m<tol) then
-         if (n==1) then
+         if (N==1) then
             print *, J2,T,state
             !write(20,*) J2, T
-            n =  n + 1
+            N =  N + 1
          endif
       endif
 
@@ -296,12 +307,14 @@ contains
 
 
 
-   subroutine Ham_inter_state(J2,s,m_guess,H_inter)
+   ! subroutine Ham_inter_state(J2,N11,N12,N21,N22,N31,N32,N41,N42,N51,N52,N61,N62,m,H_inter)
+      subroutine Ham_inter_state(J2,s,m,H_inter)
       implicit none
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(8), intent(in):: m_guess
+      real(kind=db), dimension(8), intent(in):: m
+      ! integer, dimension(maxConfig), intent(out):: N11,N12,N21,N22,N31,N32,N41,N42,N51,N52,N61,N62
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
       !character(len=3), intent(in) :: state
 
@@ -309,24 +322,29 @@ contains
 
       do i = 1, maxConfig
 
-         H_inter(i) = J1*(2*m_guess(1)*(s(i,6)+s(i,14)) &
-         &        +        (m_guess(2)*(s(i,13)+s(i,5)+s(i,7)+s(i,15))) &
-         &        +        (m_guess(3)*(s(i,4)+s(i,12))) &
-         &        +        (m_guess(4)*(s(i,3)+s(i,11))) &
-         &        +        (m_guess(5)*(s(i,2)+s(i,10)+s(i,8)+s(i,16))) &
-         &        +        (2*m_guess(6)*(s(i,1)+s(i,9))) &
-         &        -      2*(2*m_guess(1)*m_guess(6)+2*m_guess(2)*m_guess(5)+m_guess(3)*m_guess(4))) + &
+
+         H_inter(i) = J1*(2*m(1)*(s(i,6)+s(i,14)) &
+         &        +        (m(2)*(s(i,13)+s(i,5)+s(i,7)+s(i,15))) &
+         &        +        (m(3)*(s(i,4)+s(i,12))) &
+         &        +        (m(4)*(s(i,3)+s(i,11))) &
+         &        +        (m(5)*(s(i,2)+s(i,10)+s(i,8)+s(i,16))) &
+         &        +        (2*m(6)*(s(i,1)+s(i,9))) &
+         &        -      (4*m(1)*m(6)+4*m(2)*m(5)+2*m(3)*m(4))) + &
 
 
-         & J2*(m_guess(1)*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15)-m_guess(1)) + &
-         &     m_guess(2)*(2*s(i,6)+s(i,4)+s(i,8)+2*s(i,14)+s(i,12)+s(i,16)-m_guess(2)) + &
-         &     m_guess(3)*(s(i,3)+s(i,5)+s(i,11)+s(i,13)-m_guess(3)) + &
-         &     m_guess(4)*(s(i,2)+s(i,4)+s(i,10)+s(i,12)-m_guess(4)) + &
-         &     m_guess(5)*(2*s(i,1)+s(i,3)+s(i,7)+2*s(i,9)+s(i,11)+s(i,15)-m_guess(5)) + &
-         &     m_guess(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m_guess(6)) - &
-         &     2*(2*m_guess(1)*m_guess(5)+2*m_guess(2)*m_guess(6)+m_guess(2)*m_guess(4)+m_guess(3)*m_guess(5)))
+         & J2*(m(1)*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15)-m(1)) + &
+         &     m(2)*(2*s(i,6)+s(i,4)+s(i,8)+2*s(i,14)+s(i,12)+s(i,16)-m(2)) + &
+         &     m(3)*(s(i,3)+s(i,5)+s(i,11)+s(i,13)-m(3)) + &
+         &     m(4)*(s(i,2)+s(i,4)+s(i,10)+s(i,12)-m(4)) + &
+         &     m(5)*(2*s(i,1)+s(i,3)+s(i,7)+2*s(i,9)+s(i,11)+s(i,15)-m(5)) + &
+         &     m(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m(6)) - &
+         &     2*(2*m(1)*m(5)+2*m(2)*m(6)+m(2)*m(4)+m(3)*m(5)))
 
-
+         ! H_inter(i) = m(1)*(J1*N11(i) + J2*(N12(i) - m(1))) + m(2)*(J1*N21(i) + J2*(N22(i) - m(2))) &
+         ! &  + m(3)*(J1*N31(i) + J2*(N32(i) - m(3))) + m(4)*(J1*N41(i) + J2*(N42(i) - m(4)))    &
+         ! &  + m(5)*(J1*N51(i) + J2*(N52(i) - m(5))) + m(6)*(J1*N61(i) + J2*(N62(i) - m(6)))    &
+         ! &  - 2*(J1*(2*m(1)*m(6) + 2*m(2)*m(5) + m(3)*m(4)) &
+         ! &  + J2*(2*m(1)*m(5) + 2*m(2)*m(6) + m(2)*m(4) + m(3)*m(5)))
 
       enddo
 
@@ -345,45 +363,41 @@ contains
 
        case('AF')
 
-         do i = 1,7,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
+         ! do i = 1,7,2
+         !    m_order = m_order + (m(i) - m(i+1))
+         ! enddo
+
+         m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
 
          ! do i = 7,11,2
          !    m_order = m_order + (m(i+1) - m(i))
          ! enddo
 
-         !m_order = abs(2*m_order/num_sites)
+         !m_order = abs(3*m_order/num_sites)
 
-         m_order = abs(m_order/8)
+          m_order = abs(m_order/12)
 
        case('2AF')
 
-         do i = 1,7,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
-
-         ! do i = 7,11,2
-         !    m_order = m_order + (m(i+1) - m(i))
+         ! do i = 1,7,2
+         !    m_order = m_order + (m(i) - m(i+1))
          ! enddo
+
+         m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
 
          !m_order = abs(2*m_order/num_sites)
 
-         m_order = abs(m_order/8)
+         m_order = abs(m_order/12)
 
        case('PM')
 
-         do i = 1,8
-            m_order = m_order + abs(m(i))
-         enddo
-
-         !m_order = abs(2*m_order/num_sites)
-
-         ! do i = 1,12
+         ! do i = 1,8
          !    m_order = m_order + abs(m(i))
          ! enddo
 
-         m_order = abs(m_order/8)
+         m_order = (m(1)+2*m(2)+m(3)+m(4)+2*m(5)+m(6)+2*m(7)+2*m(8))
+
+         m_order = abs(m_order/12)
 
        case default
          print*, 'ERRO'

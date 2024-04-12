@@ -3,7 +3,7 @@ program square_T
    implicit none
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(8), error(6), mag_prev(6) 
+   real*8:: m(6), error(4), mag_prev(4) 
    real*8:: J2, erro, Alfa, passo
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = 0.00d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.60d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -35,14 +35,14 @@ program square_T
 
       
 
-      do while(T< 2.8d0)
+      do while(T< 3.0d0)
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -3 ; passo = 10.d0**(-2)
+      j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-2)
 
       H_inicial = 3.7
-      H_final = 3.9
+      H_final = 3.85
 
       ! H_inicial = 3.96
       ! H_final = 3.94
@@ -90,7 +90,7 @@ program square_T
 
             call partition(H_total,T,Z)
 
-            do i = 1, 6
+            do i = 1, 4
 
                mag_prev(i) = m(i)
 
@@ -107,9 +107,9 @@ program square_T
 
          end do
 
-            do i = 7, 8
+            do i = 5, 6
 
-               call magnetization(H_total,Z,s,(i+10),T,m(i))
+               call magnetization(H_total,Z,s,(i+8),T,m(i))
 
             enddo
 

@@ -73,6 +73,7 @@ contains
 
    end subroutine
 
+
    subroutine HAM_INTRA(J2,s,H_intra)
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
@@ -92,8 +93,11 @@ contains
          &  s(i,3)*s(i,13) + s(i,13)*s(i,11) + s(i,4)*s(i,14) + s(i,14)*s(i,16) + &
          &  s(i,16)*s(i,10) + s(i,5)*s(i,15) + s(i,15)*s(i,9) + s(i,6)*s(i,8))
 
-      end do
       !---------------------HAMILTONIANO INTRA-----------------------------
+
+
+      end do
+
 
 
    end subroutine

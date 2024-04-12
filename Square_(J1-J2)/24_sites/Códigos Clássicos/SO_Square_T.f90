@@ -3,7 +3,7 @@ program square_T
    implicit none
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(8), error(6), mag_prev(6)
+   real*8:: m(8), error(6), mag_prev(6), N(maxConfig,6)
    real*8:: J2, erro, Alfa, passo
    real*8:: T_inicial,T_final,H,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
@@ -20,7 +20,7 @@ program square_T
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
-   call HAM_INTRA(J2,s,H_intra)
+   call HAM_INTRA(J2,s,H_intra,N)
 !--------------------------------------------------------------
    write(*,*) 'Entre com H:'
    read*, H
@@ -63,7 +63,7 @@ program square_T
 
             do while(erro >= tol)
 
-               call Ham_inter_state(J2,s,m,H_inter)
+               call Ham_inter_state(J2,N,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
 

@@ -3,7 +3,7 @@ program square_T
    implicit none
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(6), error(4), mag_prev(4) 
+   real*8:: m(8), error(6), mag_prev(6)
    real*8:: J2, erro, Alfa, passo
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.60d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -21,6 +21,8 @@ program square_T
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
+
+
    call HAM_INTRA(J2,s,H_intra)
 !--------------------------------------------------------------
    write(*,*) 'Entre com T:'
@@ -35,17 +37,17 @@ program square_T
 
       
 
-      do while(T< 2.8d0)
+      do while(T<= 1.49d0)
 
 
 
       j = 0; Alfa = 0.d0 ; cd = -3 ; passo = 10.d0**(-2)
 
-      H_inicial = 3.7
-      H_final = 3.9
+      H_inicial = 3.95
+      H_final = 3.97
 
-      ! H_inicial = 3.96
-      ! H_final = 3.94
+      ! H_inicial = 4.0
+      ! H_final = 3.9
 
       
       CALL CPU_TIME ( tempo_inicial )
@@ -76,10 +78,13 @@ program square_T
 
             call Ham_inter_state(J2,s,m,H_inter)
 
+            ! print*, H_inter(maxConfig),m(1),m(2),m_order
+            ! read*,
+
             H_total = H_intra + H_inter - H_inicial*s_z
 
          !---------------------- SHIFT DA HAMILTONIANA ----------------
-            if (T<=10.d0**(-3)) then
+            if (T<=10.d0**(-1)) then
 
                Alfa = minval(H_total)
 
@@ -90,16 +95,18 @@ program square_T
 
             call partition(H_total,T,Z)
 
-            do i = 1, 4
+            do i = 1, 6
 
                mag_prev(i) = m(i)
 
                call magnetization(H_total,Z,s,i,T,m(i))
 
-               error(i) = abs(mag_prev(i) - m(i))
+               error(i) = abs(m(i) - mag_prev(i))
 
-               ! m1 = m1*0.5 + 0.5*m(1)
+               !m(i) = m(i)*0.5 + 0.5*mag_prev(i)
 
+               ! print*, m(i),mag_prev(i),error(i),i
+               ! read*,
 
                erro = maxval(error)
 
@@ -107,9 +114,9 @@ program square_T
 
          end do
 
-            do i = 5, 6
+            do i = 7, 8
 
-               call magnetization(H_total,Z,s,(i+8),T,m(i))
+               call magnetization(H_total,Z,s,(i+10),T,m(i))
 
             enddo
 
@@ -123,8 +130,12 @@ program square_T
          !print*, T_inicial, m_order
 
 
-         write(20,*) H_inicial, F, m_order!,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
-         ! print*, T, m_order, m_fe, m_af
+         write(20,*) H_inicial, F, m_order!,m(4)!,m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
+        ! WRITE (*, '(F3.4,F3.4,F3.4)') H_inicial, m_order, m
+         print*, H_inicial, m_order
+         !call print_matrixH(8,1,m)
+         !print*, error
+         ! read(*,*)
 
          if (j==0) then
             if (m_order<=10.d0**(-4)) then
