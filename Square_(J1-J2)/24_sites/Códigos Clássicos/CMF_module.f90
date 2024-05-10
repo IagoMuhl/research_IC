@@ -105,7 +105,9 @@ contains
       integer :: i
       real(kind=db), intent(in):: J2
       real(kind=db), dimension(maxConfig), intent(out):: H_intra
+      ! real(kind=db), dimension(maxConfig,6), intent(out):: N
 
+      ! N = 0
 
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
@@ -125,6 +127,14 @@ contains
          &  s(i,7)*s(i,21) + s(i,24)*s(i,14) + s(i,23)*s(i,13) + s(i,22)*s(i,12) + s(i,21)*s(i,11) + s(i,8)*s(i,10))
 
          !---------------------HAMILTONIANO INTRA-----------------------------
+
+         ! N(i,1) = 2*J1*(s(i,6)+s(i,14)) + J2*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15))
+         ! N(i,2) = J1*(s(i,13)+s(i,5)+s(i,7)+s(i,15)) + J2*(2*s(i,6)+s(i,4)+s(i,8)+s(i,12)+2*s(i,14)+s(i,16))
+         ! N(i,3) = J1*(s(i,4)+s(i,12)) + J2*(s(i,3)+s(i,5)+s(i,11)+s(i,13))
+         ! N(i,4) = J1*(s(i,3)+s(i,11)) + J2*(s(i,2)+s(i,4)+s(i,10)+s(i,12))
+         ! N(i,5) = J1*(s(i,2)+s(i,8)+s(i,10)+s(i,16)) + J2*(2*s(i,1)+s(i,3)+s(i,7)+s(i,11)+2*s(i,9)+s(i,15))
+         ! N(i,6) = 2*J1*(s(i,1)+s(i,9)) + J2*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16))
+
 
 
       end do
@@ -216,7 +226,8 @@ contains
       real*8:: m_fe, m_af
       integer:: i
 
-      m_fe = 1.d0; m_af = -1.d0
+      m_fe = 1.d0;
+      m_af = -1.d0
 
       m = 0.d0
 
@@ -307,10 +318,11 @@ contains
 
 
 
-   ! subroutine Ham_inter_state(J2,N11,N12,N21,N22,N31,N32,N41,N42,N51,N52,N61,N62,m,H_inter)
-      subroutine Ham_inter_state(J2,s,m,H_inter)
+   ! subroutine Ham_inter_state(J2,N,m,H_inter)
+   subroutine Ham_inter_state(J2,s,m,H_inter)
       implicit none
       integer, dimension(maxConfig,num_sites), intent(in):: s
+      ! real(kind=db), dimension(maxConfig,6), intent(in):: N
       integer :: i
       real(kind=db), intent(in):: J2
       real(kind=db), dimension(8), intent(in):: m
@@ -340,9 +352,9 @@ contains
          &     m(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m(6)) - &
          &     2*(2*m(1)*m(5)+2*m(2)*m(6)+m(2)*m(4)+m(3)*m(5)))
 
-         ! H_inter(i) = m(1)*(J1*N11(i) + J2*(N12(i) - m(1))) + m(2)*(J1*N21(i) + J2*(N22(i) - m(2))) &
-         ! &  + m(3)*(J1*N31(i) + J2*(N32(i) - m(3))) + m(4)*(J1*N41(i) + J2*(N42(i) - m(4)))    &
-         ! &  + m(5)*(J1*N51(i) + J2*(N52(i) - m(5))) + m(6)*(J1*N61(i) + J2*(N62(i) - m(6)))    &
+         ! H_inter(i) = m(1)*(N(i,1) - J2*m(1)) + m(2)*(N(i,2) - J2*m(2)) &
+         ! &  + m(3)*(N(i,3) - J2*m(3)) + m(4)*(N(i,4) - J2*m(4)) &
+         ! &  + m(5)*(N(i,5) - J2*m(5)) + m(6)*(N(i,6) - J2*m(6)) &
          ! &  - 2*(J1*(2*m(1)*m(6) + 2*m(2)*m(5) + m(3)*m(4)) &
          ! &  + J2*(2*m(1)*m(5) + 2*m(2)*m(6) + m(2)*m(4) + m(3)*m(5)))
 
@@ -355,7 +367,7 @@ contains
       real(kind=db), dimension(8), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
-      integer:: i
+      !integer:: i
 
       m_order = 0.d0
 
@@ -375,7 +387,7 @@ contains
 
          !m_order = abs(3*m_order/num_sites)
 
-          m_order = abs(m_order/12)
+         m_order = abs(m_order/12)
 
        case('2AF')
 
@@ -405,6 +417,37 @@ contains
       end select
 
    end subroutine
+
+   ! subroutine simplify(J2,s,N,S_sub)
+   !    integer, dimension(maxConfig,num_sites), intent(in):: s
+   !    real*8:: J2
+   !    real(kind=db), dimension(maxConfig,6), intent(out):: N
+   !    integer, dimension(maxConfig,8), intent(out):: S_sub
+   !    integer:: i,j
+
+   !    S_sub = 0
+
+   !    do j = 1, 8
+         
+   !    do i = 1, maxConfig
+
+   !    N(i,1) = 2*J1*(s(i,6)+s(i,14)) + J2*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15))
+   !    N(i,2) = J1*(s(i,13)+s(i,5)+s(i,7)+s(i,15)) + J2*(2*s(i,6)+s(i,4)+s(i,8)+s(i,12)+2*s(i,14)+s(i,16))
+   !    N(i,3) = J1*(s(i,4)+s(i,12)) + J2*(s(i,3)+s(i,5)+s(i,11)+s(i,13))
+   !    N(i,4) = J1*(s(i,3)+s(i,11)) + J2*(s(i,2)+s(i,4)+s(i,10)+s(i,12))
+   !    N(i,5) = J1*(s(i,2)+s(i,8)+s(i,10)+s(i,16)) + J2*(2*s(i,1)+s(i,3)+s(i,7)+s(i,11)+2*s(i,9)+s(i,15))
+   !    N(i,6) = 2*J1*(s(i,1)+s(i,9)) + J2*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16))
+
+   !    S_sub(i,j) = S_sub(i,j) + s(i,j)
+
+   !    enddo
+   !    enddo
+
+
+
+
+
+   ! end subroutine
 
 
 end module CMF

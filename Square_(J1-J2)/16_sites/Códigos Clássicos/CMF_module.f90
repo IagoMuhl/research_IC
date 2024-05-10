@@ -343,9 +343,11 @@ contains
 
        case('AF')
 
-         do i = 1,5,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
+         ! do i = 1,5,2
+         !    m_order = m_order + (m(i) - m(i+1))
+         ! enddo
+
+         m_order = (m(1)-2*m(2)+2*m(3)-m(4)+m(5)-m(6))
 
          ! do i = 7,11,2
          !    m_order = m_order + (m(i+1) - m(i))
@@ -357,9 +359,7 @@ contains
 
        case('2AF')
 
-         do i = 1,5,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
+         m_order = (m(1)-2*m(2)+2*m(3)-m(4)+m(5)-m(6))
 
          ! do i = 7,11,2
          !    m_order = m_order + (m(i+1) - m(i))

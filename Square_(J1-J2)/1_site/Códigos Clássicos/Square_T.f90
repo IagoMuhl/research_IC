@@ -10,7 +10,7 @@ program square_T
    integer:: j, up, down, cd,i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.52d0
+   tol = 10.d0**(-8); J2 = 0.0d0
 
    call base(s)
 !--------------------------------------------------------------

@@ -12,7 +12,7 @@ program square_T
    integer:: j, cd, i, p, minutos, segundos
 
 
-   tol = 10.d0**(-8); J2 = -0.60d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -35,14 +35,14 @@ program square_T
 
       
 
-      do while(T< 3.0d0)
+      do while(T< 1.4d0)
 
 
 
       j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-2)
 
-      H_inicial = 3.7
-      H_final = 3.85
+      H_inicial = 3.9
+      H_final = 3.97
 
       ! H_inicial = 3.96
       ! H_final = 3.94

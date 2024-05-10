@@ -2,6 +2,9 @@ program square_T
    use CMF
    implicit none
    integer, dimension(maxConfig,num_sites):: s
+   ! integer, dimension(:,:),allocatable:: s
+   ! real*8, dimension(maxConfig,6):: N
+   ! integer, dimension(maxConfig,8):: S_sub
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8:: m(8), error(6), mag_prev(6)
    real*8:: J2, erro, Alfa, passo
@@ -11,6 +14,7 @@ program square_T
    character(len=5):: temp
    integer:: j, cd, i, p, minutos, segundos
 
+   ! allocate(s(maxConfig,num_sites))
 
    tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
@@ -22,8 +26,11 @@ program square_T
       enddo
    enddo
 
-
    call HAM_INTRA(J2,s,H_intra)
+
+   ! call simplify(J2,s,N,S_sub)
+
+   ! deallocate(s)
 !--------------------------------------------------------------
    write(*,*) 'Entre com T:'
    read*, T
@@ -37,14 +44,14 @@ program square_T
 
       
 
-      do while(T<= 1.49d0)
+      do while(T<= 1.43d0)
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -3 ; passo = 10.d0**(-2)
+      j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-3)
 
-      H_inicial = 3.95
-      H_final = 3.97
+      H_inicial = 3.951
+      H_final = 3.956
 
       ! H_inicial = 4.0
       ! H_final = 3.9
