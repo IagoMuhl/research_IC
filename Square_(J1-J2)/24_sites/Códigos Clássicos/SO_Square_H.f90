@@ -1,10 +1,10 @@
 program square_T
    use CMF
    implicit none
-   integer, dimension(maxConfig,num_sites):: s
-   ! integer, dimension(:,:),allocatable:: s
-   ! real*8, dimension(maxConfig,6):: N
-   ! integer, dimension(maxConfig,8):: S_sub
+   !integer, dimension(maxConfig,num_sites):: s
+   integer, dimension(:,:),allocatable:: s, s_sub
+   real*8, dimension(maxConfig,6):: N
+   ! integer, dimension(maxConfig,8):: s_sub
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8:: m(8), error(6), mag_prev(6)
    real*8:: J2, erro, Alfa, passo
@@ -14,11 +14,11 @@ program square_T
    character(len=5):: temp
    integer:: j, cd, i, p, minutos, segundos
 
-   ! allocate(s(maxConfig,num_sites))
+   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,8))
 
    tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
-   call base(s)
+   call base(s,s_sub)
 
    do p = 1, num_sites
       do i = 1, maxConfig
@@ -26,11 +26,10 @@ program square_T
       enddo
    enddo
 
-   call HAM_INTRA(J2,s,H_intra)
+   call HAM_INTRA(J2,s,H_intra,N)
 
-   ! call simplify(J2,s,N,S_sub)
 
-   ! deallocate(s)
+   deallocate(s)
 !--------------------------------------------------------------
    write(*,*) 'Entre com T:'
    read*, T
@@ -48,7 +47,7 @@ program square_T
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-3)
+      j = 0; Alfa = 0.d0 ; cd = -3 ; passo = 10.d0**(-3)
 
       H_inicial = 3.951
       H_final = 3.956
@@ -83,7 +82,7 @@ program square_T
 
          do while(erro >= tol)
 
-            call Ham_inter_state(J2,s,m,H_inter)
+            call Ham_inter_state(J2,N,m,H_inter)
 
             ! print*, H_inter(maxConfig),m(1),m(2),m_order
             ! read*,
@@ -106,7 +105,7 @@ program square_T
 
                mag_prev(i) = m(i)
 
-               call magnetization(H_total,Z,s,i,T,m(i))
+               call magnetization(H_total,Z,s_sub,i,T,m(i))
 
                error(i) = abs(m(i) - mag_prev(i))
 
@@ -123,7 +122,7 @@ program square_T
 
             do i = 7, 8
 
-               call magnetization(H_total,Z,s,(i+10),T,m(i))
+               call magnetization(H_total,Z,s,i,T,m(i))
 
             enddo
 

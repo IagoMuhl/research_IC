@@ -20,7 +20,7 @@ program square_T
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
-   call HAM_INTRA(J2,s,H_intra,N)
+   call HAM_INTRA(J2,s,H_intra)
 !--------------------------------------------------------------
    write(*,*) 'Entre com H:'
    read*, H
@@ -63,7 +63,7 @@ program square_T
 
             do while(erro >= tol)
 
-               call Ham_inter_state(J2,N,m,H_inter)
+               call Ham_inter_state(J2,s,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
 
