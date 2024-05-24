@@ -1,9 +1,9 @@
 program square_T
    use CMF
    implicit none
-   integer, dimension(maxConfig,num_sites):: s
+   integer, dimension(:,:), allocatable:: s,s_sub
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(6), error(4), mag_prev(4) 
+   real*8:: m(6), error(4), mag_prev(4), N(maxConfig,4)
    real*8:: J2, erro, Alfa, passo
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
    real*4:: tempo_inicial, tempo_final
@@ -11,17 +11,19 @@ program square_T
    character(len=5):: temp
    integer:: j, cd, i, p, minutos, segundos
 
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0;
 
-   tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
+   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,6))
 !----------------------------BASE-------------------------------
-   call base(s)
+   call base(s,s_sub)
 
    do p = 1, num_sites
       do i = 1, maxConfig
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
-   call HAM_INTRA(J2,s,H_intra)
+   call HAM_INTRA(J2,s,H_intra,N)
+   deallocate(s)
 !--------------------------------------------------------------
    write(*,*) 'Entre com T:'
    read*, T
@@ -39,10 +41,10 @@ program square_T
 
 
 
-      j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-2)
+      j = 0; Alfa = 0.d0 ; cd = -3 ; passo = 10.d0**(-2)
 
-      H_inicial = 3.9
-      H_final = 3.97
+      H_inicial = 3.5
+      H_final = 4.5
 
       ! H_inicial = 3.96
       ! H_final = 3.94
@@ -74,7 +76,7 @@ program square_T
 
          do while(erro >= tol)
 
-            call Ham_inter_state(J2,s,m,H_inter)
+            call Ham_inter_state(J2,N,m,H_inter)
 
             H_total = H_intra + H_inter - H_inicial*s_z
 
@@ -94,7 +96,7 @@ program square_T
 
                mag_prev(i) = m(i)
 
-               call magnetization(H_total,Z,s,i,T,m(i))
+               call magnetization(H_total,Z,s_sub,i,T,m(i))
 
                error(i) = abs(mag_prev(i) - m(i))
 
@@ -109,7 +111,7 @@ program square_T
 
             do i = 5, 6
 
-               call magnetization(H_total,Z,s,(i+8),T,m(i))
+               call magnetization(H_total,Z,s_sub,i,T,m(i))
 
             enddo
 
@@ -123,8 +125,8 @@ program square_T
          !print*, T_inicial, m_order
 
 
-         write(20,*) H_inicial, F, m_order!,m(1),m(2)!,m(3),m(4),m(5),m(6),m(7),m(8)
-         ! print*, T, m_order, m_fe, m_af
+         write(20,*) H_inicial, F, m_order
+         print*, H_inicial, m_order
 
          if (j==0) then
             if (m_order<=10.d0**(-4)) then

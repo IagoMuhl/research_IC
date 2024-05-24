@@ -15,7 +15,7 @@ contains
       integer:: s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16
       integer:: s17,s18,s19,s20,s21,s22,s23,s24
       integer, intent(out):: s(maxConfig,num_sites)
-      integer, intent(out):: s_sub(maxConfig,8)
+      integer, intent(out):: s_sub(maxConfig,10)
 
       k=1
       !!!!!!!!!!    CONTRUÇÃO DA BASE     !!!!!!!!!!!!
@@ -50,8 +50,8 @@ contains
                                                                               s(k,4)=s4; s_sub(k,4)=s4
                                                                               s(k,5)=s5; s_sub(k,5)=s5
                                                                               s(k,6)=s6; s_sub(k,6)=s6
-                                                                              s(k,7)=s7
-                                                                              s(k,8)=s8
+                                                                              s(k,7)=s7; s_sub(k,7)=s7
+                                                                              s(k,8)=s8; s_sub(k,8)=s8
                                                                               s(k,9)=s9
                                                                               s(k,10)=s10
                                                                               s(k,11)=s11
@@ -60,8 +60,8 @@ contains
                                                                               s(k,14)=s14
                                                                               s(k,15)=s15
                                                                               s(k,16)=s16
-                                                                              s(k,17)=s17; s_sub(k,7)=s17
-                                                                              s(k,18)=s18; s_sub(k,8)=s18
+                                                                              s(k,17)=s17; s_sub(k,9)=s17
+                                                                              s(k,18)=s18; s_sub(k,10)=s18
                                                                               s(k,19)=s19
                                                                               s(k,20)=s20
                                                                               s(k,21)=s21
@@ -105,7 +105,7 @@ contains
       integer :: i
       real(kind=db), intent(in):: J2
       real(kind=db), dimension(maxConfig), intent(out):: H_intra
-      real(kind=db), dimension(maxConfig,6), intent(out):: N
+      real(kind=db), dimension(maxConfig,8), intent(out):: N
 
       ! N = 0
 
@@ -129,11 +129,13 @@ contains
          !---------------------HAMILTONIANO INTRA-----------------------------
 
          N(i,1) = 2*J1*(s(i,6)+s(i,14)) + J2*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15))
-         N(i,2) = J1*(s(i,13)+s(i,5)+s(i,7)+s(i,15)) + J2*(2*s(i,6)+s(i,4)+s(i,8)+s(i,12)+2*s(i,14)+s(i,16))
+         N(i,2) = J1*(s(i,13)+s(i,5)) + J2*(s(i,6)+s(i,4)+s(i,12)+s(i,14))
          N(i,3) = J1*(s(i,4)+s(i,12)) + J2*(s(i,3)+s(i,5)+s(i,11)+s(i,13))
          N(i,4) = J1*(s(i,3)+s(i,11)) + J2*(s(i,2)+s(i,4)+s(i,10)+s(i,12))
-         N(i,5) = J1*(s(i,2)+s(i,8)+s(i,10)+s(i,16)) + J2*(2*s(i,1)+s(i,3)+s(i,7)+s(i,11)+2*s(i,9)+s(i,15))
+         N(i,5) = J1*(s(i,2)+s(i,10)) + J2*(s(i,1)+s(i,3)+s(i,11)+s(i,9))
          N(i,6) = 2*J1*(s(i,1)+s(i,9)) + J2*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16))
+         N(i,7) = J1*(s(i,16)+s(i,8)) + J2*(s(i,1)+s(i,15))
+         N(i,8) = J1*(s(i,15)+s(i,7)) + J2*(s(i,16)+s(i,14))
 
 
 
@@ -322,7 +324,7 @@ contains
    !subroutine Ham_inter_state(J2,s,m,H_inter)
       implicit none
       !integer, dimension(maxConfig,num_sites), intent(in):: s
-      real(kind=db), dimension(maxConfig,6), intent(in):: N
+      real(kind=db), dimension(maxConfig,8), intent(in):: N
       integer :: i
       real(kind=db), intent(in):: J2
       real(kind=db), dimension(8), intent(in):: m
@@ -352,11 +354,12 @@ contains
          ! &     m(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m(6)) - &
          ! &     2*(2*m(1)*m(5)+2*m(2)*m(6)+m(2)*m(4)+m(3)*m(5)))
 
-         H_inter(i) = m(1)*(N(i,1) - J2*m(1)) + m(2)*(N(i,2) - J2*m(2)) &
+         H_inter(i) = m(1)*(N(i,1) - J2*m(1)) + m(2)*(N(i,2)) &
          &  + m(3)*(N(i,3) - J2*m(3)) + m(4)*(N(i,4) - J2*m(4)) &
-         &  + m(5)*(N(i,5) - J2*m(5)) + m(6)*(N(i,6) - J2*m(6)) &
-         &  - 2*(J1*(2*m(1)*m(6) + 2*m(2)*m(5) + m(3)*m(4)) &
-         &  + J2*(2*m(1)*m(5) + 2*m(2)*m(6) + m(2)*m(4) + m(3)*m(5)))
+         &  + m(5)*(N(i,5)) + m(6)*(N(i,6) - J2*m(6)) &
+         &  + m(7)*(N(i,7) - J2*m(7)) + m(8)*(N(i,8) - J2*m(8)) &
+         &  - 2*(J1*(2*m(1)*m(6) + m(2)*m(5) + m(3)*m(4) + m(7)*m(8)) &
+         &  + J2*(m(1)*m(5) + m(2)*m(6) + m(2)*m(4) + m(3)*m(5) + m(1)*m(7) + m(6)*m(8)))
 
       enddo
 
@@ -364,10 +367,10 @@ contains
    end subroutine
 
    subroutine order_parameter(state,m,m_order)
-      real(kind=db), dimension(8), intent(in):: m
+      real(kind=db), dimension(10), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
-      integer:: i
+      !integer:: i
 
       m_order = 0.d0
 
@@ -375,41 +378,37 @@ contains
 
        case('AF')
 
-         do i = 1,7,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
+!          do i = 1,7,2
+!             m_order = m_order + (m(i) - m(i+1))
+!          enddo
 
-         ! m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
+         m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
 
-         ! do i = 7,11,2
-         !    m_order = m_order + (m(i+1) - m(i))
-         ! enddo
 
-         !m_order = abs(3*m_order/num_sites)
-
-         m_order = abs(m_order/8)
+         m_order = abs(m_order/12)
 
        case('2AF')
 
-         do i = 1,7,2
-            m_order = m_order + (m(i) - m(i+1))
-         enddo
+         m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
+
+
+         m_order = abs(m_order/12)
 
          ! m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
 
          !m_order = abs(2*m_order/num_sites)
 
-         m_order = abs(m_order/8)
+         ! m_order = abs(m_order/8)
 
        case('PM')
 
-         do i = 1,8
-            m_order = m_order + abs(m(i))
-         enddo
+         ! do i = 1,10
+         !    m_order = m_order + abs(m(i))
+         ! enddo
 
-         ! m_order = (m(1)+2*m(2)+m(3)+m(4)+2*m(5)+m(6)+2*m(7)+2*m(8))
+         m_order = (m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8)+2*m(9)+2*(10))
 
-         m_order = abs(m_order/8)
+         m_order = abs(m_order/12)
 
        case default
          print*, 'ERRO'
@@ -418,36 +417,6 @@ contains
 
    end subroutine
 
-   ! subroutine simplify(J2,s,N,S_sub)
-   !    integer, dimension(maxConfig,num_sites), intent(in):: s
-   !    real*8:: J2
-   !    real(kind=db), dimension(maxConfig,6), intent(out):: N
-   !    integer, dimension(maxConfig,8), intent(out):: S_sub
-   !    integer:: i,j
-
-   !    S_sub = 0
-
-   !    do j = 1, 8
-         
-   !    do i = 1, maxConfig
-
-   !    N(i,1) = 2*J1*(s(i,6)+s(i,14)) + J2*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15))
-   !    N(i,2) = J1*(s(i,13)+s(i,5)+s(i,7)+s(i,15)) + J2*(2*s(i,6)+s(i,4)+s(i,8)+s(i,12)+2*s(i,14)+s(i,16))
-   !    N(i,3) = J1*(s(i,4)+s(i,12)) + J2*(s(i,3)+s(i,5)+s(i,11)+s(i,13))
-   !    N(i,4) = J1*(s(i,3)+s(i,11)) + J2*(s(i,2)+s(i,4)+s(i,10)+s(i,12))
-   !    N(i,5) = J1*(s(i,2)+s(i,8)+s(i,10)+s(i,16)) + J2*(2*s(i,1)+s(i,3)+s(i,7)+s(i,11)+2*s(i,9)+s(i,15))
-   !    N(i,6) = 2*J1*(s(i,1)+s(i,9)) + J2*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16))
-
-   !    S_sub(i,j) = S_sub(i,j) + s(i,j)
-
-   !    enddo
-   !    enddo
-
-
-
-
-
-   ! end subroutine
 
 
 end module CMF

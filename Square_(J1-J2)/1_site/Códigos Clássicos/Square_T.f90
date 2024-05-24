@@ -96,6 +96,7 @@ program square_T
 
             call magnetization(H_total_2,Z2,s,T_inicial,m2)
 
+            print*, T_inicial, m1, m2
 
             erro1 = abs(m(1) - m1)
             erro2 = abs(m(2) - m2)
