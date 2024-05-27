@@ -134,8 +134,8 @@ contains
          N(i,4) = J1*(s(i,3)+s(i,11)) + J2*(s(i,2)+s(i,4)+s(i,10)+s(i,12))
          N(i,5) = J1*(s(i,2)+s(i,10)) + J2*(s(i,1)+s(i,3)+s(i,11)+s(i,9))
          N(i,6) = 2*J1*(s(i,1)+s(i,9)) + J2*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16))
-         N(i,7) = J1*(s(i,16)+s(i,8)) + J2*(s(i,1)+s(i,15))
-         N(i,8) = J1*(s(i,15)+s(i,7)) + J2*(s(i,16)+s(i,14))
+         N(i,7) = J1*(s(i,16)+s(i,8)) + J2*(s(i,1)+s(i,15)+s(i,7)+s(i,9))
+         N(i,8) = J1*(s(i,15)+s(i,7)) + J2*(s(i,16)+s(i,14)+s(i,6)+s(i,8))
 
 
 
@@ -186,8 +186,8 @@ contains
 
 
 
-   subroutine magnetization(H,Z,s,inf,T,m)
-      integer, dimension(maxConfig,num_sites), intent(in) :: s
+   subroutine magnetization(H,Z,s_sub,inf,T,m)
+      integer, dimension(maxConfig,10), intent(in) :: s_sub
       real(kind=db):: b
       real(kind=db), dimension(maxConfig), intent(in):: H
       real(kind=db), intent(out):: m
@@ -201,7 +201,7 @@ contains
 
       do i = 1, maxConfig
 
-         m = m + (s(i,inf)*dexp(-b*(H(i))))
+         m = m + (s_sub(i,inf)*dexp(-b*(H(i))))
 
          ! read*,
 
@@ -224,7 +224,7 @@ contains
    subroutine mag_vetor(state,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), dimension(8), intent(out):: m
+      real(kind=db), dimension(10), intent(out):: m
       real*8:: m_fe, m_af
       integer:: i
 
@@ -236,12 +236,14 @@ contains
       select case (state)
 
        case ('AF')
+       
+       ! AF sempre vai do menor campo para o maior !
 
-         do i = 1,7,2
+         do i = 1,9,2
             m(i) = m_fe
          enddo
 
-         do i = 2,8,2
+         do i = 2,10,2
             m(i) = m_af
          enddo
 
@@ -257,11 +259,11 @@ contains
          m_fe = 0.84719110987579493
          m_af = 0.65197042353076307
 
-         do i = 1,7,2
+         do i = 1,9,2
             m(i) = m_fe
          enddo
 
-         do i = 2,8,2
+         do i = 2,10,2
             m(i) = m_af
          enddo
 
@@ -276,7 +278,7 @@ contains
 
        case ('PM')
 
-         do i = 1,8
+         do i = 1,10
             m(i) = m_fe
          enddo
 
@@ -321,16 +323,13 @@ contains
 
 
    subroutine Ham_inter_state(J2,N,m,H_inter)
-   !subroutine Ham_inter_state(J2,s,m,H_inter)
       implicit none
-      !integer, dimension(maxConfig,num_sites), intent(in):: s
       real(kind=db), dimension(maxConfig,8), intent(in):: N
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(8), intent(in):: m
-      ! integer, dimension(maxConfig), intent(out):: N11,N12,N21,N22,N31,N32,N41,N42,N51,N52,N61,N62
+      real(kind=db), dimension(10), intent(in):: m
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
-      !character(len=3), intent(in) :: state
+
 
       H_inter = 0.d0
 
@@ -354,12 +353,13 @@ contains
          ! &     m(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m(6)) - &
          ! &     2*(2*m(1)*m(5)+2*m(2)*m(6)+m(2)*m(4)+m(3)*m(5)))
 
-         H_inter(i) = m(1)*(N(i,1) - J2*m(1)) + m(2)*(N(i,2)) &
-         &  + m(3)*(N(i,3) - J2*m(3)) + m(4)*(N(i,4) - J2*m(4)) &
-         &  + m(5)*(N(i,5)) + m(6)*(N(i,6) - J2*m(6)) &
-         &  + m(7)*(N(i,7) - J2*m(7)) + m(8)*(N(i,8) - J2*m(8)) &
-         &  - 2*(J1*(2*m(1)*m(6) + m(2)*m(5) + m(3)*m(4) + m(7)*m(8)) &
-         &  + J2*(m(1)*m(5) + m(2)*m(6) + m(2)*m(4) + m(3)*m(5) + m(1)*m(7) + m(6)*m(8)))
+         H_inter(i) = m(1)*N(i,1) + m(2)*N(i,2) + m(3)*N(i,3) + m(4)*N(i,4) + &
+             m(5)*N(i,5) + m(6)*N(i,6) + m(7)*N(i,7) + m(8)*N(i,8) - &
+             (2*J1*(2*m(1)*m(6) + m(2)*m(5) + m(3)*m(4)) + &
+             J2*(m(1)*m(1) + m(3)*m(3) + m(4)*m(4) + m(6)*m(6) + m(7)*m(7) + m(8)*m(8) + &
+             2*(m(1)*m(5) + m(2)*m(6) + m(2)*m(4) + m(3)*m(5) + m(6)*m(8) + m(1)*m(7))))
+
+
 
       enddo
 

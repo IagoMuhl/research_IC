@@ -8,11 +8,11 @@ program square_T
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8:: m(10), error(8), mag_prev(8)
    real*8:: J2, erro, Alfa, passo
-   real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F
+   real*8:: H_min,H_max,T,step,Z,m_order,tol,F,hold,T_max
 !    real*4:: tempo_inicial, tempo_final
    character(len=3):: state
    character(len=6):: temp
-   integer:: j, cd, i, p! minutos, segundos
+   integer:: j, cd, i, p, ef, k! minutos, segundos
    character(8)  :: date
    character(10) :: time
    character(5)  :: zone
@@ -20,7 +20,7 @@ program square_T
 
    allocate(s(maxConfig,num_sites) , s_sub(maxConfig,10))
 
-   tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0; k = 1
 !----------------------------BASE-------------------------------
    call base(s,s_sub)
 
@@ -35,39 +35,66 @@ program square_T
 
    deallocate(s)
 !--------------------------------------------------------------
-   write(*,*) 'Entre com T:'
-   read*, T
+   write(*,*) 'Entre com T e T_max:'
+   read*, T,T_max
 
    write(*,*) 'Entre com a fase:'
    read*, state
 
    !open(unit=20, file= 'SO_H_' // trim(state) // "_T-H.dat")
+   
+   write(*,*) 'Entre com o step(-3,-5) e o passo de T(-1,-2,-3):'
+   read*, cd, ef
+   
+            passo = 10.d0**(ef)
+   
+          if ( state=="AF" ) then
+            step = 10.d0**(cd)
+         else
+            step = -10.d0**(cd)
+         end if
+         
 
    do
 
+      do while(T<= T_max)
 
+	! write(*,*) 'Estamos dentro do programa :)'
 
-      do while(T<= 1.43d0)
-
-
-
-         j = 0; Alfa = 0.d0 ; cd = -5 ; passo = 10.d0**(-3)
-
-         H_inicial = 3.953
-         H_final = 3.956
-
-         ! H_inicial = 4.0
-         ! H_final = 3.9
+         j = 0; Alfa = 0.d0
+         
+         if (k==1) then
+         
+         write(*,*) 'Entre com o campo mínimo e máximo:'
+         read*, H_min, H_max
+         
+         if ( state=="AF" ) then
+            hold = H_min
+         else
+            hold = H_max
+         end if
+         endif
+   
+   
+   if ( state=="AF" ) then
+            H_min = hold
+         else
+            H_max = hold
+         end if
+   
+   
+         !H_min = 3.98
+         !H_max = 4.3
 
 
 !       CALL CPU_TIME ( tempo_inicial )
 
          ! -
-         if ( H_inicial>H_final ) then
-            step = -10.d0**(cd)
-         else
-            step = 10.d0**(cd)
-         end if
+        ! if ( H_min>H_max ) then
+        !    step = -10.d0**(cd)
+       !  else
+      !      step = 10.d0**(cd)
+     !    end if
 
 
          call mag_vetor(state,m)
@@ -80,7 +107,7 @@ program square_T
 
          open(unit=20, file= trim(temp) // '_SO_H_' // trim(state) // "_T-H.dat")
 
-         do while (H_inicial/=H_final)
+         do while (H_min/=H_max)
 
             error = 1.d0; erro = 1.d0
 
@@ -91,7 +118,7 @@ program square_T
                ! print*, H_inter(maxConfig),m(1),m(2),m_order
                ! read*,
 
-               H_total = H_intra + H_inter - H_inicial*s_z
+               H_total = H_intra + H_inter - H_min*s_z
 
                !---------------------- SHIFT DA HAMILTONIANA ----------------
                if (T<=10.d0**(-1)) then
@@ -140,14 +167,14 @@ program square_T
 
 
 
-            write(20,*) H_inicial, F, m_order
+            write(20,*) H_min, F, m_order
 
             call date_and_time(date,time,zone,values)
             call date_and_time(DATE=date,ZONE=zone)
             call date_and_time(TIME=time)
             call date_and_time(VALUES=values)
 
-            write(*, '(F8.5,A,F8.5,A,I2,A,I2,A,I2,A,I2)') H_inicial,' ', m_order,' ', values(5),':',values(6),' do dia ',values(3),'/',values(2)
+            write(*, '(F8.5,A,F8.5,A,I2,A,I2,A,I2,A,I2)') H_min,' ', m_order,' - ', values(5),':',values(6),' do dia ',values(3),'/',values(2)
             !call print_matrixH(8,1,m)
             !print*, error
             ! read(*,*)
@@ -155,20 +182,21 @@ program square_T
             if (j==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '\/---------\/'
-                  write(*,18) H_inicial, T
+                  write(*,18) H_min, T
                   print*, '/\---------/\'
 18                format ((F8.5))
                   j = 1
-                  !write(20,*) T, H_inicial
+                  !write(20,*) T, H_min
                end if
             end if
 
 
 
-            H_inicial = H_inicial + step
+            H_min = H_min + step;   k = 0
+		
 
-            if ((max(H_inicial,H_final))-(min(H_inicial,H_final))<=abs(step)) then
-               H_inicial = H_final
+            if ((max(H_min,H_max))-(min(H_min,H_max))<=abs(step)) then
+               H_min = H_max
             endif
 
             ! if (max(T_final,T_inicial)>=12.d0) then
@@ -185,7 +213,7 @@ program square_T
 
          print*, '------------'
          Print*, 'State =','', state
-         print*, 'H =','', H_inicial
+         print*, 'H =','', H_min
          print*, 'T','',T
          print*, 'J2','',J2
          print*, '----END-----'
