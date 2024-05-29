@@ -1,46 +1,75 @@
 program square_T
    use CMF
    implicit none
-   integer, dimension(maxConfig,num_sites):: s
-   real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(8), error(6), mag_prev(6), N(maxConfig,6)
-   real*8:: J2, erro, Alfa, passo
-   real*8:: T_inicial,T_final,H,step,Z,m_order,tol,F
-   real*4:: tempo_inicial, tempo_final
-   character(len=3):: state
-   integer:: j, cd,i,p, minutos, segundos
 
+   integer, dimension(:,:),allocatable:: s, s_sub
+   real*8, dimension(maxConfig,8):: N
+   real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
+   real*8:: m(10), error(8), mag_prev(8)
+   real*8:: J2, erro, Alfa, passo, T_min, T_max
+   real*8:: T_inicial,T_final,H,step,Z,m_order,tol,F,H_max
+   character(len=3):: state
+   character(len=5):: temp
+   integer:: j, cd, i, p, ef
+   character(8)  :: date
+   character(10) :: time
+   character(5)  :: zone
+   integer,dimension(8) :: values
+
+   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,10))
 
    tol = 10.d0**(-8); J2 = 0.0d0; s_z = 0;
 !----------------------------BASE-------------------------------
-   call base(s)
+   call base(s,s_sub)
 
    do p = 1, num_sites
       do i = 1, maxConfig
          s_z(i) = s_z(i) + s(i,p)
       enddo
    enddo
-   call HAM_INTRA(J2,s,H_intra)
+   call HAM_INTRA(J2,s,H_intra,N)
+
+   deallocate(s)
 !--------------------------------------------------------------
-   write(*,*) 'Entre com H:'
-   read*, H
+   write(*,*) 'Entre com H e H_max:'
+   read*, H,H_max
 
    write(*,*) 'Entre com a fase:'
    read*, state
 
-   open(unit=20, file= 'SO_T_' // trim(state) // "_T-H.dat")
+   ! open(unit=20, file= 'SO_T_' // trim(state) // "_T-H.dat")
+
+   write(*,*) 'Entre com o step(-3,-5) e o passo de H(-1,-2,-3):'
+   read*, cd, ef
+
+   passo = 10.d0**(ef)
+   
+          if ( state=="AF" ) then
+            step = 10.d0**(cd)
+         else
+            step = -10.d0**(cd)
+         end if
+
+         write(*,*) 'Entre com a temperatura MÍN e MÁX:'
+         read*, T_min, T_max
 
    do
 
-      do while(H<=0.02)
+      do while(H<=H_max)
 
-         j = 0; Alfa = 0.d0 ; cd = -3; passo = 10.d0**(-3)
+         j = 0; Alfa = 0.d0 
 
-         T_inicial = 4.4d0
-         T_final = 4.5d0
+        
+         if ( state=="AF" ) then
+            T_inicial = T_min
+            T_final = T_max
+         else
+            T_inicial = T_max
+            T_final = T_min
+         end if  
 
 
-         CALL CPU_TIME ( tempo_inicial )
+         ! CALL CPU_TIME ( tempo_inicial )
 
          ! -
          if ( T_inicial>T_final ) then
@@ -56,6 +85,9 @@ program square_T
 
          !open(unit=20, file=trim(state) // "_H_T-F-m.dat")
 
+         WRITE (temp, '(F5.3)') H
+
+         open(unit=20, file= trim(temp) // '_SO_T_' // trim(state) // "_T-H.dat")
 
          do while (T_inicial/=T_final)
 
@@ -63,12 +95,12 @@ program square_T
 
             do while(erro >= tol)
 
-               call Ham_inter_state(J2,s,m,H_inter)
+               call Ham_inter_state(J2,N,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
 
                !---------------------- SHIFT DA HAMILTONIANA ----------------
-               if (T_inicial<=10.d0**(-3)) then
+               if (T_inicial<=10.d0**(-1)) then
 
                   Alfa = minval(H_total)
 
@@ -79,7 +111,7 @@ program square_T
 
                call partition(H_total,T_inicial,Z)
 
-               do i = 1, 6
+               do i = 1, 8
 
                   mag_prev(i) = m(i)
 
@@ -97,9 +129,9 @@ program square_T
 
             end do
 
-               do i = 7, 8
+               do i = 1, 10
 
-                  call magnetization(H_total,Z,s,(i+10),T_inicial,m(i))
+                  call magnetization(H_total,Z,s,i,T_inicial,m(i))
 
                enddo
 
@@ -109,11 +141,16 @@ program square_T
 
             F = F + Alfa
 
-            !print*, T_inicial, m_order
 
+            write(20,*) T_inicial, F, m_order
 
-            write(20,*) T_inicial, F, m_order!,m(1),m(2),m(3),m(4),m(5),m(6),m(7),m(8)
-            ! print*, T, m_order, m_fe, m_af
+            call date_and_time(date,time,zone,values)
+            call date_and_time(DATE=date,ZONE=zone)
+            call date_and_time(TIME=time)
+            call date_and_time(VALUES=values)
+
+            write(*, '(F8.5,A,F8.5,A,I2,A,I2,A,I2,A,I2)') T_inicial,' ',&
+            m_order,' - ', values(5),':',values(6),' do dia ',values(3),'/',values(2)
 
             if (j==0) then
                if (m_order<=10.d0**(-4)) then
@@ -153,20 +190,20 @@ program square_T
          print*, 'J2','',J2
          print*, '----END-----'
 
-         CALL CPU_TIME ( tempo_final )
+         !CALL CPU_TIME ( tempo_final )
 
-         minutos = int(tempo_final - tempo_inicial)/60
-         segundos = int(mod((tempo_final - tempo_inicial),60.0))
+         ! minutos = int(tempo_final - tempo_inicial)/60
+         ! segundos = int(mod((tempo_final - tempo_inicial),60.0))
 
-         WRITE (*, '(A,I3,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
+         ! WRITE (*, '(A,I3,A,I2,A)') 'Demorou ',minutos,' minutos e ',segundos,' segundos'
 
-         call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
+         ! call system('paplay /usr/share/sounds/gnome/default/alerts/drip.ogg')
 
          H = H + passo
 
       enddo
 
-      call system('paplay /usr/share/sounds/sound-icons/trumpet-12.wav')
+      !call system('paplay /usr/share/sounds/sound-icons/trumpet-12.wav')
 
       print*, '=== FIM ==='
 

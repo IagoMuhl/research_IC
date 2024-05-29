@@ -15,7 +15,7 @@ contains
       integer:: s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16
       integer:: s17,s18,s19,s20,s21,s22,s23,s24
       integer, intent(out):: s(maxConfig,num_sites)
-      integer, intent(out):: s_sub(maxConfig,10)
+      integer, intent(out):: s_sub(maxConfig,8)
 
       k=1
       !!!!!!!!!!    CONTRUÇÃO DA BASE     !!!!!!!!!!!!
@@ -60,8 +60,8 @@ contains
                                                                               s(k,14)=s14
                                                                               s(k,15)=s15
                                                                               s(k,16)=s16
-                                                                              s(k,17)=s17; s_sub(k,9)=s17
-                                                                              s(k,18)=s18; s_sub(k,10)=s18
+                                                                              s(k,17)=s17
+                                                                              s(k,18)=s18
                                                                               s(k,19)=s19
                                                                               s(k,20)=s20
                                                                               s(k,21)=s21
@@ -224,7 +224,7 @@ contains
    subroutine mag_vetor(state,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), dimension(10), intent(out):: m
+      real(kind=db), dimension(8), intent(out):: m
       real*8:: m_fe, m_af
       integer:: i
 
@@ -239,11 +239,11 @@ contains
        
        ! AF sempre vai do menor campo para o maior !
 
-         do i = 1,9,2
+         do i = 1,7,2
             m(i) = m_fe
          enddo
 
-         do i = 2,10,2
+         do i = 2,8,2
             m(i) = m_af
          enddo
 
@@ -259,11 +259,11 @@ contains
          m_fe = 0.84719110987579493
          m_af = 0.65197042353076307
 
-         do i = 1,9,2
+         do i = 1,7,2
             m(i) = m_fe
          enddo
 
-         do i = 2,10,2
+         do i = 2,8,2
             m(i) = m_af
          enddo
 
@@ -278,7 +278,7 @@ contains
 
        case ('PM')
 
-         do i = 1,10
+         do i = 1,8
             m(i) = m_fe
          enddo
 
@@ -327,7 +327,7 @@ contains
       real(kind=db), dimension(maxConfig,8), intent(in):: N
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(10), intent(in):: m
+      real(kind=db), dimension(8), intent(in):: m
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
 
 
@@ -356,7 +356,7 @@ contains
          H_inter(i) = m(1)*(N(i,1)-J2*m(1)) + m(2)*N(i,2) + m(3)*(N(i,3)-J2*m(3)) + m(4)*(N(i,4)-J2*m(4)) &
           + m(5)*N(i,5) + m(6)*(N(i,6)-J2*m(6)) + m(7)*(N(i,7)-J2*m(7)) + m(8)*(N(i,8)-J2*m(8)) - &
              (2*J1*(2*m(1)*m(6) + m(2)*m(5) + m(3)*m(4) + m(7)*m(8)) + &
-             J2*(2*(m(1)*m(5) + m(2)*m(6) + m(2)*m(4) + m(3)*m(5) + m(6)*m(8) + m(1)*m(7))))
+             2*J2*((m(1)*m(5) + m(2)*m(6) + m(2)*m(4) + m(3)*m(5) + m(6)*m(8) + m(1)*m(7))))
 
 
 
@@ -366,48 +366,57 @@ contains
    end subroutine
 
    subroutine order_parameter(state,m,m_order)
-      real(kind=db), dimension(10), intent(in):: m
+      real(kind=db), dimension(8), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
-      !integer:: i
+      real*8:: m_a,m_b
+      integer:: i
 
-      m_order = 0.d0
+      m_order = 0.d0; m_a = 0.d0; m_a = 0.d0
 
       select case(state)
 
        case('AF')
 
-!          do i = 1,7,2
-!             m_order = m_order + (m(i) - m(i+1))
-!          enddo
+         do i = 1,7,2
 
-         m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
+            ! m_order = m_order + abs(m(i) - m(i+1))
+
+            m_a = m_a + m(i)
+
+            m_b = m_b + m(i+1)
+
+         enddo
+
+         !m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
 
 
-         m_order = abs(m_order/12)
+         m_order = abs(m_a - m_b)/8
 
        case('2AF')
 
-         m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
+         ! m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
 
 
-         m_order = abs(m_order/12)
+         do i = 1,7,2
+            m_order = m_order + abs(m(i) - m(i+1))
+         enddo
 
          ! m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
 
-         !m_order = abs(2*m_order/num_sites)
+         ! m_order = abs(2*m_order/num_sites)
 
-         ! m_order = abs(m_order/8)
+         m_order = abs(m_order/8)
 
        case('PM')
 
-         ! do i = 1,10
-         !    m_order = m_order + abs(m(i))
-         ! enddo
+         do i = 1,8
+            m_order = m_order + abs(m(i))
+         enddo
 
-         m_order = (m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8)+2*m(9)+2*(10))
+         ! m_order = (m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8)+2*m(9)+2*(10))
 
-         m_order = abs(m_order/12)
+         m_order = abs(m_order/8)
 
        case default
          print*, 'ERRO'

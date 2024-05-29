@@ -84,7 +84,7 @@ contains
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
          H_intra(i) = J1*(s(i,1)*s(i,2) + s(i,2)*s(i,3) + s(i,3)*s(i,4) + s(i,12)*s(i,13) + s(i,13)*s(i,14) + &
-         &      s(i,14)*s(i,5) + s(i,11)*s(i,16)+ s(i,16)*s(i,15) + s(i,15)*s(i,6) + s(i,10)*s(i,9) + s(i,9)*s(i,8) + &
+         &      s(i,14)*s(i,5) + s(i,11)*s(i,16) + s(i,16)*s(i,15) + s(i,15)*s(i,6) + s(i,10)*s(i,9) + s(i,9)*s(i,8) + &
          &      s(i,8)*s(i,7) + s(i,1)*s(i,12) + s(i,12)*s(i,11) + s(i,11)*s(i,10) + s(i,2)*s(i,13) + &
          &      s(i,13)*s(i,16) + s(i,16)*s(i,9) + s(i,3)*s(i,14) + s(i,14)*s(i,15) + s(i,15)*s(i,8) + &
          &      s(i,4)*s(i,5) + s(i,5)*s(i,6) + s(i,6)*s(i,7)) + &
@@ -96,7 +96,7 @@ contains
 
          !---------------------HAMILTONIANO INTRA-----------------------------
 
-         N(i,1) = 2*J1*(s(i,10)+s(i,4)) + J2*(s(i,1) + s(i,7)+s(i,9)+s(i,5)+s(i,3)+s(i,11))
+         N(i,1) = 2*J1*(s(i,10)+s(i,4)) + J2*(s(i,1)+s(i,7)+s(i,9)+s(i,5)+s(i,3)+s(i,11))
          N(i,2) = J1*(s(i,3)+s(i,9)+s(i,5)+s(i,11)) + J2*(2*s(i,10)+s(i,2)+s(i,8)+2*s(i,4)+s(i,6)+s(i,12))
          N(i,3) = J1*(s(i,2)+s(i,8)+s(i,6)+s(i,12)) + J2*(2*s(i,1)+s(i,3)+s(i,9)+2*s(i,7)+s(i,5)+s(i,11))
          N(i,4) = 2*J1*(s(i,7)+s(i,1)) + J2*(s(i,2)+s(i,8)+s(i,4)+s(i,10)+s(i,12)+s(i,6))
@@ -307,7 +307,7 @@ contains
 
          H_inter(i) = m_guess(1)*(N(i,1)) + m_guess(2)*(N(i,2)) + &
          &            m_guess(3)*(N(i,3)) + m_guess(4)*(N(i,4)) + &
-         &  -  J1*(4*(m_guess(1)*m_guess(4) + m_guess(2)*m_guess(3))) &
+         &  -  4*J1*(m_guess(1)*m_guess(4) + m_guess(2)*m_guess(3)) &
          &  -  J2*(m_guess(1)*m_guess(1)+2*m_guess(2)*m_guess(2) + &
          &      m_guess(4)*m_guess(4)+2*m_guess(3)*m_guess(3) + &
          &      4*m_guess(1)*m_guess(3)+4*m_guess(2)*m_guess(4))

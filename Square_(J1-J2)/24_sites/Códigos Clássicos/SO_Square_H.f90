@@ -1,24 +1,22 @@
 program square_T
    use CMF
    implicit none
-!integer, dimension(maxConfig,num_sites):: s
+
    integer, dimension(:,:),allocatable:: s, s_sub
    real*8, dimension(maxConfig,8):: N
-! integer, dimension(maxConfig,8):: s_sub
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(10), error(8), mag_prev(8)
+   real*8:: m(8), error(8), mag_prev(8)
    real*8:: J2, erro, Alfa, passo, H_min, H_max
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F,T_max
-!    real*4:: tempo_inicial, tempo_final
    character(len=3):: state
    character(len=5):: temp
-   integer:: j, cd, i, p, ef! minutos, segundos
+   integer:: j, cd, i, p, ef
    character(8)  :: date
    character(10) :: time
    character(5)  :: zone
    integer,dimension(8) :: values
 
-   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,10))
+   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,8))
 
    tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
@@ -31,7 +29,6 @@ program square_T
    enddo
 
    call HAM_INTRA(J2,s,H_intra,N)
-
 
    deallocate(s)
 !--------------------------------------------------------------
@@ -145,11 +142,11 @@ program square_T
 
             end do
 
-            do i = 9, 10
+            ! do i = 1, 10
 
-               call magnetization(H_total,Z,s_sub,i,T,m(i))
+            !    call magnetization(H_total,Z,s_sub,i,T,m(i))
 
-            enddo
+            ! enddo
 
             call order_parameter(state,m,m_order)
 
@@ -157,8 +154,6 @@ program square_T
             call F_helm(T,Z,F)
 
             F = F + Alfa
-
-
 
 
             write(20,*) H_inicial, F, m_order
