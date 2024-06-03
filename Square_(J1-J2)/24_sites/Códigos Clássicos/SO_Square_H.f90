@@ -5,7 +5,7 @@ program square_T
    integer, dimension(:,:),allocatable:: s, s_sub
    real*8, dimension(maxConfig,8):: N
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
-   real*8:: m(8), error(8), mag_prev(8)
+   real*8:: m(12), error(12), mag_prev(12)
    real*8:: J2, erro, Alfa, passo, H_min, H_max
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F,T_max
    character(len=3):: state
@@ -16,7 +16,7 @@ program square_T
    character(5)  :: zone
    integer,dimension(8) :: values
 
-   allocate(s(maxConfig,num_sites) , s_sub(maxConfig,8))
+   allocate(s(maxConfig,num_sites), s_sub(maxConfig,12))
 
    tol = 10.d0**(-8); J2 = -0.36d0; s_z = 0;
 !----------------------------BASE-------------------------------
@@ -123,7 +123,7 @@ program square_T
 
                call partition(H_total,T,Z)
 
-               do i = 1, 8
+               do i = 1, 12
 
                   mag_prev(i) = m(i)
 
@@ -142,7 +142,7 @@ program square_T
 
             end do
 
-            ! do i = 1, 10
+            ! do i = 1, 12
 
             !    call magnetization(H_total,Z,s_sub,i,T,m(i))
 

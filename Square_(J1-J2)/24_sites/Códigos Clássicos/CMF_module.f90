@@ -15,7 +15,7 @@ contains
       integer:: s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16
       integer:: s17,s18,s19,s20,s21,s22,s23,s24
       integer, intent(out):: s(maxConfig,num_sites)
-      integer, intent(out):: s_sub(maxConfig,8)
+      integer, intent(out):: s_sub(maxConfig,12)
 
       k=1
       !!!!!!!!!!    CONTRUÇÃO DA BASE     !!!!!!!!!!!!
@@ -47,7 +47,7 @@ contains
                                                                               s(k,1)=s1; s_sub(k,1)=s1
                                                                               s(k,2)=s2; s_sub(k,2)=s2
                                                                               s(k,3)=s3; s_sub(k,3)=s3
-                                                                              s(k,4)=s4; s_sub(k,4)=s4
+                                                                              s(k,4)=s4;s_sub(k,4)=s4
                                                                               s(k,5)=s5; s_sub(k,5)=s5
                                                                               s(k,6)=s6; s_sub(k,6)=s6
                                                                               s(k,7)=s7; s_sub(k,7)=s7
@@ -60,10 +60,10 @@ contains
                                                                               s(k,14)=s14
                                                                               s(k,15)=s15
                                                                               s(k,16)=s16
-                                                                              s(k,17)=s17
-                                                                              s(k,18)=s18
-                                                                              s(k,19)=s19
-                                                                              s(k,20)=s20
+                                                                              s(k,17)=s17; s_sub(k,9)=s17
+                                                                              s(k,18)=s18; s_sub(k,10)=s18
+                                                                              s(k,19)=s19; s_sub(k,11)=s19
+                                                                              s(k,20)=s20; s_sub(k,12)=s20
                                                                               s(k,21)=s21
                                                                               s(k,22)=s22
                                                                               s(k,23)=s23
@@ -187,7 +187,7 @@ contains
 
 
    subroutine magnetization(H,Z,s_sub,inf,T,m)
-      integer, dimension(maxConfig,10), intent(in) :: s_sub
+      integer, dimension(maxConfig,12), intent(in) :: s_sub
       real(kind=db):: b
       real(kind=db), dimension(maxConfig), intent(in):: H
       real(kind=db), intent(out):: m
@@ -224,7 +224,7 @@ contains
    subroutine mag_vetor(state,m)
       implicit none
       character(len=*), intent(in):: state
-      real(kind=db), dimension(8), intent(out):: m
+      real(kind=db), dimension(12), intent(out):: m
       real*8:: m_fe, m_af
       integer:: i
 
@@ -239,11 +239,11 @@ contains
        
        ! AF sempre vai do menor campo para o maior !
 
-         do i = 1,7,2
+         do i = 1,11,2
             m(i) = m_fe
          enddo
 
-         do i = 2,8,2
+         do i = 2,12,2
             m(i) = m_af
          enddo
 
@@ -259,11 +259,11 @@ contains
          m_fe = 0.84719110987579493
          m_af = 0.65197042353076307
 
-         do i = 1,7,2
+         do i = 1,11,2
             m(i) = m_fe
          enddo
 
-         do i = 2,8,2
+         do i = 2,12,2
             m(i) = m_af
          enddo
 
@@ -278,7 +278,7 @@ contains
 
        case ('PM')
 
-         do i = 1,8
+         do i = 1,12
             m(i) = m_fe
          enddo
 
@@ -327,7 +327,7 @@ contains
       real(kind=db), dimension(maxConfig,8), intent(in):: N
       integer :: i
       real(kind=db), intent(in):: J2
-      real(kind=db), dimension(8), intent(in):: m
+      real(kind=db), dimension(12), intent(in):: m
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
 
 
@@ -335,23 +335,37 @@ contains
 
       do i = 1, maxConfig
 
+         ! H_inter(i) = J1*((s(i,1)*m(6)+s(i,6)*m(1)-m(1)*m(6)) + &
+         ! (s(i,1)*m(14)+s(i,14)*m(1)-m(1)*m(14)) + &
+         ! (s(i,2)*m(13)+s(i,13)*m(2)-m(2)*m(13)) + &
+         ! (s(i,3)*m(12)+s(i,12)*m(3)-m(3)*m(12)) + &
+         ! (s(i,4)*m(11)+s(i,11)*m(4)-m(4)*m(11)) + &
+         ! (s(i,5)*m(10)+s(i,10)*m(5)-m(5)*m(10)) + &
+         ! (s(i,6)*m(9)+s(i,9)*m(6)-m(6)*m(9)) + &
+         ! (s(i,7)*m(16)+s(i,16)*m(7)-m(7)*m(16)) + &
+         ! (s(i,8)*m(15)+s(i,15)*m(8)-m(8)*m(15)) + &
+         ! (s(i,9)*m(14)+s(i,14)*m(9)-m(9)*m(14))) + &
 
-         ! H_inter(i) = J1*(2*m(1)*(s(i,6)+s(i,14)) &
-         ! &        +        (m(2)*(s(i,13)+s(i,5)+s(i,7)+s(i,15))) &
-         ! &        +        (m(3)*(s(i,4)+s(i,12))) &
-         ! &        +        (m(4)*(s(i,3)+s(i,11))) &
-         ! &        +        (m(5)*(s(i,2)+s(i,10)+s(i,8)+s(i,16))) &
-         ! &        +        (2*m(6)*(s(i,1)+s(i,9))) &
-         ! &        -      (4*m(1)*m(6)+4*m(2)*m(5)+2*m(3)*m(4))) + &
+         ! J2*((s(i,1)*m(9)+s(i,9)*m(1)-m(1)*m(9)) + &
+         ! (s(i,1)*m(13)+s(i,13)*m(1)-m(1)*m(13)) + &
+         ! (s(i,2)*m(14)+s(i,14)*m(2)-m(2)*m(14)) + &
+         ! (s(i,2)*m(12)+s(i,12)*m(2)-m(2)*m(12)) + &
+         ! (s(i,3)*m(13)+s(i,13)*m(3)-m(3)*m(13)) + &
+         ! (s(i,3)*m(11)+s(i,11)*m(3)-m(3)*m(11)) + &
+         ! (s(i,4)*m(12)+s(i,12)*m(4)-m(4)*m(12)) + &
+         ! (s(i,4)*m(10)+s(i,10)*m(4)-m(4)*m(10)) + &
+         ! (s(i,5)*m(11)+s(i,11)*m(5)-m(5)*m(11)) + &
+         ! (s(i,5)*m(9)+s(i,9)*m(5)-m(5)*m(9)) + &
+         ! (s(i,10)*m(6)+s(i,6)*m(10)-m(6)*m(10)) + &
+         ! (s(i,6)*m(14)+s(i,14)*m(6)-m(6)*m(14)) + &
+         ! (s(i,6)*m(16)+s(i,16)*m(6)-m(6)*m(16)) + &
+         ! (s(i,7)*m(1)+s(i,1)*m(7)-m(1)*m(7)) + &
+         ! (s(i,7)*m(15)+s(i,15)*m(7)-m(7)*m(15)) + &
+         ! (s(i,8)*m(16)+s(i,16)*m(8)-m(8)*m(16)) + &
+         ! (s(i,8)*m(14)+s(i,14)*m(8)-m(8)*m(14)) + &
+         ! (s(i,9)*m(15)+s(i,15)*m(9)-m(9)*m(15)))
 
 
-         ! & J2*(m(1)*(s(i,1)+s(i,5)+s(i,7)+s(i,9)+s(i,13)+s(i,15)-m(1)) + &
-         ! &     m(2)*(2*s(i,6)+s(i,4)+s(i,8)+2*s(i,14)+s(i,12)+s(i,16)-m(2)) + &
-         ! &     m(3)*(s(i,3)+s(i,5)+s(i,11)+s(i,13)-m(3)) + &
-         ! &     m(4)*(s(i,2)+s(i,4)+s(i,10)+s(i,12)-m(4)) + &
-         ! &     m(5)*(2*s(i,1)+s(i,3)+s(i,7)+2*s(i,9)+s(i,11)+s(i,15)-m(5)) + &
-         ! &     m(6)*(s(i,2)+s(i,6)+s(i,8)+s(i,10)+s(i,14)+s(i,16)-m(6)) - &
-         ! &     2*(2*m(1)*m(5)+2*m(2)*m(6)+m(2)*m(4)+m(3)*m(5)))
 
          H_inter(i) = m(1)*(N(i,1)-J2*m(1)) + m(2)*N(i,2) + m(3)*(N(i,3)-J2*m(3)) + m(4)*(N(i,4)-J2*m(4)) &
           + m(5)*N(i,5) + m(6)*(N(i,6)-J2*m(6)) + m(7)*(N(i,7)-J2*m(7)) + m(8)*(N(i,8)-J2*m(8)) - &
@@ -366,7 +380,7 @@ contains
    end subroutine
 
    subroutine order_parameter(state,m,m_order)
-      real(kind=db), dimension(8), intent(in):: m
+      real(kind=db), dimension(12), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
       real*8:: m_a,m_b
@@ -378,7 +392,7 @@ contains
 
        case('AF')
 
-         do i = 1,7,2
+         do i = 1,11,2
 
             ! m_order = m_order + abs(m(i) - m(i+1))
 
@@ -391,32 +405,38 @@ contains
          !m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
 
 
-         m_order = abs(m_a - m_b)/8
+         m_order = 2*abs(m_a - m_b)/num_sites
 
        case('2AF')
 
          ! m_order = (m(1)-m(2)+m(3)-m(4)+m(5)-m(6)+m(7)-m(8)+2*m(9)-2*m(10))
 
 
-         do i = 1,7,2
-            m_order = m_order + abs(m(i) - m(i+1))
+         do i = 1,11,2
+
+            ! m_order = m_order + abs(m(i) - m(i+1))
+
+            m_a = m_a + m(i)
+
+            m_b = m_b + m(i+1)
+
          enddo
 
          ! m_order = (m(1)-2*m(2)+m(3)-m(4)+2*m(5)-m(6)+2*m(7)-2*m(8))
 
          ! m_order = abs(2*m_order/num_sites)
 
-         m_order = abs(m_order/8)
+         m_order = abs(m_a - m_b)/12
 
        case('PM')
 
-         do i = 1,8
+         do i = 1,12
             m_order = m_order + abs(m(i))
          enddo
 
          ! m_order = (m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8)+2*m(9)+2*(10))
 
-         m_order = abs(m_order/8)
+         m_order = abs(m_order)/12
 
        case default
          print*, 'ERRO'
