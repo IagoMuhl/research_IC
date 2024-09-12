@@ -18,7 +18,7 @@ program square_T
 
    allocate(s(maxConfig,num_sites) , s_sub(maxConfig,12))
 
-   tol = 10.d0**(-8); J2 = 0.0d0; s_z = 0;
+   tol = 10.d0**(-8); J2 = -0.33d0; s_z = 0;
 !----------------------------BASE-------------------------------
    call base(s,s_sub)
 
@@ -42,7 +42,7 @@ program square_T
    write(*,*) 'Entre com o step(-3,-5) e o passo de H(-1,-2,-3):'
    read*, cd, ef
 
-   passo = 10.d0**(ef)
+         passo = 10.d0**(ef)
    
           if ( state=="AF" ) then
             step = 10.d0**(cd)
@@ -129,7 +129,7 @@ program square_T
 
             end do
 
-               do i = 1, 10
+               do i = 1, 12
 
                   call magnetization(H_total,Z,s,i,T_inicial,m(i))
 
