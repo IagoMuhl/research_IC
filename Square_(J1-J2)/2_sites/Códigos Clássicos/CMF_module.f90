@@ -41,7 +41,7 @@ contains
 
       !---------------------HAMILTONIANO INTRA-----------------------------
       do i = 1, maxConfig
-         H_intra(i) = J1*(s(i,1)*s(i,2)) + J2*0
+         H_intra(i) = J1*(s(i,1)*s(i,2))
 
       end do
       !---------------------HAMILTONIANO INTRA-----------------------------

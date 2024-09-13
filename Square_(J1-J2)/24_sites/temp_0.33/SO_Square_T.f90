@@ -80,6 +80,8 @@ program square_T
 
 
          call mag_vetor(state,m)
+         
+         print*, 'Cheguei aqui'
 
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -92,6 +94,8 @@ program square_T
          do while (T_inicial/=T_final)
 
             error = 1.d0; erro = 1.d0
+
+
 
             do while(erro >= tol)
 
