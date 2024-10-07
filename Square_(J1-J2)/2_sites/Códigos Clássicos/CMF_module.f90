@@ -140,9 +140,9 @@ contains
          m_order = abs(m(1) - m(2))/2.d0
 
        case ('PM')
-         m = [m1,m1]
+         m = [m1,m2]
 
-         m_order = abs(m(1) + m(2))/2.d0
+         m_order = 0.d0
 
        case default
          write(*,*) 'Inaccurate State'
@@ -183,7 +183,7 @@ contains
       implicit none
       integer, dimension(maxConfig,num_sites), intent(in):: s
       integer :: i
-      real(kind=db), intent(in):: J2
+      real(kind=db), intent(in):: J2!,x
       real(kind=db), dimension(num_sites), intent(in):: m_guess
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
       !character(len=3), intent(in) :: state
@@ -192,43 +192,24 @@ contains
 
           do i = 1, maxConfig
 
-      !        H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
-      !        & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)*m_guess(1) + m_guess(2)*m_guess(1)))
+            
+            !  H_inter(i) = 3*J1*(s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.d0 + s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.d0) & 
+            !          &  + 4*J2*(s(i,1)*m_guess(1)-m_guess(1)*m_guess(1)/2.d0 + s(i,2)*m_guess(2)-m_guess(2)*m_guess(2)/2.d0)
 
+            H_inter(i) = 3*J1*(s(i,1)*m_guess(2)-(m_guess(2)+2*m_guess(1))*m_guess(2)/2.d0 + &
+            & s(i,2)*(m_guess(2)+2*m_guess(1))-m_guess(2)*(m_guess(2)+2*m_guess(1))/2.d0) & 
+                     &  + 4*J2*(s(i,1)*(m_guess(2)+2*m_guess(1))-(m_guess(2)+2*m_guess(1))*(m_guess(2)+2*m_guess(1))/2.d0 + &
+                     & s(i,2)*m_guess(2)-m_guess(2)*m_guess(2)/2.d0)
 
-             H_inter(i) = 3*J1*(s(i,1)*m_guess(2)-m_guess(1)*m_guess(2)/2.d0 + s(i,2)*m_guess(1)-m_guess(2)*m_guess(1)/2.d0) & 
-                     &  + 4*J2*(s(i,1)*m_guess(1)-m_guess(1)*m_guess(1)/2.d0 + s(i,2)*m_guess(2)-m_guess(2)*m_guess(2)/2.d0)
+            ! H_inter(i) = (m_guess(1) + m_guess(2))*(3*s(i,2)+4*J2*s(i,1)-2*J2*(m_guess(1) + &
+            ! & m_guess(2))+(m_guess(2)/(m_guess(1) + m_guess(2)))* &
+            ! & (-2*J2*m_guess(2)+9*J2*(m_guess(1) + m_guess(2))+3*s(i,1)+4*J2*s(i,2)))
 
-      !       ! H_inter(i) = (2*J1)*(m_guess(2)*(s(i,1)+s(i,4))+m_guess(1)*(s(i,2)+s(i,3))-(2*m_guess(1)*m_guess(2)))&
-      !       ! & +(3*J2 + 4*J3)*(m_guess(1)*(s(i,1)+s(i,4)-(m_guess(1)))+m_guess(2)*(s(i,2)+s(i,3)-(m_guess(2))))
+            ! H_inter(i) = ((3*J1*s(i,1) + J1*s(i,2) + 4*J2*s(i,1) + 2*J2*s(i,2) - 2*J2*m_guess(1))*m_guess(2) &
+            ! & + (3*J1*s(i,2) - 2*J2*m_guess(1))*m_guess(1) - 2*J2*m_guess(1)**2)
 
-      !       !H_inter(i) = (-2*J1 + 3*J2 + 4*J3)*(s(i,1)-s(i,2)-s(i,3)+s(i,4)-2*m_guess(1))*(m_guess(1))
           enddo
-      ! !  case ('SAF')
-      ! !    do i = 1, maxConfig
 
-      ! !       !H_inter(i) = (-3*J2+4*J3)*(s(i,1)-s(i,2)+s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
-
-      ! !       H_inter(i) = 2*J1*((s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(1))*m_guess(1) + (s(i,1)+s(i,2)+s(i,3)+s(i,4)-m_guess(2))*m_guess(2) &
-      ! !       & - 2*m_guess(1)*m_guess(2)) &
-      ! !       & + 6*J2*((s(i,1)+s(i,2))*m_guess(2) + (s(i,3)+s(i,4))*m_guess(1) - 2*m_guess(1)*m_guess(2))
-
-      ! !    enddo
-      !  case ('SD')
-      !    do i = 1, maxConfig
-      !       H_inter(i) = (-2*J1+J2)*(s(i,1)+s(i,2)-s(i,3)-s(i,4)-2*m_guess(1))*(m_guess(1))
-      !    enddo
-      !  case ('PM')
-      !    do i = 1, maxConfig
-      !       ! H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
-      !       ! & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)**2 + m_guess(2)**2))
-
-      !       H_inter(i) = 4*J1*(m_guess(1)*(s(i,2)+s(i,3)) + m_guess(2)*(s(i,1)+s(i,4)) - 2*m_guess(1)*m_guess(2)) + &
-      !        & 6*J2*(m_guess(1)*(s(i,1)+s(i,4)) + m_guess(2)*(s(i,2)+s(i,3)) - (m_guess(1)*m_guess(1) + m_guess(2)*m_guess(1)))
-      !    enddo
-      !  case default
-      !    print *, 'State inválido'
-      ! end select
 
    end subroutine
 

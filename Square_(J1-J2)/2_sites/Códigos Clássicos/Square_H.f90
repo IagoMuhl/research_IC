@@ -10,13 +10,15 @@ program square_H
    integer:: j, up, down, cd, i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.275d0
+   tol = 10.d0**(-8); J2 = -0.1d0
 
    call base(s)
 !--------------------------------------------------------------
    do i = 1, maxConfig
    s_x(i) = s(i,1) + s(i,2)
    enddo
+
+   call HAM_INTRA(J2,s,H_intra)
 
    do
 
@@ -60,19 +62,6 @@ program square_H
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
-      ! call HAM_INTRA(J2,H_inicial,s,H_intra)
-
-      ! call mag_vetor(state,m_fe,m_af,m,m_order)
-
-      ! call Ham_inter_state(J2,s,m,H_inter)
-
-      ! H_total = H_intra + H_inter
-
-      ! call partition(H_total,T,Z)
-
-      ! call magnetization(H_total,Z,s,up,T,m_fe)
-
-      ! call magnetization(H_total,Z,s,down,T,m_af)
 
  
 
@@ -80,7 +69,7 @@ program square_H
 
       call mag_vetor(state,m_fe,m_af,m,m_order)
 
-      call HAM_INTRA(J2,s,H_intra)
+
 
       ! - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -139,7 +128,7 @@ program square_H
          if (j==0) then
             if (m_order<=10.d0**(-4)) then
                print*, '\/---------\/'
-               write(*,18) H_inicial, T
+               write(*,18) H_inicial, T, m1, m2
                print*, '/\---------/\'
 18             format ((F8.5))
                j = 1
