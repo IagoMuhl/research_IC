@@ -160,6 +160,27 @@ contains
 
    end subroutine
 
+   subroutine Inner_energy(H,Z,T,U)
+      implicit none
+      
+      real(kind=db), intent(in):: Z,T,H(maxConfig)
+      real(kind=db), intent(out):: U
+      real(kind=db):: b
+      integer:: i
+      b = 1.d0/T
+      U = 0.d0
+
+
+      do i = 1, maxConfig
+
+         U = U + H(i)*dexp(-b*(H(i)))
+
+      end do
+      
+      U = U/Z
+
+   end subroutine
+
 
 
    subroutine print_m(state,J2,m,tol,T,n)

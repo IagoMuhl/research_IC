@@ -4,13 +4,14 @@ program square_T
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_inter_1, H_inter_2, H_total_1, H_total_2 ,s_z
    real*8, dimension(minConfig):: m
-   real*8:: J2, erro, m1, m2, Z1, Z2, F2
+   real*8:: J2, erro, m1, m2, Z1, Z2, F2, U1, U2, U
    real*8:: T_inicial,T_final,H,m_fe,m_af,step,m_order,tol,F,erro1,erro2
+   real*8:: St
    character(len=3):: state
    integer:: j, up, down, cd,i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = 0.0d0
+   tol = 10.d0**(-8); J2 = -0.1d0
 
    call base(s)
 !--------------------------------------------------------------
@@ -114,13 +115,19 @@ program square_T
          call F_helm(T_inicial,Z1,F)
          call F_helm(T_inicial,Z2,F2)
 
+         call Inner_energy(H_total_1,Z1,T_inicial,U1)
+         call Inner_energy(H_total_2,Z2,T_inicial,U2)
+
          F = (F + F2)/2.d0
+         U = (U1 + U2)/2.d0
+
+         St = (U - F)/(num_sites*T_inicial)
 
 
          !print*, T_inicial, m_order
 
 
-         write(20,*) T_inicial, F, m_order, m1, m2
+         write(20,*) T_inicial, F, m_order, St
          ! print*, T, m_order, m_fe, m_af
 
          if (j==0) then

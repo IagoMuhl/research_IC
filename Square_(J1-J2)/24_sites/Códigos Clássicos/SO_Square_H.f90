@@ -6,7 +6,7 @@ program square_T
    real*8, dimension(maxConfig,8):: N
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total,s_z
    real*8:: m(12), error(8), mag_prev(8)
-   real*8:: J2, erro, Alfa, passo, H_min, H_max
+   real*8:: J2, erro, Alfa, passo, H_min, H_max, U, S_ns
    real*8:: H_inicial,H_final,T,step,Z,m_order,tol,F,T_max
    character(len=3):: state
    character(len=5):: temp
@@ -150,13 +150,16 @@ program square_T
 
             call order_parameter(state,m,m_order)
 
-
             call F_helm(T,Z,F)
+
+            call Inner_energy(H_total,Z,T,U)
 
             F = F + Alfa
 
+            S_ns = (U - F)/num_sites*T
 
-            write(20,*) H_inicial, F, m_order
+
+            write(20,*) H_inicial, F, m_order, S_ns, U
 
             call date_and_time(date,time,zone,values)
             call date_and_time(DATE=date,ZONE=zone)
