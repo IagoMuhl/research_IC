@@ -6,12 +6,12 @@ program square_T
    real*8, dimension(minConfig):: m
    real*8:: J2, erro, m1, m2, Z1, Z2, F2, U1, U2, U
    real*8:: T_inicial,T_final,H,m_fe,m_af,step,m_order,tol,F,erro1,erro2
-   real*8:: St
+   real*8:: St, So, Cv
    character(len=3):: state
-   integer:: j, up, down, cd,i
+   integer:: j, up, down, cd,i, conts
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.1d0
+   tol = 10.d0**(-8); J2 = -0.4d0; conts = 1
 
    call base(s)
 !--------------------------------------------------------------
@@ -97,7 +97,7 @@ program square_T
 
             call magnetization(H_total_2,Z2,s,T_inicial,m2)
 
-            print*, T_inicial, m1, m2
+            !print*, T_inicial, m1, m2
 
             erro1 = abs(m(1) - m1)
             erro2 = abs(m(2) - m2)
@@ -123,11 +123,22 @@ program square_T
 
          St = (U - F)/(num_sites*T_inicial)
 
+         !Cv = T_inicial*((St - So)/(step))
 
+      
+         If(conts == 1) then
+            So = St 
+            Cv = 0
+         else
+            Cv = T_inicial*((St - So)/(step))
+            So = St
+         end if
+
+         conts = 0
          !print*, T_inicial, m_order
 
 
-         write(20,*) T_inicial, F, m_order, St
+         write(20,*) T_inicial, F, m_order, St, Cv
          ! print*, T, m_order, m_fe, m_af
 
          if (j==0) then
