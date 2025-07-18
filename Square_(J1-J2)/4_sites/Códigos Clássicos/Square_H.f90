@@ -10,7 +10,7 @@ program square_H
    integer:: j, up, down, cd, i
 
    up = 1; down = 2
-   tol = 10.d0**(-8); J2 = -0.365d0
+   tol = 10.d0**(-8); J2 = -0.33d0
 !---------------------------------------------
    call base(s)
    do i = 1, maxConfig
