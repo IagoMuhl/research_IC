@@ -61,12 +61,7 @@ contains
 
       end do
 
-
-
    end subroutine
-
-
-
 
    subroutine print_matrix(row,column,matrix)
       integer, intent(in):: row,column
@@ -143,20 +138,32 @@ contains
 
       select case (state)
 
-       case ('V')
+      case ('5')
 
          m(1) = m_fe; m(4) = m_fe
 
          m(2) = m_af; m(3) = m_af
          m(5) = m_af; m(6) = m_af
 
-      !  case ('PM')
+      case ('6')
 
-      !    do i = 1,6
-      !       m(i) = 0
-      !    enddo
+         m(1) = m_fe; m(2) = m_fe
+         m(3) = m_fe; m(4) = m_fe
 
-       case default
+         m(5) = m_af; m(6) = m_af
+
+      case('4')
+
+         m(1) = m_af; m(4) = m_af
+
+         m(2) = m_fe; m(3) = m_fe
+         m(5) = m_fe; m(6) = m_fe
+
+      case ('pm')
+
+         m = 0
+
+      case default
          write(*,*) 'Inaccurate State'
       end select
 
@@ -236,40 +243,82 @@ contains
 
       enddo
 
+   end subroutine
+
+      subroutine Ham_inter_fase_4(J2,J3,s,m,m_prime,H_inter,H_inter_prime)
+      implicit none
+      integer, intent(in):: s(maxConfig,num_sites)
+      real(kind=db), intent(in):: J2,J3
+      real(kind=db), dimension(6), intent(in):: m,m_prime
+      real(kind=db), dimension(maxConfig), intent(out):: H_inter, H_inter_prime
+      integer :: i
+
+      H_inter = 0.d0; H_inter_prime = 0.d0
+
+      do i = 1, maxConfig
+
+      H_inter(i) = J1*((s(i,1)-m(2)/2)*(m_prime(4)) + (s(i,2)-m(2)/2)*(m(6)) + (s(i,3)-m(3)/2)*(m(5)) &
+      & + (s(i,4)-m(4)/2)*(m_prime(1)) + (s(i,5)-m(5)/2)*(m(3)) + (s(i,6)-m(6)/2)*(m(2))) &
+      & + J2*((s(i,1)-m(1)/2)*(m(2)+m_prime(5)+m_prime(3)+m(6)) + (s(i,2)-m(2)/2)*(m_prime(4)+m_prime(1)+2*m(5)) &
+      & + (s(i,3)-m(3)/2)*(m(4)+m_prime(1)+2*m(6)) + (s(i,4)-m(4)/2)*(m(4)+m_prime(2)+m_prime(6)+m(3)) &
+      & + (s(i,5)-m(5)/2)*(m(4)+m_prime(1)+2*m(2)) + (s(i,6)-m(6)/2)*(m(1)+m_prime(4)+2*m(3))) &
+      & + J3*((2*s(i,1)-m(1))*(m(1)) + (s(i,2)-m(2)/2)*(m(6)+m_prime(3)) + (s(i,3)-m(3)/2)*(m(5)+m_prime(2)) &
+      & + (2*s(i,4)-m(4))*(m(4)) + (s(i,5)-m(5)/2)*(m(3)+m_prime(6)) + (s(i,6)-m(6)/2)*(m(2)+m_prime(5)))
+
+      H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m(4)) + (s(i,2)-m_prime(2)/2)*(m(4)) + (s(i,3)-m_prime(3)/2)*(m(1)) &
+      & + (s(i,4)-m_prime(4)/2)*(m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)) + (s(i,6)-m_prime(6)/2)*(m(4))) &
+      & + J2*((s(i,1)-m_prime(1)/2)*(m(4)+m(5)+m(3)+m(4)) + (s(i,2)-m_prime(2)/2)*(m(4)+m(5)+m(3)+m(1)) &
+      & + (s(i,3)-m_prime(3)/2)*(m(4)+m(1)+m(6)+m(2)) + (s(i,4)-m_prime(4)/2)*(m(1)+m(2)+m(6)+m(1)) &
+      & + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4)) + (s(i,6)-m_prime(6)/2)*(m(1)+m(4)+m(3)+m(5))) &
+      & + J3*((s(i,1)-m_prime(1)/2)*(m(5)+m(3)) + (s(i,2)-m_prime(2)/2)*(m(2)+m(3)) + (s(i,3)-m_prime(3)/2)*(m(2)+m(3)) &
+      & + (s(i,4)-m_prime(4)/2)*(m(6)+m(2)) + (s(i,5)-m_prime(5)/2)*(m(5)+m(6)) + (s(i,6)-m_prime(6)/2)*(m(5)+m(6)))
+
+      enddo
 
    end subroutine
+
+
 
    subroutine order_parameter(state,m,m_order)
       real(kind=db), dimension(6), intent(in):: m
       character(len=3), intent(in):: state
       real(kind=db), intent(out):: m_order
       real*8:: m_a,m_b
-      integer:: i
 
       m_order = 0.d0; m_a = 0.d0; m_a = 0.d0
 
       select case(state)
 
-       case('V')
+      case('5')
 
-            ! m_order = m_order + abs(m(i) - m(i+1))
+         m_a = m(1) + m(4)
 
-            m_a = m(1) + m(4)
+         m_b = m(2) + m(3) + m(5) + m(6)
 
-            m_b = m(2) + m(3) + m(5) + m(6)
+         m_order = abs(m_a - m_b)/num_sites
+      
+      case('6')
+
+         m_a = m(1) + m(2) + m(3) + m(6)
+
+         m_b = m(5) + m(4)
 
          m_order = abs(m_a - m_b)/num_sites
 
+      case('4')
 
-       case('PM')
+         m_a = m(1) + m(4)
 
-         do i = 1,6
-            m_order = m_order + abs(m(i))
-         enddo
+         m_b = m(2) + m(3) + m(5) + m(6)
+
+         m_order = abs(m_a - m_b)/num_sites
+
+       case('pm')
+
+         m_order = 0.d0
 
          ! m_order = (m(1)+m(2)+m(3)+m(4)+m(5)+m(6)+m(7)+m(8)+2*m(1)+2*(10))
 
-         m_order = abs(m_order)/num_sites
 
        case default
          print*, 'ERRO'
@@ -277,7 +326,6 @@ contains
       end select
 
    end subroutine
-
 
 
 end module CMF
