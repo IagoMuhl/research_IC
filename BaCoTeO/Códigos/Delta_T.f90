@@ -1,4 +1,4 @@
-program square_T
+program hexa_T
    use CMF
    implicit none
 
@@ -13,7 +13,7 @@ program square_T
 
 
 
-   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0; H = 0.d0
+   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0; H = 0.0d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -33,12 +33,13 @@ program square_T
    ! write(*,*) 'Entre com o step(-3,-5):'
    ! read*, cd
 
-   T = 0.1; T_max = 3; cd = -3;
+   do
+
+   T = 1.5; T_max = 2.5; cd = -5;
    step = 10.d0**(cd); k = 0
 
       WRITE (temp, '(F5.3)') H
-   
-   do
+
 
       write(*,*) 'Entre com a fase:'
       read*, state
@@ -49,12 +50,12 @@ program square_T
 !-------------------------- FASE PM ------------------------------------
 
       open(unit=30, file= 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
+      open(unit=21, file = 'Magnetização_cluster_'// trim(state) // '.dat')
+
 
          Alfa = 0.d0
 
          call mag_vetor(state,m)
-
-         m_prime = m
 
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -64,7 +65,7 @@ program square_T
 
             do while(erro >= tol)
 
-               call Ham_inter(J2,J3,s,m,m_prime,H_inter)
+               call Ham_inter(J2,J3,s,m,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
 
@@ -108,6 +109,7 @@ program square_T
             mag = sum(m)
 
             write(30,*) T_max, F, m_order, mag
+            write(21,*) T_max, m
 
 
             if (k==10**(-(cd+1))) then
@@ -126,7 +128,7 @@ program square_T
          !----------------- NOVAS ENTRADAS  -----------------
 
          print*, '------------'
-         Print*, 'State =','', state
+         Print*, 'State = ','', state
          print*, 'H =','', H
          print*, 'T','',T_max
          print*, 'J2','',J2
@@ -139,6 +141,7 @@ program square_T
       print*, '=== FIM ==='
 
       close(30)
+      close(21)
 !----------------------------------------------------------------------------
 
          case('6')
@@ -154,11 +157,14 @@ program square_T
 
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
-         do while (T/=T_max)
-
+         ! do while (T/=T_max)
+         do while (T_max/=T)
             error = 1.d0; erro = 1.d0; 
 
             do while(erro >= tol)
+
+               ! print*, m
+               ! read*,
 
                call Ham_inter(J2,J3,s,m,m,H_inter)
 
@@ -174,13 +180,15 @@ program square_T
                endif
             !---------------------- SHIFT DA HAMILTONIANA ----------------
 
-               call partition(H_total,T,Z)
+               !call partition(H_total,T,Z)
+               call partition(H_total,T_max,Z)
 
                do i = 1, 6
 
                   mag_prev(i) = m(i)
 
-                  call magnetization(H_total,Z,s,i,T,m(i))
+                  ! call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total,Z,s,i,T_max,m(i))
 
                   error(i) = abs(mag_prev(i) - m(i))
                   error(i+6) = 0
@@ -189,32 +197,33 @@ program square_T
 
                erro = maxval(error)
 
-
-            ! print*, m
-            ! print*, erro
-            ! print*, k
-
             end do
 
             call order_parameter(state,m,m_order)
 
-            call F_helm(T,Z,F)
+            ! call F_helm(T,Z,F)
+            call F_helm(T_max,Z,F)
 
             F = F + Alfa
 
             mag = sum(m)
 
-            write(25,*) T, F, m_order, mag
-            write(21,*) T, m
-            write(22,*) T, m_prime
+            ! write(25,*) T, F, m_order, mag
+            ! write(21,*) T, m
+            ! write(22,*) T, m_prime
+
+            write(25,*) T_max, F, m_order, mag
+            write(21,*) T_max, m
+            write(22,*) T_max, m_prime
 
 
             if (k==10**(-(cd+1))) then
-               print*, 'Rodando... T = ', T
+               print*, 'Rodando... T = ', T_max
                k = 0
             endif
 
-            T = T + step; k = k + 1
+            ! T = T + step; k = k + 1
+            T_max = T_max - step; k = k + 1
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
                T = T_max
@@ -225,7 +234,7 @@ program square_T
          !----------------- NOVAS ENTRADAS  -----------------
 
          print*, '------------'
-         Print*, 'State =','', state
+         Print*, 'State = ','', state
          print*, 'H =','', H
          print*, 'T','',T
          print*, 'J2','',J2
@@ -388,10 +397,14 @@ program square_T
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
          do while (T/=T_max)
+         !   do while (T_max/=T)
 
             error = 1.d0; erro = 1.d0; 
 
             do while(erro >= tol)
+
+               ! print*, m
+               ! read*,
 
                call Ham_inter_fase_4(J2,J3,s,m,m_prime,H_inter,H_inter_prime)
 
@@ -414,6 +427,9 @@ program square_T
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
+               ! call partition(H_total,T_max,Z)
+               ! call partition(H_total_prime,T_max,Z_prime)
+
                do i = 1, 6
 
                   mag_prev(i) = m(i)
@@ -421,6 +437,9 @@ program square_T
 
                   call magnetization(H_total,Z,s,i,T,m(i))
                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+                  ! call magnetization(H_total,Z,s,i,T_max,m(i))
+                  ! call magnetization(H_total_prime,Z_prime,s,i,T_max,m_prime(i))
 
                   error(i) = abs(mag_prev(i) - m(i))
 
@@ -430,11 +449,11 @@ program square_T
 
             erro = maxval(error)
 
-            print*, m
-            print*, m_prime
-            print*, erro
-            print*, k
-            read*,
+            ! print*, m
+            ! print*, m_prime
+            ! print*, erro
+            ! print*, k
+            ! read*,
 
             end do
 
@@ -444,6 +463,9 @@ program square_T
 
             call F_helm(T,Z,F)
             call F_helm(T,Z_prime,F_prime)
+
+            ! call F_helm(T_max,Z,F)
+            ! call F_helm(T_max,Z_prime,F_prime)
 
             F = F + Alfa
             F_prime = F_prime + Beta
@@ -455,6 +477,10 @@ program square_T
             write(28,*) T, F, m_order, mag
             write(21,*) T, m
             write(22,*) T, m_prime
+
+            ! write(28,*) T_max, F, m_order, mag
+            ! write(21,*) T_max, m
+            ! write(22,*) T_max, m_prime
             
 
             if (j==0) then
@@ -475,6 +501,8 @@ program square_T
             endif
 
             T = T + step; k = k + 1
+
+            ! T_max = T_max - step; k = k + 1
 
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
@@ -505,7 +533,7 @@ program square_T
 !-------------------------------------------------------------------------      
 
 
-         case('end')
+         case('fim')
 
             stop
 

@@ -147,10 +147,11 @@ contains
 
       case ('6')
 
-         m(1) = m_fe; m(2) = m_fe
+         m(1) = m_af; m(2) = m_af
+
          m(3) = m_fe; m(4) = m_fe
 
-         m(5) = m_af; m(6) = m_af
+         m(5) = m_fe; m(6) = m_fe
 
       case('4')
 
@@ -259,8 +260,8 @@ contains
 
       H_inter(i) = J1*((s(i,1)-m(2)/2)*(m_prime(4)) + (s(i,2)-m(2)/2)*(m(6)) + (s(i,3)-m(3)/2)*(m(5)) &
       & + (s(i,4)-m(4)/2)*(m_prime(1)) + (s(i,5)-m(5)/2)*(m(3)) + (s(i,6)-m(6)/2)*(m(2))) &
-      & + J2*((s(i,1)-m(1)/2)*(m(2)+m_prime(5)+m_prime(3)+m(6)) + (s(i,2)-m(2)/2)*(m_prime(4)+m_prime(1)+2*m(5)) &
-      & + (s(i,3)-m(3)/2)*(m(4)+m_prime(1)+2*m(6)) + (s(i,4)-m(4)/2)*(m(4)+m_prime(2)+m_prime(6)+m(3)) &
+      & + J2*((s(i,1)-m(1)/2)*(m(2)+m_prime(5)+m_prime(3)+m(6)) + (s(i,2)-m(2)/2)*(m_prime(4)+m(1)+2*m(5)) &
+      & + (s(i,3)-m(3)/2)*(m(4)+m_prime(1)+2*m(6)) + (s(i,4)-m(4)/2)*(m(5)+m_prime(2)+m_prime(6)+m(3)) &
       & + (s(i,5)-m(5)/2)*(m(4)+m_prime(1)+2*m(2)) + (s(i,6)-m(6)/2)*(m(1)+m_prime(4)+2*m(3))) &
       & + J3*((2*s(i,1)-m(1))*(m(1)) + (s(i,2)-m(2)/2)*(m(6)+m_prime(3)) + (s(i,3)-m(3)/2)*(m(5)+m_prime(2)) &
       & + (2*s(i,4)-m(4))*(m(4)) + (s(i,5)-m(5)/2)*(m(3)+m_prime(6)) + (s(i,6)-m(6)/2)*(m(2)+m_prime(5)))
@@ -268,8 +269,8 @@ contains
       H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m(4)) + (s(i,2)-m_prime(2)/2)*(m(4)) + (s(i,3)-m_prime(3)/2)*(m(1)) &
       & + (s(i,4)-m_prime(4)/2)*(m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)) + (s(i,6)-m_prime(6)/2)*(m(4))) &
       & + J2*((s(i,1)-m_prime(1)/2)*(m(4)+m(5)+m(3)+m(4)) + (s(i,2)-m_prime(2)/2)*(m(4)+m(5)+m(3)+m(1)) &
-      & + (s(i,3)-m_prime(3)/2)*(m(4)+m(1)+m(6)+m(2)) + (s(i,4)-m_prime(4)/2)*(m(1)+m(2)+m(6)+m(1)) &
-      & + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4)) + (s(i,6)-m_prime(6)/2)*(m(1)+m(4)+m(3)+m(5))) &
+      & + (s(i,3)-m_prime(3)/2)*(m(4)+m(2)+m(6)+m(1)) + (s(i,4)-m_prime(4)/2)*(m(1)+m(2)+m(6)+m(1)) &
+      & + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4)) + (s(i,6)-m_prime(6)/2)*(m(1)+m(5)+m(3)+m(4))) &
       & + J3*((s(i,1)-m_prime(1)/2)*(m(5)+m(3)) + (s(i,2)-m_prime(2)/2)*(m(2)+m(3)) + (s(i,3)-m_prime(3)/2)*(m(2)+m(3)) &
       & + (s(i,4)-m_prime(4)/2)*(m(6)+m(2)) + (s(i,5)-m_prime(5)/2)*(m(5)+m(6)) + (s(i,6)-m_prime(6)/2)*(m(5)+m(6)))
 
@@ -299,17 +300,17 @@ contains
       
       case('6')
 
-         m_a = m(1) + m(2) + m(3) + m(6)
+         m_a = m(3) + m(4) + m(5) + m(6)
 
-         m_b = m(5) + m(4)
+         m_b = m(1) + m(2)
 
          m_order = abs(m_a - m_b)/num_sites
 
       case('4')
 
-         m_a = m(1) + m(4)
+         m_a = m(2) + m(3) + m(5) + m(6)
 
-         m_b = m(2) + m(3) + m(5) + m(6)
+         m_b = m(1) + m(4)
 
          m_order = abs(m_a - m_b)/num_sites
 
