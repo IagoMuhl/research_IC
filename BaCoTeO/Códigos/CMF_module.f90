@@ -118,6 +118,9 @@ contains
 
       end do
 
+      ! print*, m, Z
+      ! read*,
+
       m = m/Z
 
    end subroutine
@@ -128,41 +131,31 @@ contains
       implicit none
       character(len=*), intent(in):: state
       real(kind=db), dimension(6), intent(out):: m
-      real*8:: m_fe, m_af
+      real*8:: up, down
 
 
-      m_fe = 1.d0;
-      m_af = -1.d0
+      up = 1.d0
+      down = -1.d0
 
       m = 0.d0
 
       select case (state)
 
+      case('4')
+
+         m = [down, up, up, down, up, up]
+
       case ('5')
 
-         m(1) = m_fe; m(4) = m_fe
-
-         m(2) = m_af; m(3) = m_af
-         m(5) = m_af; m(6) = m_af
+         m = [up, down, down, up, down, down]
 
       case ('6')
 
-         m(1) = m_af; m(2) = m_af
-
-         m(3) = m_fe; m(4) = m_fe
-
-         m(5) = m_fe; m(6) = m_fe
-
-      case('4')
-
-         m(1) = m_af; m(4) = m_af
-
-         m(2) = m_fe; m(3) = m_fe
-         m(5) = m_fe; m(6) = m_fe
+         m = [down, down, up, up, up, up]
 
       case ('pm')
 
-         m = 0
+         m = [up, up, up, up, up, up]
 
       case default
          write(*,*) 'Inaccurate State'
@@ -219,10 +212,10 @@ contains
    end subroutine
 
 
-
-   subroutine Ham_inter(J2,J3,s,m,m_prime,H_inter)
+   subroutine Ham_inter(state,J2,J3,s,m,m_prime,H_inter)
       implicit none
       integer, intent(in):: s(maxConfig,num_sites)
+      character(len=*), intent(in):: state
       real(kind=db), intent(in):: J2,J3
       real(kind=db), dimension(6), intent(in):: m,m_prime
       real(kind=db), dimension(maxConfig), intent(out):: H_inter
@@ -230,19 +223,64 @@ contains
 
       H_inter = 0.d0
 
+      select case (state)
+
+      case('4')
+
       do i = 1, maxConfig
 
-      H_inter(i) = J1*((s(i,1)*m(4)+s(i,4)*m(1)-m(1)*m(4))+(s(i,2)*m_prime(5)-(m(2)*m_prime(5)/2)) &
-      & + (s(i,3)*m_prime(6)-(m(3)*m_prime(6))/2)+(s(i,5)*m_prime(2)-(m(5)*m_prime(2))/2) &
-      & + (s(i,6)*m_prime(3)-(m(6)*m_prime(3))/2)) + J2*((s(i,1)-m(1)/2)*(m(3)+m_prime(3)+m(5)+m_prime(5)) &
-      & + (s(i,2)-m(2)/2)*(m(4)+m_prime(4)+2*m_prime(6)) + (s(i,3)-m(3)/2)*(m(1)+m_prime(1)+2*m_prime(5)) &
-      & + (s(i,5)-m(5)/2)*(m(1)+m_prime(1)+2*m_prime(3)) + (s(i,6)-m(6)/2)*(m(4)+m_prime(4)+2*m_prime(2)) &
-      & + (s(i,4)-m(4)/2)*(m(2)+m_prime(2)+m(6)+m_prime(6))) + J3*((s(i,1)-m(1)/2)*(m_prime(2)+m_prime(6)) & 
-      & + (s(i,2)-m(2)/2)*(m(3)+m_prime(1)) + (s(i,3)-m(3)/2)*(m(2)+m_prime(4)) &
-      & + (s(i,4)-m(4)/2)*(m_prime(3)+m_prime(5)) + (s(i,5)-m(5)/2)*(m(6)+m_prime(4)) & 
-      & + (s(i,6)-m(6)/2)*(m(5)+m_prime(1)))
+         H_inter(i) = J1*((s(i,1)-m(1)/2)*(m_prime(4)) + (s(i,2)-m(2)/2)*(m(6)) + (s(i,3)-m(3)/2)*(m(5)) &
+         & + (s(i,4)-m(4)/2)*(m_prime(1)) + (s(i,5)-m(5)/2)*(m(3)) + (s(i,6)-m(6)/2)*(m(2))) &
+         & + J2*((s(i,1)-m(1)/2)*(m(2)+m_prime(5)+m_prime(3)+m(6)) + (s(i,2)-m(2)/2)*(m_prime(4)+m(1)+2*m(5)) &
+         & + (s(i,3)-m(3)/2)*(m(4)+m_prime(1)+2*m(6)) + (s(i,4)-m(4)/2)*(m(5)+m_prime(2)+m_prime(6)+m(3)) &
+         & + (s(i,5)-m(5)/2)*(m(4)+m_prime(1)+2*m(2)) + (s(i,6)-m(6)/2)*(m(1)+m_prime(4)+2*m(3))) &
+         & + J3*((s(i,1)-m(1)/2)*(2*m(1)) + (s(i,2)-m(2)/2)*(m(6)+m_prime(3)) + (s(i,3)-m(3)/2)*(m(5)+m_prime(2)) &
+         & + (s(i,4)-m(4)/2)*(2*m(4)) + (s(i,5)-m(5)/2)*(m(3)+m_prime(6)) + (s(i,6)-m(6)/2)*(m(2)+m_prime(5)))
+
 
       enddo
+
+      case('5')
+
+      do i = 1, maxConfig
+
+         H_inter(i) = J1*((s(i,1)*m(4)+s(i,4)*m(1)-m(1)*m(4))+(s(i,2)*m_prime(5)-(m(2)*m_prime(5)/2)) &
+         & + (s(i,3)*m_prime(6)-(m(3)*m_prime(6))/2)+(s(i,5)*m_prime(2)-(m(5)*m_prime(2))/2) &
+         & + (s(i,6)*m_prime(3)-(m(6)*m_prime(3))/2)) + J2*((s(i,1)-m(1)/2)*(m(3)+m_prime(3)+m(5)+m_prime(5)) &
+         & + (s(i,2)-m(2)/2)*(m(4)+m_prime(4)+2*m_prime(6)) + (s(i,3)-m(3)/2)*(m(1)+m_prime(1)+2*m_prime(5)) &
+         & + (s(i,5)-m(5)/2)*(m(1)+m_prime(1)+2*m_prime(3)) + (s(i,6)-m(6)/2)*(m(4)+m_prime(4)+2*m_prime(2)) &
+         & + (s(i,4)-m(4)/2)*(m(2)+m_prime(2)+m(6)+m_prime(6))) + J3*((s(i,1)-m(1)/2)*(m_prime(2)+m_prime(6)) & 
+         & + (s(i,2)-m(2)/2)*(m(3)+m_prime(1)) + (s(i,3)-m(3)/2)*(m(2)+m_prime(4)) &
+         & + (s(i,4)-m(4)/2)*(m_prime(3)+m_prime(5)) + (s(i,5)-m(5)/2)*(m(6)+m_prime(4)) & 
+         & + (s(i,6)-m(6)/2)*(m(5)+m_prime(1)))
+
+      enddo
+
+      case('6')
+
+      do i = 1, maxConfig
+
+         H_inter(i) = J1*((s(i,1)*m(4)+s(i,4)*m(1)-m(1)*m(4))+(s(i,2)*m_prime(5)-(m(2)*m_prime(5)/2)) &
+         & + (s(i,3)*m_prime(6)-(m(3)*m_prime(6))/2)+(s(i,5)*m_prime(2)-(m(5)*m_prime(2))/2) &
+         & + (s(i,6)*m_prime(3)-(m(6)*m_prime(3))/2)) + J2*((s(i,1)-m(1)/2)*(m(3)+m_prime(3)+m(5)+m_prime(5)) &
+         & + (s(i,2)-m(2)/2)*(m(4)+m_prime(4)+2*m_prime(6)) + (s(i,3)-m(3)/2)*(m(1)+m_prime(1)+2*m_prime(5)) &
+         & + (s(i,5)-m(5)/2)*(m(1)+m_prime(1)+2*m_prime(3)) + (s(i,6)-m(6)/2)*(m(4)+m_prime(4)+2*m_prime(2)) &
+         & + (s(i,4)-m(4)/2)*(m(2)+m_prime(2)+m(6)+m_prime(6))) + J3*((s(i,1)-m(1)/2)*(m_prime(2)+m_prime(6)) & 
+         & + (s(i,2)-m(2)/2)*(m(3)+m_prime(1)) + (s(i,3)-m(3)/2)*(m(2)+m_prime(4)) &
+         & + (s(i,4)-m(4)/2)*(m_prime(3)+m_prime(5)) + (s(i,5)-m(5)/2)*(m(6)+m_prime(4)) & 
+         & + (s(i,6)-m(6)/2)*(m(5)+m_prime(1)))
+
+      enddo
+
+      case('pm')
+
+      do i = 1, maxConfig
+
+         H_inter(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6)-3*m(1))*(J1*m(1) + 4*J2*m(1) + 2*J3*m(1))
+
+      enddo
+
+      end select
 
    end subroutine
 
@@ -258,13 +296,18 @@ contains
 
       do i = 1, maxConfig
 
-      H_inter(i) = J1*((s(i,1)-m(2)/2)*(m_prime(4)) + (s(i,2)-m(2)/2)*(m(6)) + (s(i,3)-m(3)/2)*(m(5)) &
+      H_inter(i) = J1*((s(i,1)-m(1)/2)*(m_prime(4)) + (s(i,2)-m(2)/2)*(m(6)) + (s(i,3)-m(3)/2)*(m(5)) &
       & + (s(i,4)-m(4)/2)*(m_prime(1)) + (s(i,5)-m(5)/2)*(m(3)) + (s(i,6)-m(6)/2)*(m(2))) &
       & + J2*((s(i,1)-m(1)/2)*(m(2)+m_prime(5)+m_prime(3)+m(6)) + (s(i,2)-m(2)/2)*(m_prime(4)+m(1)+2*m(5)) &
       & + (s(i,3)-m(3)/2)*(m(4)+m_prime(1)+2*m(6)) + (s(i,4)-m(4)/2)*(m(5)+m_prime(2)+m_prime(6)+m(3)) &
       & + (s(i,5)-m(5)/2)*(m(4)+m_prime(1)+2*m(2)) + (s(i,6)-m(6)/2)*(m(1)+m_prime(4)+2*m(3))) &
-      & + J3*((2*s(i,1)-m(1))*(m(1)) + (s(i,2)-m(2)/2)*(m(6)+m_prime(3)) + (s(i,3)-m(3)/2)*(m(5)+m_prime(2)) &
-      & + (2*s(i,4)-m(4))*(m(4)) + (s(i,5)-m(5)/2)*(m(3)+m_prime(6)) + (s(i,6)-m(6)/2)*(m(2)+m_prime(5)))
+      & + J3*((s(i,1)-m(1)/2)*(2*m(1)) + (s(i,2)-m(2)/2)*(m(6)+m_prime(3)) + (s(i,3)-m(3)/2)*(m(5)+m_prime(2)) &
+      & + (s(i,4)-m(4)/2)*(2*m(4)) + (s(i,5)-m(5)/2)*(m(3)+m_prime(6)) + (s(i,6)-m(6)/2)*(m(2)+m_prime(5)))
+
+      ! H_inter(i) = J1*(m_prime(1)*(s(i,1)+s(i,4)-m(1)) + m(2)*(s(i,2)+s(i,3)+s(i,5)+s(i,6)-2*m(2))) &
+      ! & +  J2*(m_prime(1)*(2*s(i,1)+2*s(i,4)-2*m(1)+s(i,2)+s(i,3)+s(i,5)+s(i,6)-2*m(2)) &
+      ! & + m(1)*(s(i,2)+s(i,3)+s(i,5)+s(i,6)-2*m(2)) + 2*m(2)*(s(i,1)+s(i,4)-m(1)+s(i,2)+s(i,3)+s(i,5)+s(i,6)-2*m(2))) &
+      ! & + J3*(2*m(1)*(s(i,1)+s(i,4)-m(1)) + (m_prime(1) + m(2))*(s(i,2)+s(i,3)+s(i,5)+s(i,6)-2*m(2)))
 
       H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m(4)) + (s(i,2)-m_prime(2)/2)*(m(4)) + (s(i,3)-m_prime(3)/2)*(m(1)) &
       & + (s(i,4)-m_prime(4)/2)*(m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)) + (s(i,6)-m_prime(6)/2)*(m(4))) &
@@ -273,6 +316,8 @@ contains
       & + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4)) + (s(i,6)-m_prime(6)/2)*(m(1)+m(5)+m(3)+m(4))) &
       & + J3*((s(i,1)-m_prime(1)/2)*(m(5)+m(3)) + (s(i,2)-m_prime(2)/2)*(m(2)+m(3)) + (s(i,3)-m_prime(3)/2)*(m(2)+m(3)) &
       & + (s(i,4)-m_prime(4)/2)*(m(6)+m(2)) + (s(i,5)-m_prime(5)/2)*(m(5)+m(6)) + (s(i,6)-m_prime(6)/2)*(m(5)+m(6)))
+
+      ! H_inter_prime(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6)-3*m_prime(1))*(J1*m(1) + J2*2*(m(1)+m(2)) + J3*2*m(2))
 
       enddo
 
