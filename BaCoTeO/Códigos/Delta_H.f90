@@ -13,7 +13,8 @@ program hexa_H
 
 
 
-   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0; T = 0.01d0
+   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0;
+   T = 1.967d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -25,8 +26,8 @@ program hexa_H
    call HAM_INTRA(J2,J3,s,H_intra)
 
 !--------------------------------------------------------------
-   ! write(*,*) 'Entre com H e H_final:'
-   ! read*, H,H_final
+   ! write(*,*) 'Entre com T:'
+   ! read*, T
 
    ! ! open(unit=20, file= 'SO_T_' // trim(state) // "_T-H.dat")
 
@@ -37,11 +38,11 @@ program hexa_H
 
    do
 
-   write(*,*) 'Entre com H e H_final:'
-   read*, H,H_final
+   ! write(*,*) 'Entre com H e H_final:'
+   ! read*, H,H_final
 
-  ! H = 1; H_final = 8;
-    cd = -3; l = 0
+   H = 1; H_final = 2.5;
+   cd = -5; l = 0
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -75,7 +76,7 @@ program hexa_H
 
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
-               H_total = (H_intra + H_inter)/2 - H*s_z
+               H_total = H_intra + H_inter - H*s_z
 
                !---------------------- SHIFT DA HAMILTONIANA ----------------
                if (T<=10.d0**(-1)) then
@@ -98,7 +99,7 @@ program hexa_H
                   error(i) = abs(mag_prev - m(i))
                   error(i+6) = 0
 
-                  ! m(i) = 0.5*m(1) + 0.5*mag_prev
+                  m(i) = 0.5*m(i) + 0.5*mag_prev
 
                enddo
 
@@ -117,7 +118,7 @@ program hexa_H
 
             end do
 
-            call order_parameter(state,m,m_order)
+            ! call order_parameter(state,m,m_order)
 
             call F_helm(T,Z,F)
 
@@ -180,7 +181,7 @@ program hexa_H
 
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
-               H_total = (H_intra + H_inter)/2 - H*s_z
+               H_total = H_intra + H_inter - H*s_z
 
             !---------------------- SHIFT DA HAMILTONIANA ----------------
                if (T<=10.d0**(-1)) then
@@ -289,8 +290,8 @@ program hexa_H
 
                call Ham_inter(state,J2,J3,s,m_prime,m,H_inter_prime)
 
-               H_total = (H_intra + H_inter)/2 - H*s_z
-               H_total_prime = (H_intra + H_inter_prime)/2 - H*s_z
+               H_total = H_intra + H_inter - H*s_z
+               H_total_prime = H_intra + H_inter_prime - H*s_z
 
                !---------------------- SHIFT DA HAMILTONIANA ----------------
                if (T<=10.d0**(-1)) then
@@ -413,7 +414,7 @@ program hexa_H
 
          call mag_vetor(state,m)
 
-         m_prime = 1
+         m_prime = 1.d0
 
          j = 0
          ! - - - - - - - - - - - - - - - - - - - - - - -
@@ -431,12 +432,23 @@ program hexa_H
                H_inter_prime = 0.d0
 
                do i = 1, maxConfig
-                  H_inter_prime(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6) &
+
+                  H_inter_prime(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6) & 
                   & -3*m_prime(1))*(J1*m(1) + J2*2*(m(1)+m(2)) + J3*2*m(2))
+
+                  ! H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m(4)) & 
+                  ! & + (s(i,2)-m_prime(2)/2)*(m(4)) + (s(i,3)-m_prime(3)/2)*(m(1)) &
+                  ! & + (s(i,4)-m_prime(4)/2)*(m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)) &
+                  ! & + (s(i,6)-m_prime(6)/2)*(m(4))) + J2*((s(i,1)-m_prime(1)/2)*(m(4)+m(5)+m(3)+m(4)) &
+                  ! & + (s(i,2)-m_prime(2)/2)*(m(4)+m(5)+m(3)+m(1)) + (s(i,3)-m_prime(3)/2)*(m(4)+m(2)+m(6)+m(1)) &
+                  ! & + (s(i,4)-m_prime(4)/2)*(m(1)+m(2)+m(6)+m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4))&
+                  ! & + (s(i,6)-m_prime(6)/2)*(m(1)+m(5)+m(3)+m(4))) + J3*((s(i,1)-m_prime(1)/2)*(m(5)+m(3)) &
+                  ! & + (s(i,2)-m_prime(2)/2)*(m(2)+m(3)) + (s(i,3)-m_prime(3)/2)*(m(2)+m(3)) &
+                  ! & + (s(i,4)-m_prime(4)/2)*(m(6)+m(2)) + (s(i,5)-m_prime(5)/2)*(m(5)+m(6)) + (s(i,6)-m_prime(6)/2)*(m(5)+m(6)))
                enddo
 
-               H_total = (H_intra + H_inter)/2 - H*s_z
-               H_total_prime = (H_intra + H_inter_prime)/2 - H*s_z
+               H_total = H_intra + H_inter - H*s_z
+               H_total_prime = H_intra + H_inter_prime - H*s_z
 
                !---------------------- SHIFT DA HAMILTONIANA ----------------
                if (T<=10.d0**(-1)) then
@@ -461,17 +473,24 @@ program hexa_H
                   mag_prev_prime = m_prime(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z,s,i,T,m_prime(i))
+                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                   error(i) = abs(mag_prev - m(i))
                   error(i+6) = abs(mag_prev_prime - m_prime(i))
 
-                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
-                  ! m_prime(1) = 0.5*m_prime(1) + 0.5*mag_prev_prime
+                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                end do
 
+
             erro = maxval(error)
+
+            ! m_prime = m(2)
+
+            ! if (maxval(m_prime)>1.d0) then
+            !    m_prime = 1.d0
+            ! endif
 
             ! print*, m
             ! print*, m_prime

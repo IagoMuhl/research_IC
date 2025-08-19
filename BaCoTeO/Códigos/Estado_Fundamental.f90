@@ -6,16 +6,16 @@ program estado_fundamental
 ! 0.806122449
      open(15)
 
-    do while (H<=5)
+    do while (H<=10)
 
-        E_4 = 3*J3/4.d0 - H/2
-        E_5 = -J1/4.d0 - J2/2.d0 + 3*J3/4.d0
-        E_6 = J1/12.d0 - J2/2.d0 + J3/12.d0 - H/3.d0
-        E_PO = 3*J1/4.d0 + 3*J2/2.d0 + 3*J3/4.d0 - H
+        E_4 = (3*J3/4.d0)*2 - H/2
+        E_5 = (-J1/4.d0 - J2/2.d0 + 3*J3/4.d0)*2
+        E_6 = (J1/12.d0 - J2/2.d0 + J3/12.d0)*2 - H/3.d0
+        E_PO = (3*J1/4.d0 + 3*J2/2.d0 + 3*J3/4.d0)*2 - H
 
         WRITE(15,*) H, E_4, E_5, E_6, E_PO
 
-        H = H + 0.00001
+        H = H + 0.001
 
     enddo
 

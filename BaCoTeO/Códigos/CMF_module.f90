@@ -276,7 +276,16 @@ contains
 
       do i = 1, maxConfig
 
-         H_inter(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6)-3*m(1))*(J1*m(1) + 4*J2*m(1) + 2*J3*m(1))
+         H_inter(i) = J1*((s(i,1)*m(4)+s(i,4)*m(1)-m(1)*m(4))+(s(i,2)*m_prime(5)-(m(2)*m_prime(5)/2)) &
+         & + (s(i,3)*m_prime(6)-(m(3)*m_prime(6))/2)+(s(i,5)*m_prime(2)-(m(5)*m_prime(2))/2) &
+         & + (s(i,6)*m_prime(3)-(m(6)*m_prime(3))/2)) + J2*((s(i,1)-m(1)/2)*(m(3)+m_prime(3)+m(5)+m_prime(5)) &
+         & + (s(i,2)-m(2)/2)*(m(4)+m_prime(4)+2*m_prime(6)) + (s(i,3)-m(3)/2)*(m(1)+m_prime(1)+2*m_prime(5)) &
+         & + (s(i,5)-m(5)/2)*(m(1)+m_prime(1)+2*m_prime(3)) + (s(i,6)-m(6)/2)*(m(4)+m_prime(4)+2*m_prime(2)) &
+         & + (s(i,4)-m(4)/2)*(m(2)+m_prime(2)+m(6)+m_prime(6))) + J3*((s(i,1)-m(1)/2)*(m_prime(2)+m_prime(6)) & 
+         & + (s(i,2)-m(2)/2)*(m(3)+m_prime(1)) + (s(i,3)-m(3)/2)*(m(2)+m_prime(4)) &
+         & + (s(i,4)-m(4)/2)*(m_prime(3)+m_prime(5)) + (s(i,5)-m(5)/2)*(m(6)+m_prime(4)) & 
+         & + (s(i,6)-m(6)/2)*(m(5)+m_prime(1)))
+
 
       enddo
 
