@@ -4,9 +4,9 @@ program hexa_H
 
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total, s_z, H_inter_prime, H_total_prime
-   real*8:: m(6), error(12), mag_prev, m_prime(6), mag_prev_prime
+   real*8:: m(num_sites), error(2*num_sites), mag_prev, m_prime(num_sites), mag_prev_prime
    real*8:: J2, J3, erro, Alfa, Beta, mag, l
-   real*8:: T,H,step,Z,Z_prime,m_order,m_second,tol,F,H_final,F_prime
+   real*8:: T,H,step,Z,Z_prime,m_order,tol,F,H_final,F_prime
    character(len=3):: state
    character(len=5):: temp
    integer:: j, cd, i, p
@@ -14,7 +14,7 @@ program hexa_H
 
 
    tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0;
-   T = 0.3d0
+   T = 0.05d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -90,6 +90,8 @@ program hexa_H
 
                call partition(H_total,T,Z)
 
+               ! call magnetization(H_total,Z,s,1,T,m(1))
+
                do i = 1, num_sites
 
                   mag_prev = m(i)
@@ -97,10 +99,7 @@ program hexa_H
                   call magnetization(H_total,Z,s,i,T,m(i))
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+6) = 0.d0
-
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  error(i+num_sites) = 0
 
 
                end do
@@ -128,6 +127,7 @@ program hexa_H
 
             mag = sum(m)/num_sites
 
+            print*, H, mag
             write(30,*) H, F, m_order, mag
             write(21,*) H, m
 
@@ -205,7 +205,7 @@ program hexa_H
 
                   error(i) = abs(mag_prev - m(i))
 
-                  error(i+6) = 0.d0
+                  error(i+num_sites) = 0.d0
 
                   m(i) = 0.5*m(i) + mag_prev*0.5
 
@@ -225,7 +225,7 @@ program hexa_H
 
             end do
 
-            call order_parameter(state,m,m_order)
+            ! call order_parameter(state,m,m_order)
             ! call order_parameter(state,m_prime,m_second)
 
             ! m = (m + m_second)/2
@@ -236,6 +236,7 @@ program hexa_H
 
             mag = sum(m)/num_sites
 
+            print*, H, mag
             write(25,*) H, F, m_order, mag
             write(21,*) H, m
 
@@ -328,7 +329,7 @@ program hexa_H
                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+6) = abs(mag_prev_prime - m_prime(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   m(i) = 0.5*m(i) + 0.5*mag_prev
                   m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
@@ -351,7 +352,7 @@ program hexa_H
 
             end do
 
-            call order_parameter(state,m,m_order)
+            ! call order_parameter(state,m,m_order)
             ! call order_parameter(state,m_prime,m_second)
 
 
@@ -368,6 +369,8 @@ program hexa_H
 
             mag = (sum(m) + sum(m_prime))/(2*num_sites)
 
+
+            Print*, H, mag
             write(20,*) H, F, m_order, mag
 
 
@@ -428,7 +431,8 @@ program hexa_H
 
          call mag_vetor(state,m)
 
-         m_prime = 1.d0
+         m_prime = [1.d0, -1.d0, 1.d0, 1.d0, 1.d0, 1.d0, -1.d0, 1.d0, 1.d0, &
+                  & -1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, -1.d0, -1.d0]
 
          j = 0
          ! - - - - - - - - - - - - - - - - - - - - - - -
@@ -447,18 +451,43 @@ program hexa_H
 
                do i = 1, maxConfig
 
-                  H_inter_prime(i) = (s(i,1)+s(i,2)+s(i,3)+s(i,4)+s(i,5)+s(i,6) & 
-                  & -3*m_prime(1))*(J1*m(1) + J2*2*(m(1)+m(2)) + J3*2*m(2))
+                  H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m_prime(18)) + &
+                  & + (s(i,2)-m_prime(2)/2)*(m_prime(15)) + (s(i,3)-m_prime(3)/2)*(m(14)) &
+                  & + (s(i,6)-m_prime(6)/2)*(m(13)) + (s(i,7)-m_prime(7)/2)*(m_prime(12)) &
+                  & + (s(i,8)-m_prime(8)/2)*(m_prime(9)) &
+                  & + (s(i,9)-m_prime(9)/2)*(m_prime(8)) + (s(i,12)-m_prime(12)/2)*(m_prime(7)) &
+                  & + (s(i,13)-m_prime(13)/2)*(m(6)) &
+                  & + (s(i,14)-m_prime(14)/2)*(m(3)) + (s(i,15)-m_prime(15)/2)*(m_prime(2)) &
+                  & + (s(i,18)-m_prime(18)/2)*(m_prime(1))) &
+                  & + J2*((s(i,1)-m_prime(1)/2)*(m_prime(1)+m_prime(1)+m_prime(17)+m_prime(15)) &
+                  & + (s(i,2)-m_prime(2)/2)*(m_prime(18)+m_prime(16)+m_prime(14)+m(14)) &
+                  & + (s(i,3)-m_prime(3)/2)*(m(15)+m_prime(15)+m(13)) + (s(i,4)-m_prime(4)/2)*(m(14)) &
+                  & + (s(i,5)-m_prime(5)/2)*(m(13)) + (s(i,6)-m_prime(6)/2)*(m(14)+m_prime(12)+m(12)) &
+                  & + (s(i,7)-m_prime(7)/2)*(m(13)+m_prime(13)+m_prime(11)+m_prime(9)) &
+                  & + (s(i,8)-m_prime(8)/2)*(m_prime(12)+m_prime(10)+m_prime(8)+m_prime(8)) &
+                  & + (s(i,9)-m_prime(9)/2)*(m_prime(9)+m_prime(9)+m_prime(7)) &
+                  & + (s(i,10)-m_prime(10)/2)*(m_prime(8)) + (s(i,11)-m_prime(11)/2)*(m_prime(7)) &
+                  & + (s(i,12)-m_prime(12)/2)*(m_prime(8)+m(6)+m_prime(6)) &
+                  & + (s(i,13)-m_prime(13)/2)*(m(7)+m_prime(7)+m(5)+m(3)) &
+                  & + (s(i,14)-m_prime(14)/2)*(m(6)+m(4)+m_prime(2)+m(2)) &
+                  & + (s(i,15)-m_prime(15)/2)*(m_prime(3)+m(3)+m_prime(1)) &
+                  & + (s(i,16)-m_prime(16)/2)*(m_prime(2)) + (s(i,17)-m_prime(17)/2)*(m_prime(1)) &
+                  & + (s(i,18)-m_prime(18)/2)*(m_prime(2)+m_prime(18)+m_prime(18))) &
+                  & + J3*((s(i,1)-m_prime(1)/2)*(m_prime(18)+m_prime(16)) &
+                  & + (s(i,2)-m_prime(2)/2)*(m_prime(17)+m(15)) &
+                  & + (s(i,3)-m_prime(3)/2)*(m_prime(14)) + (s(i,4)-m_prime(4)/2)*(m(13)) &
+                  & + (s(i,5)-m_prime(5)/2)*(m(14)) + (s(i,6)-m_prime(6)/2)*(m_prime(13)) &
+                  & + (s(i,7)-m_prime(7)/2)*(m(12)+m_prime(10)) &
+                  & + (s(i,8)-m_prime(8)/2)*(m_prime(11)+m_prime(9)) &
+                  & + (s(i,9)-m_prime(9)/2)*(m_prime(8)) &
+                  & + (s(i,10)-m_prime(10)/2)*(m_prime(7)) + (s(i,11)-m_prime(11)/2)*(m_prime(8)) &
+                  & + (s(i,12)-m_prime(12)/2)*(m(7)) &
+                  & + (s(i,13)-m_prime(13)/2)*(m_prime(6)+m(4)) &
+                  & + (s(i,14)-m_prime(14)/2)*(m(5)+m_prime(3)) &
+                  & + (s(i,15)-m_prime(15)/2)*(m(2)) &
+                  & + (s(i,16)-m_prime(16)/2)*(m_prime(1)) + (s(i,17)-m_prime(17)/2)*(m_prime(2)) &
+                  & + (s(i,18)-m_prime(18)/2)*(m_prime(1)))
 
-                  ! H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m(4)) & 
-                  ! & + (s(i,2)-m_prime(2)/2)*(m(4)) + (s(i,3)-m_prime(3)/2)*(m(1)) &
-                  ! & + (s(i,4)-m_prime(4)/2)*(m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)) &
-                  ! & + (s(i,6)-m_prime(6)/2)*(m(4))) + J2*((s(i,1)-m_prime(1)/2)*(m(4)+m(5)+m(3)+m(4)) &
-                  ! & + (s(i,2)-m_prime(2)/2)*(m(4)+m(5)+m(3)+m(1)) + (s(i,3)-m_prime(3)/2)*(m(4)+m(2)+m(6)+m(1)) &
-                  ! & + (s(i,4)-m_prime(4)/2)*(m(1)+m(2)+m(6)+m(1)) + (s(i,5)-m_prime(5)/2)*(m(1)+m(2)+m(6)+m(4))&
-                  ! & + (s(i,6)-m_prime(6)/2)*(m(1)+m(5)+m(3)+m(4))) + J3*((s(i,1)-m_prime(1)/2)*(m(5)+m(3)) &
-                  ! & + (s(i,2)-m_prime(2)/2)*(m(2)+m(3)) + (s(i,3)-m_prime(3)/2)*(m(2)+m(3)) &
-                  ! & + (s(i,4)-m_prime(4)/2)*(m(6)+m(2)) + (s(i,5)-m_prime(5)/2)*(m(5)+m(6)) + (s(i,6)-m_prime(6)/2)*(m(5)+m(6)))
                enddo
 
                H_total = H_intra + H_inter - H*s_z
@@ -490,7 +519,7 @@ program hexa_H
                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+6) = abs(mag_prev_prime - m_prime(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   m(i) = 0.5*m(i) + 0.5*mag_prev
                   m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
@@ -535,14 +564,14 @@ program hexa_H
             write(21,*) H, m, F
             write(22,*) H, m_prime, F_prime
 
-            F = (3*F + F_prime)/4
+            F = (F + 3*F_prime)/4
 
             ! F = (F+F_prime)/2
 
-            mag = (3*sum(m) + sum(m_prime))/(4*num_sites)
+            mag = (sum(m) + 3*sum(m_prime))/(4*num_sites)
 
+            print*, H,mag
             write(28,*) H, F, m_order, mag
-
 
 
             if (j==0) then
