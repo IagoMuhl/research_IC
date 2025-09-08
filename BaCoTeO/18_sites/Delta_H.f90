@@ -5,11 +5,11 @@ program hexa_H
    integer, dimension(maxConfig,num_sites):: s
    real*8, dimension(maxConfig):: H_intra, H_inter, H_total, s_z, H_inter_prime, H_total_prime
    real*8:: m(num_sites), error(2*num_sites), mag_prev, m_prime(num_sites), mag_prev_prime
-   real*8:: J2, J3, erro, Alfa, Beta, mag, l
+   real*8:: J2, J3, erro, Alfa, Beta, mag
    real*8:: T,H,step,Z,Z_prime,m_order,tol,F,H_final,F_prime
    character(len=3):: state
    character(len=5):: temp
-   integer:: j, cd, i, p
+   integer:: j, cd, i, p, n
 
 
 
@@ -42,7 +42,7 @@ program hexa_H
    read*, H,H_final
 
    ! H = 7.5; H_final = 8;
-   cd = -3; l = 0
+   cd = -3
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -70,10 +70,10 @@ program hexa_H
 
          do while (H/=H_final)
 
-            error = 1.d0; erro = 1.d0; 
+               erro = 1.d0; error = 0.d0
 
             do while(erro >= tol)
-
+               
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
@@ -90,8 +90,6 @@ program hexa_H
 
                call partition(H_total,T,Z)
 
-               ! call magnetization(H_total,Z,s,1,T,m(1))
-
                do i = 1, num_sites
 
                   mag_prev = m(i)
@@ -100,7 +98,8 @@ program hexa_H
 
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = 0
-
+                  
+                  m(i) = 0.5*m(i) + mag_prev*0.5
 
                end do
 
@@ -109,17 +108,8 @@ program hexa_H
             ! print*, m
             ! print*, Alfa, erro
             ! read*,
-            
-            l = l + abs(step)
-
-            if (l>=10**(-(cd+1))) then
-            print*, 'Rodando... H = ', H
-            l = 0
-            endif
 
             end do
-
-            ! call order_parameter(state,m,m_order)
 
             call F_helm(T,Z,F)
 
@@ -132,12 +122,7 @@ program hexa_H
             write(21,*) H, m
 
 
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H
-               l = 0
-            endif
-
-             H = H + step; l = l + 1
+             H = H + step
 
             if ((max(H,H_final))-(min(H,H_final))<=abs(step)) then
                H = H_final
@@ -177,7 +162,7 @@ program hexa_H
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
          do while (H/=H_final)
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
 
@@ -197,7 +182,19 @@ program hexa_H
 
                call partition(H_total,T,Z)
 
-               do i = 1, num_sites
+                  mag_prev = m(1)
+
+                  call magnetization(H_total,Z,s,1,T,m(1))
+
+                  error(1) = abs(mag_prev - m(1))
+
+                  m(1) = 0.5*m(1) + mag_prev*0.5
+
+                  m(2) = m(1)
+               
+               n = 15
+
+               do i = 3, 10
 
                   mag_prev = m(i)
 
@@ -205,30 +202,17 @@ program hexa_H
 
                   error(i) = abs(mag_prev - m(i))
 
-                  error(i+num_sites) = 0.d0
-
                   m(i) = 0.5*m(i) + mag_prev*0.5
+
+                  m(i+n) = m(i)
+                  n = n - 2
 
                end do
 
-               
-
                erro = maxval(error)
-               ! m_prime = m
 
-                l = l + abs(step)
-
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H, erro
-               l = 0
-            endif
 
             end do
-
-            ! call order_parameter(state,m,m_order)
-            ! call order_parameter(state,m_prime,m_second)
-
-            ! m = (m + m_second)/2
 
             call F_helm(T,Z,F)
 
@@ -240,13 +224,7 @@ program hexa_H
             write(25,*) H, F, m_order, mag
             write(21,*) H, m
 
-
-            if (l==10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H
-               l = 0
-            endif
-
-            H = H + step; l = l + 1
+            H = H + step
 
             if ((max(H,H_final))-(min(H,H_final))<=abs(step)) then
                H = H_final
@@ -318,9 +296,11 @@ program hexa_H
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
-               ! print*, m
+                  n = 7
 
-               do i = 1, num_sites
+                  error = 0.d0
+
+               do i = 1, 4
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
@@ -334,7 +314,32 @@ program hexa_H
                   m(i) = 0.5*m(i) + 0.5*mag_prev
                   m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
+                  m(i+n) = m(i)
+                  m_prime(i+n) = m_prime(i)
 
+                  n = n - 2
+               end do
+
+                  n = 9
+
+               do i = 9, 13
+
+                  mag_prev = m(i)
+                  mag_prev_prime = m_prime(i)
+
+                  call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+                  error(i) = abs(mag_prev - m(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+                  m(i+n) = m(i)
+                  m_prime(i+n) = m_prime(i)
+
+                  n = n - 2
                end do
 
             erro = maxval(error)
@@ -343,17 +348,7 @@ program hexa_H
             ! print*, m
             ! read*,
 
-            l = l + abs(step)
-
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H
-               l = 0
-            endif
-
             end do
-
-            ! call order_parameter(state,m,m_order)
-            ! call order_parameter(state,m_prime,m_second)
 
 
             call F_helm(T,Z,F)
@@ -386,12 +381,8 @@ program hexa_H
                end if
             end if
 
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H
-               l = 0
-            endif
 
-            H = H + step; l = l + 1.d0
+            H = H + step
 
 
             if ((max(H,H_final))-(min(H,H_final))<=abs(step)) then
@@ -432,18 +423,16 @@ program hexa_H
          call mag_vetor(state,m)
 
          m_prime = [1.d0, -1.d0, 1.d0, 1.d0, 1.d0, 1.d0, -1.d0, 1.d0, 1.d0, &
-                  & -1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, -1.d0, -1.d0]
+                  & -1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, 1.d0, -1.d0, 1.d0]
 
          j = 0
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
          do while (H/=H_final)
-         !   do while (T/=T)
 
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
-
 
                call Ham_inter(state,J2,J3,s,m,m_prime,H_inter)
 
@@ -504,24 +493,44 @@ program hexa_H
 
                endif
                !---------------------- SHIFT DA HAMILTONIANA ----------------
-
+               error = 0.d0
 
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
-
-                do i = 1, num_sites
+                  do i = 1, 5, 2
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   m(i) = 0.5*m(i) + 0.5*mag_prev
+
+               end do
+
+               m(2) = m(1)
+               n = 6
+               do i = 1,2
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
+
+                do i = 1, num_sites
+
+                  ! mag_prev = m(i)
+                  mag_prev_prime = m_prime(i)
+
+                  ! call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+                  ! error(i) = abs(mag_prev - m(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
                   m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
 
@@ -530,29 +539,8 @@ program hexa_H
 
             erro = maxval(error)
 
-            ! m_prime = m(2)
-
-            ! if (maxval(m_prime)>1.d0) then
-            !    m_prime = 1.d0
-            ! endif
-
-            ! print*, m
-            ! print*, m_prime
-            ! print*, erro
-            ! print*, l
-            ! read*,
-
-            l = l + abs(step)
-
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H, erro
-               l = 0
-            endif
 
             end do
-
-            ! call order_parameter(state,m,m_order)
-            ! call order_parameter(state,m_prime,m_second)
 
 
             call F_helm(T,Z,F)
@@ -566,11 +554,9 @@ program hexa_H
 
             F = (F + 3*F_prime)/4
 
-            ! F = (F+F_prime)/2
-
             mag = (sum(m) + 3*sum(m_prime))/(4*num_sites)
 
-            print*, H,mag
+            print*, H, mag
             write(28,*) H, F, m_order, mag
 
 
@@ -586,12 +572,7 @@ program hexa_H
                end if
             end if
 
-            if (l>=10**(-(cd+1))) then
-               print*, 'Rodando... H = ', H
-               l = 0
-            endif
-
-            H = H + step; l = l + 1.d0
+            H = H + step
 
             if ((max(H,H_final))-(min(H,H_final))<=abs(step)) then
                H = H_final
