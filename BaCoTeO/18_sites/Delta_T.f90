@@ -9,12 +9,12 @@ program hexa_T
    real*8:: T,H,step,Z,Z_prime,m_order,tol,F,T_max,F_prime
    character(len=3):: state
    character(len=5):: temp
-   integer:: j, cd, i, p, k
+   integer:: j, cd, i, p, k, n
 
 
 
    tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0; 
-   H = 2.5d0
+   H = 0.d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -71,9 +71,9 @@ program hexa_T
 
          do while (T/=T_max)
 
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
-            ! do while(erro >= tol)
+            do while(erro >= tol)
 
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
@@ -91,28 +91,26 @@ program hexa_T
 
                call partition(H_total,T,Z)
 
-               call magnetization(H_total,Z,s,1,T,m(1))
+                do i = 1, num_sites
 
-               do i = 2, num_sites
+                  mag_prev = m(i)
 
-                  ! mag_prev = m(i)
+                  call magnetization(H_total,Z,s,i,T,m(i))
 
-                  ! call magnetization(H_total,Z,s,i,T,m(i))
-
-                  ! error(i) = abs(mag_prev - m(i))
-                  ! error(i+6) = 0
-
-                  m(i) = m(1)
+                  error(i) = abs(mag_prev - m(i))
+                  error(i+num_sites) = 0
+                  
+                  m(i) = 0.5*m(i) + mag_prev*0.5
 
                end do
 
-               ! erro = maxval(error)
+               erro = maxval(error)
 
             ! print*, m
             ! print*, erro
             ! read*,
 
-            ! end do
+            end do
 
             ! call order_parameter(state,m,m_order)
 
@@ -122,16 +120,11 @@ program hexa_T
 
             mag = sum(m)/num_sites
 
-            write(30,*) T, F, m_order, mag
+            print*, T, mag
+            write(30,*) T, F, mag
             write(21,*) T, m
 
-
-            if (k==10**(-(cd+1))) then
-               print*, 'Rodando... T = ', T
-               k = 0
-            endif
-
-            T = T + step; k = k + 1
+            T = T + step
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
                T = T_max
@@ -171,14 +164,11 @@ program hexa_T
 
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
-         ! do while (T/=T_max)
          do while (T/=T_max)
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
 
-               ! print*, m
-               ! read*,
 
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
@@ -196,22 +186,47 @@ program hexa_T
 
                call partition(H_total,T,Z)
 
-               do i = 1, num_sites
+               ! do i = 1, num_sites
+
+               !    mag_prev = m(i)
+
+               !    call magnetization(H_total,Z,s,i,T,m(i))
+
+               !    error(i) = abs(mag_prev - m(i))
+               !    error(i+num_sites) = 0
+
+               ! end do
+
+               mag_prev = m(1)
+
+                  call magnetization(H_total,Z,s,1,T,m(1))
+
+                  error(1) = abs(mag_prev - m(1))
+
+                  m(1) = 0.5*m(1) + mag_prev*0.5
+
+                  m(2) = m(1)
+               
+               n = 15
+
+               do i = 3, 10
 
                   mag_prev = m(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = 0
+
+                  m(i) = 0.5*m(i) + mag_prev*0.5
+
+                  m(i+n) = m(i)
+                  n = n - 2
 
                end do
 
                erro = maxval(error)
 
             end do
-
-            ! call order_parameter(state,m,m_order)
 
 
             call F_helm(T,Z,F)
@@ -220,18 +235,14 @@ program hexa_T
 
             mag = sum(m)/num_sites
 
-            write(25,*) T, F, m_order, mag
+            print*, T, mag
+            write(25,*) T, F, mag
             write(21,*) T, m
             write(22,*) T, m_prime
 
 
 
-            if (k==10**(-(cd+1))) then
-               print*, 'Rodando... T = ', T
-               k = 0
-            endif
-
-            T = T + step; k = k + 1
+            T = T + step
 
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
@@ -277,7 +288,7 @@ program hexa_T
 
          do while (T/=T_max)
 
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
 
@@ -304,7 +315,24 @@ program hexa_T
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
-               do i = 1, num_sites
+               ! do i = 1, num_sites
+
+               !    mag_prev = m(i)
+               !    mag_prev_prime = m_prime(i)
+
+               !    call magnetization(H_total,Z,s,i,T,m(i))
+               !    call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+               !    error(i) = abs(mag_prev - m(i))
+
+               !    error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+               ! end do
+               n = 7
+
+                  error = 0.d0
+
+               do i = 1, 4
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
@@ -313,17 +341,42 @@ program hexa_T
                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                   error(i) = abs(mag_prev - m(i))
-
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
+                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+                  m(i+n) = m(i)
+                  m_prime(i+n) = m_prime(i)
+
+                  n = n - 2
+               end do
+
+                  n = 9
+
+               do i = 9, 13
+
+                  mag_prev = m(i)
+                  mag_prev_prime = m_prime(i)
+
+                  call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+                  error(i) = abs(mag_prev - m(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+                  m(i+n) = m(i)
+                  m_prime(i+n) = m_prime(i)
+
+                  n = n - 2
                end do
 
             erro = maxval(error)
 
             end do
-
-            ! call order_parameter(state,m,m_order)
-            ! call order_parameter(state,m_prime,m_second)
 
 
             call F_helm(T,Z,F)
@@ -334,11 +387,14 @@ program hexa_T
 
             F = (F + F_prime)/2
 
+            m_order = (m(1)-m(2)-m(3)+m(4)-m(9)-m(10)+m(11)-m(12)+m(13))/9.d0
+
             mag = (sum(m) + sum(m_prime))/(2*num_sites)
 
+            Print*, T, mag, m_order
             write(21,*) T, m
             write(22,*) T, m_prime
-            write(20,*) T, F, m_order, mag
+            write(20,*) T, F, mag, m_order
 
 
             if (j==0) then
@@ -353,12 +409,8 @@ program hexa_T
                end if
             end if
 
-            if (k==10**(-(cd+1))) then
-               print*, 'Rodando... T = ', T
-               k = 0
-            endif
 
-            T = T + step; k = k + 1
+            T = T + step
 
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
@@ -407,12 +459,9 @@ program hexa_T
          do while (T/=T_max)
          !   do while (T_max/=T)
 
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
-
-               ! print*, m
-               ! read*,
 
                call Ham_inter(state,J2,J3,s,m,m_prime,H_inter)
 
@@ -420,10 +469,14 @@ program hexa_T
 
                do i = 1, maxConfig
 
-                  H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m_prime(18)) + (s(i,2)-m_prime(2)/2)*(m_prime(15)) + (s(i,3)-m_prime(3)/2)*(m(14)) &
-                  & + (s(i,6)-m_prime(6)/2)*(m(13)) + (s(i,7)-m_prime(7)/2)*(m_prime(12)) + (s(i,8)-m_prime(8)/2)*(m_prime(9)) &
-                  & + (s(i,9)-m_prime(9)/2)*(m_prime(8)) + (s(i,12)-m_prime(12)/2)*(m_prime(7)) + (s(i,13)-m_prime(13)/2)*(m(6)) &
-                  & + (s(i,14)-m_prime(14)/2)*(m(3)) + (s(i,15)-m_prime(15)/2)*(m_prime(2)) + (s(i,18)-m_prime(18)/2)*(m_prime(1))) &
+                  H_inter_prime(i) = J1*((s(i,1)-m_prime(1)/2)*(m_prime(18)) + &
+                  & + (s(i,2)-m_prime(2)/2)*(m_prime(15)) + (s(i,3)-m_prime(3)/2)*(m(14)) &
+                  & + (s(i,6)-m_prime(6)/2)*(m(13)) + (s(i,7)-m_prime(7)/2)*(m_prime(12)) &
+                  & + (s(i,8)-m_prime(8)/2)*(m_prime(9)) &
+                  & + (s(i,9)-m_prime(9)/2)*(m_prime(8)) + (s(i,12)-m_prime(12)/2)*(m_prime(7)) &
+                  & + (s(i,13)-m_prime(13)/2)*(m(6)) &
+                  & + (s(i,14)-m_prime(14)/2)*(m(3)) + (s(i,15)-m_prime(15)/2)*(m_prime(2)) &
+                  & + (s(i,18)-m_prime(18)/2)*(m_prime(1))) &
                   & + J2*((s(i,1)-m_prime(1)/2)*(m_prime(1)+m_prime(1)+m_prime(17)+m_prime(15)) &
                   & + (s(i,2)-m_prime(2)/2)*(m_prime(18)+m_prime(16)+m_prime(14)+m(14)) &
                   & + (s(i,3)-m_prime(3)/2)*(m(15)+m_prime(15)+m(13)) + (s(i,4)-m_prime(4)/2)*(m(14)) &
@@ -453,8 +506,6 @@ program hexa_T
                   & + (s(i,16)-m_prime(16)/2)*(m_prime(1)) + (s(i,17)-m_prime(17)/2)*(m_prime(2)) &
                   & + (s(i,18)-m_prime(18)/2)*(m_prime(1)))
 
-
-
                enddo
 
                H_total = H_intra + H_inter - H*s_z
@@ -477,19 +528,56 @@ program hexa_T
                call partition(H_total_prime,T,Z_prime)
 
 
-               do i = 1, num_sites
+               ! do i = 1, num_sites
+
+               !    mag_prev = m(i)
+               !    mag_prev_prime = m_prime(i)
+
+               !    call magnetization(H_total,Z,s,i,T,m(i))
+               !    call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+
+               !    error(i) = abs(mag_prev - m(i))
+               !    error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+               !    m(i) = 0.5*m(i) + 0.5*mag_prev
+               !    m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+
+               ! end do
+                  do i = 1, 5, 2
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
-
 
                   error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   m(i) = 0.5*m(i) + 0.5*mag_prev
+
+               end do
+
+               m(2) = m(1)
+               n = 6
+               do i = 1,2
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
+
+                do i = 1, num_sites
+
+                  ! mag_prev = m(i)
+                  mag_prev_prime = m_prime(i)
+
+                  ! call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+                  ! error(i) = abs(mag_prev - m(i))
+                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
                   m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
 
@@ -522,13 +610,11 @@ program hexa_T
 
             mag = (sum(m) + 3*sum(m_prime))/(4*num_sites)
 
-            write(28,*) T, F, m_order, mag
+            write(28,*) T, F, mag
             write(21,*) T, m
             write(22,*) T, m_prime
 
-            ! write(28,*) T_max, F, m_order, mag
-            ! write(21,*) T_max, m
-            ! write(22,*) T_max, m_prime
+            print*, T, mag
             
 
             if (j==0) then
@@ -543,14 +629,9 @@ program hexa_T
                end if
             end if
 
-            if (k==10**(-(cd+1))) then
-               print*, 'Rodando... T = ', T
-               k = 0
-            endif
 
-            T = T + step; k = k + 1
 
-            ! T_max = T_max - step; k = k + 1
+            T = T + step
 
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then

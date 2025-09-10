@@ -269,7 +269,7 @@ program hexa_H
 
          do while (H/=H_final)
 
-            error = 1.d0; erro = 1.d0; 
+            error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
 
@@ -366,7 +366,7 @@ program hexa_H
 
 
             Print*, H, mag
-            write(20,*) H, F, m_order, mag
+            write(20,*) H, F, mag
 
 
             if (j==0) then

@@ -626,7 +626,7 @@ program hexa_H_varre
 
       if (T>=T_final) stop
       
-      T = T + 0.1
+      T = T + passo
 
    enddo
 
