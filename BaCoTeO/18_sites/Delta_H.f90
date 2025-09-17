@@ -9,12 +9,13 @@ program hexa_H
    real*8:: T,H,step,Z,Z_prime,m_order,tol,F,H_final,F_prime
    character(len=3):: state
    character(len=5):: temp
-   integer:: j, cd, i, p, n
+   integer:: j, cd, i, p, n, iter, iter_max
 
 
 
-   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0;
-   T = 0.05d0
+   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626;
+   s_z = 0; iter_max = 500
+   T = 1.0d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -42,7 +43,7 @@ program hexa_H
    read*, H,H_final
 
    ! H = 7.5; H_final = 8;
-   cd = -3
+   cd = -3; iter = 0
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -90,26 +91,34 @@ program hexa_H
 
                call partition(H_total,T,Z)
 
-               do i = 1, num_sites
+               ! do i = 1, num_sites
 
-                  mag_prev = m(i)
+                  mag_prev = m(1)
 
-                  call magnetization(H_total,Z,s,i,T,m(i))
+                  call magnetization(H_total,Z,s,1,T,m(1))
 
-                  error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = 0
+                  error(1) = abs(mag_prev - m(1))
+                  ! error(i+num_sites) = 0
                   
-                  m(i) = 0.5*m(i) + mag_prev*0.5
+                  m(1) = 0.5*m(1) + mag_prev*0.5
 
-               end do
+               ! end do
+                  m = m(1)
 
-               erro = maxval(error)
+               iter = iter + 1
+            erro = maxval(error)
 
-            ! print*, m
-            ! print*, Alfa, erro
-            ! read*,
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
             call F_helm(T,Z,F)
 
@@ -118,7 +127,7 @@ program hexa_H
             mag = sum(m)/num_sites
 
             print*, H, mag
-            write(30,*) H, F, m_order, mag
+            write(30,*) H, F, mag
             write(21,*) H, m
 
 
@@ -188,7 +197,7 @@ program hexa_H
 
                   error(1) = abs(mag_prev - m(1))
 
-                  m(1) = 0.5*m(1) + mag_prev*0.5
+                  ! m(1) = 0.5*m(1) + mag_prev*0.5
 
                   m(2) = m(1)
                
@@ -202,17 +211,27 @@ program hexa_H
 
                   error(i) = abs(mag_prev - m(i))
 
-                  m(i) = 0.5*m(i) + mag_prev*0.5
+                  ! m(i) = 0.5*m(i) + mag_prev*0.5
 
                   m(i+n) = m(i)
                   n = n - 2
 
                end do
 
-               erro = maxval(error)
+               iter = iter + 1
+            erro = maxval(error)
 
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
             call F_helm(T,Z,F)
 
@@ -221,7 +240,7 @@ program hexa_H
             mag = sum(m)/num_sites
 
             print*, H, mag
-            write(25,*) H, F, m_order, mag
+            write(25,*) H, F, mag
             write(21,*) H, m
 
             H = H + step
@@ -298,8 +317,6 @@ program hexa_H
 
                   n = 7
 
-                  error = 0.d0
-
                do i = 1, 4
 
                   mag_prev = m(i)
@@ -311,8 +328,8 @@ program hexa_H
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -333,8 +350,8 @@ program hexa_H
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -342,13 +359,20 @@ program hexa_H
                   n = n - 2
                end do
 
+           iter = iter + 1
             erro = maxval(error)
 
-            ! print*, erro
-            ! print*, m
-            ! read*,
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
 
             call F_helm(T,Z,F)
@@ -477,6 +501,7 @@ program hexa_H
                   & + (s(i,16)-m_prime(16)/2)*(m_prime(1)) + (s(i,17)-m_prime(17)/2)*(m_prime(2)) &
                   & + (s(i,18)-m_prime(18)/2)*(m_prime(1)))
 
+
                enddo
 
                H_total = H_intra + H_inter - H*s_z
@@ -498,49 +523,38 @@ program hexa_H
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
-                  do i = 1, 5, 2
 
-                  mag_prev = m(i)
-                  mag_prev_prime = m_prime(i)
+                  do i = 1, num_sites
 
-                  call magnetization(H_total,Z,s,i,T,m(i))
+                     mag_prev = m(i)
+                     mag_prev_prime = m_prime(i)
 
-                  error(i) = abs(mag_prev - m(i))
+                     call magnetization(H_total,Z,s,i,T,m(i))
+                     call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                     ! m(i) = 0.5*m(i) + mag_prev*0.5
+                     ! m_prime(i) = 0.5*m_prime(i) + mag_prev_prime*0.5
 
-               end do
+                     error(i) = abs(mag_prev - m(i))
+                     error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-               m(2) = m(1)
-               n = 6
-               do i = 1,2
-                  m(i+n) = m(i)
-                  m(i+2*n) = m(i)
-               enddo
+                   end do
 
 
-                do i = 1, num_sites
-
-                  ! mag_prev = m(i)
-                  mag_prev_prime = m_prime(i)
-
-                  ! call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
-
-                  ! error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
-
-                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
-
-
-               end do
-
-
+            iter = iter + 1
             erro = maxval(error)
 
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
 
             call F_helm(T,Z,F)
@@ -557,7 +571,7 @@ program hexa_H
             mag = (sum(m) + 3*sum(m_prime))/(4*num_sites)
 
             print*, H, mag
-            write(28,*) H, F, m_order, mag
+            write(28,*) H, F, mag
 
 
             if (j==0) then

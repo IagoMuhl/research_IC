@@ -100,7 +100,7 @@ program hexa_T
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = 0
                   
-                  m(i) = 0.5*m(i) + mag_prev*0.5
+                  ! m(i) = 0.5*m(i) + mag_prev*0.5
 
                end do
 
@@ -203,7 +203,7 @@ program hexa_T
 
                   error(1) = abs(mag_prev - m(1))
 
-                  m(1) = 0.5*m(1) + mag_prev*0.5
+                  ! m(1) = 0.5*m(1) + mag_prev*0.5
 
                   m(2) = m(1)
                
@@ -217,7 +217,7 @@ program hexa_T
 
                   error(i) = abs(mag_prev - m(i))
 
-                  m(i) = 0.5*m(i) + mag_prev*0.5
+                  ! m(i) = 0.5*m(i) + mag_prev*0.5
 
                   m(i+n) = m(i)
                   n = n - 2
@@ -343,8 +343,8 @@ program hexa_T
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -365,8 +365,8 @@ program hexa_T
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -554,7 +554,7 @@ program hexa_T
 
                   error(i) = abs(mag_prev - m(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
 
                end do
 
@@ -578,7 +578,7 @@ program hexa_T
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   ! m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
 
                end do

@@ -9,13 +9,14 @@ program hexa_H_varre
    real*8:: T,H,step,Z,Z_prime,tol,F,H_final,F_prime,T_final
    character(len=3):: state
    character(len=5):: temp
-   integer:: j, cd, i, p, n
+   integer:: j, cd, i, p, n, iter, iter_max
 
 
 
-   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0; cd = -3
+   tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626
+   s_z = 0; cd = -3; iter_max = 500
 
-   T = 0.2d0; T_final = 1.5d0
+   T = 0.25d0; T_final = 0.95d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -35,7 +36,7 @@ program hexa_H_varre
    ! write(*,*) 'Entre com o step(-3,-5):'
    ! read*, cd
 
-   passo = 10.d0**(-1)
+   passo = 0.1
 
 
    do while (T/=T_final)
@@ -45,15 +46,15 @@ program hexa_H_varre
    ! write(*,*) 'Entre com H e H_final:'
    ! read*, H,H_final
 
-!       H = 8; H_final = 7;
+      ! H = 7.9; H_final = 6;
 
-!       if (H < H_final) then
-!          step = 10.d0**(cd)
-!       else
-!          step = -10.d0**(cd)
-!       endif
+      ! if (H < H_final) then
+      !    step = 10.d0**(cd)
+      ! else
+      !    step = -10.d0**(cd)
+      ! endif
 
-!       state = 'pm'
+!       state = 'pm'; iter = 0
 ! !-------------------------- FASE PM ------------------------------------
 
 !       open(unit=30, file= 'Fase_' // trim(state) // '_Temperatura_' // trim(temp) // "_T-H.dat")
@@ -101,13 +102,20 @@ program hexa_H_varre
 
 !                end do
 
-!                erro = maxval(error)
+!               iter = iter + 1
+!             erro = maxval(error)
 
-!             ! print*, m
-!             ! print*, Alfa, erro
-!             ! read*,
-
+!             if (iter>=iter_max) then
+!                exit
+!             endif
 !             end do
+
+!             if (iter>=iter_max) then
+!                exit
+!             endif
+
+!             print*, iter
+!             iter = 0
 
 !             call F_helm(T,Z,F)
 
@@ -116,7 +124,7 @@ program hexa_H_varre
 !             mag = sum(m)/num_sites
 
 !             print*, 'Temp:',T, 'Campo:',H, 'Mag:',mag ,'Fase: ',state
-!             write(30,*) H, F, m_order, mag
+!             write(30,*) H, F, mag
 !             write(21,*) H, m
 
 
@@ -143,11 +151,11 @@ program hexa_H_varre
 
 !       close(30)
 !       close(21)
-! !----------------------------------------------------------------------------
+! ! !----------------------------------------------------------------------------
    
-      if (T <= 0.8) then
+      if (T <= 0.6) then
 
-      H = 3; H_final = 2.35;
+      H = 3.0; H_final = 2.4;
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -155,7 +163,7 @@ program hexa_H_varre
          step = -10.d0**(cd)
       endif
 
-      state = '6'
+      state = '6'; iter = 0
 !-------------------------- FASE 6 ------------------------------------
 
       open(unit=25, file= 'Fase_' // trim(state) // '_Temperatura_' // trim(temp) // "_T-H.dat")
@@ -194,7 +202,7 @@ program hexa_H_varre
 
                   error(1) = abs(mag_prev - m(1))
 
-                  m(1) = 0.5*m(1) + mag_prev*0.5
+                  ! m(1) = 0.5*m(1) + mag_prev*0.5
 
                   m(2) = m(1)
                
@@ -208,17 +216,27 @@ program hexa_H_varre
 
                   error(i) = abs(mag_prev - m(i))
 
-                  m(i) = 0.5*m(i) + mag_prev*0.5
+                  ! m(i) = 0.5*m(i) + mag_prev*0.5
 
                   m(i+n) = m(i)
                   n = n - 2
 
                end do
 
-               erro = maxval(error)
+            iter = iter + 1
+            erro = maxval(error)
 
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
             call F_helm(T,Z,F)
 
@@ -258,7 +276,7 @@ program hexa_H_varre
 !----------------------------------------------------------------------------
       endif
 
-      H = 2.35; H_final = 2.7;
+      H = 2.4; H_final = 2.7;
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -266,7 +284,7 @@ program hexa_H_varre
          step = -10.d0**(cd)
       endif
 
-      state = '5'
+      state = '5'; iter = 0
 !-------------------------- FASE 5 -----------------------------------
       open(unit=20, file = 'Fase_' // trim(state) // '_Temperatura_' // trim(temp) // "_T-H.dat")
       ! open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
@@ -326,8 +344,8 @@ program hexa_H_varre
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -348,8 +366,8 @@ program hexa_H_varre
                   error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
                   m(i+n) = m(i)
                   m_prime(i+n) = m_prime(i)
@@ -357,13 +375,20 @@ program hexa_H_varre
                   n = n - 2
                end do
 
+            iter = iter + 1
             erro = maxval(error)
 
-            ! print*, erro
-            ! print*, m
-            ! read*,
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
+
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
 
             call F_helm(T,Z,F)
@@ -427,7 +452,7 @@ program hexa_H_varre
       ! close(22)
 !-------------------------------------------------------------------------      
       
-      H = 3; H_final = 2.45;
+      H = 3; H_final = 2.4;
 
       if (H < H_final) then
          step = 10.d0**(cd)
@@ -435,7 +460,7 @@ program hexa_H_varre
          step = -10.d0**(cd)
       endif
 
-      state = '4'
+      state = '4'; iter = 0
 !-------------------------- FASE 4 -----------------------------------
       open(unit=28, file = 'Fase_' // trim(state) // '_Temperatura_' // trim(temp) // "_T-H.dat")
       ! open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
@@ -521,50 +546,38 @@ program hexa_H_varre
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
-                  do i = 1, 5, 2
+
+                do i = 1, num_sites
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
-
-                  error(i) = abs(mag_prev - m(i))
-
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-
-               end do
-
-               m(2) = m(1)
-               n = 6
-               do i = 1,2
-                  m(i+n) = m(i)
-                  m(i+2*n) = m(i)
-               enddo
-
-
-                do i = 1, num_sites
-
-                  ! mag_prev = m(i)
-                  mag_prev_prime = m_prime(i)
-
-                  ! call magnetization(H_total,Z,s,i,T,m(i))
                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
-                  ! error(i) = abs(mag_prev - m(i))
+                  error(i) = abs(mag_prev - m(i))
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   ! m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
 
                end do
 
-
+               iter = iter + 1
             erro = maxval(error)
 
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
 
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
             call F_helm(T,Z,F)
             call F_helm(T,Z_prime,F_prime)
