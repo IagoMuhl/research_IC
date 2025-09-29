@@ -6,21 +6,21 @@ program ising2d
   integer:: N_steps, N_equilibrio
   integer, allocatable :: s(:,:), seed
   real*8:: r, J_1, E, M, T, T_start, T_end, T_step
-  real*8:: E_acum, E2_acum, M_acum, M2_acum, Chi, C, M_abs_acum
+  real*8:: E_acum, E2_acum, M_acum, M2_acum, M4_acum, Chi, C, M_abs_acum, U_Binder
 
 
 
   ! ... Parâmetros do sistema
    J_1 = 1.d0
-   L = 8
+   L = 32
    N = L*L
-   T_start = 5d0
+   T_start = 2.3d0
    T = T_start
-   T_end = 4.5d0
-   T_step = -0.1d0
+   T_end = 2.2d0
+   T_step = -0.001d0
    N_equilibrio = 2*10**(6)
    N_steps = 4*10**(6)
-   seed = 65426
+   seed = 65465712
 
    open(L)
 
@@ -59,9 +59,10 @@ program ising2d
       E2_acum = 0.d0
       M_acum = 0.d0
       M2_acum = 0.d0
+      M4_acum = 0.d0
       M = 0.d0
       M_abs_acum = 0.d0
-      x = 0; y = 0
+      ! x = 0; y = 0
 
       ! 4. Fase de Coleta de Dados
       do i = 1, N_steps
@@ -73,13 +74,7 @@ program ising2d
          M = sum(s)
          M_acum = M_acum + abs(M)
          M2_acum = M2_acum + M*M
-
-         ! x = x + 1
-         ! if (x >= 100000) then
-         !    y = y + 1
-         !    call write_spin_matrix(s,L,T,y)
-         !    x = 0
-         ! endif
+         M4_acum = M4_acum + M**4
 
       end do
 
@@ -91,12 +86,14 @@ program ising2d
       Chi = (abs(M2_acum/N_steps) - ((M_acum/N_steps)*(M_acum/N_steps))) / T
       ! ... Calcule a capacidade calorífica e a susceptibilidade aqui
 
+      U_Binder = 1.d0 - ((M4_acum/N_steps)/(3*((M2_acum/N_steps)*(M2_acum/N_steps))))
+
       E = E/N
       M = M/N
       C = C/N
       Chi = Chi/N
 
-      write(L,*) T, E, M, C, Chi
+      write(L,*) T, E, M, C, Chi, U_Binder
 
       ! 6. Imprime os resultados para a temperatura T
       write(*,*) 'T = ', T, ' E = ', E, ' M = ', M

@@ -14,9 +14,11 @@ program hexa_T_varre
 
 
    tol = 10.d0**(-8); J2 = 0.806122449; J3 = -0.111564626; s_z = 0
-   iter_max = 10000
+   iter_max = 100000
 
-   H = 0.0d0; H_final = 0.35d0
+   passo = 0.05; cd = -3; step = 10.d0**(cd)
+
+   H = 1.95d0; H_final = 1.45d0
 !----------------------------BASE-------------------------------
    call base(s)
 
@@ -28,148 +30,38 @@ program hexa_T_varre
    call HAM_INTRA(J2,J3,s,H_intra)
 
 !--------------------------------------------------------------
-   ! write(*,*) 'Entre com T e T_max:'
-   ! read*, T,T_max
 
-   ! ! open(unit=20, file= 'SO_T_' // trim(state) // "_T-H.dat")
+    if (H > H_final) then
+         passo = -passo
+   endif
 
-   ! write(*,*) 'Entre com o step(-3,-5):'
-   ! read*, cd
-
-   do while (H/=H_final)
+   do
 
    ! write(*,*) 'Entre com T e T_max:'
    ! read*, T,T_max
 
-   passo = 0.05
 
-   cd = -5; step = 10.d0**(cd); k = 0
+
+    k = 0
 
       WRITE (temp, '(F5.3)') H
 
-      ! T = 1.81; T_max = 1.80
+      T = 1.75; T_max = 1.69
 
-      ! if (T < T_max) then
-      !    step = 10.d0**(cd)
-      ! else
-      !    step = -10.d0**(cd)
-      ! endif
-
-      ! write(*,*) 'Entre com a fase:'
-      ! read*, state
+      if (T < T_max) then
+         step = 10.d0**(cd)
+      else
+         step = -10.d0**(cd)
+      endif
 
       
 
-!       state = 'pm'; iter = 0
-! !-------------------------- FASE PM ------------------------------------
+      state = 'pm'; iter = 0
+!-------------------------- FASE PM ------------------------------------
 
-!       open(unit=30, file= 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
-!       ! open(unit=21, file = 'Mag_'// trim(state) // '.dat')
+      open(unit=30, file= 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
+      ! open(unit=21, file = 'Mag_'// trim(state) // '.dat')
 
-
-!          Alfa = 0.d0
-
-!          call mag_vetor(state,m)
-
-!          ! - - - - - - - - - - - - - - - - - - - - - - -
-
-!          do while (T/=T_max)
-
-!             error = 0.d0; erro = 1.d0; 
-
-!             do while(erro >= tol)
-
-!                call Ham_inter(state,J2,J3,s,m,m,H_inter)
-
-!                H_total = H_intra + H_inter - H*s_z
-
-!                !---------------------- SHIFT DA HAMILTONIANA ----------------
-!                if (T<=10.d0**(-1)) then
-
-!                   Alfa = minval(H_total)
-
-!                   H_total = H_total - Alfa
-
-!                endif
-!                !---------------------- SHIFT DA HAMILTONIANA ----------------
-
-!                call partition(H_total,T,Z)
-
-!                 do i = 1, num_sites
-
-!                   mag_prev = m(i)
-
-!                   call magnetization(H_total,Z,s,i,T,m(i))
-
-!                   error(i) = abs(mag_prev - m(i))
-!                   error(i+num_sites) = 0
-                  
-!                   m(i) = 0.5*m(i) + mag_prev*0.5
-
-!                end do
-
-!             iter = iter + 1
-!             erro = maxval(error)
-
-!             if (iter>=iter_max) then
-!                exit
-!             endif
-!             end do
-
-!             if (iter>=iter_max) then
-!                exit
-!             endif
-
-!             print*, iter
-!             iter = 0
-
-!             call F_helm(T,Z,F)
-
-!             F = F + Alfa
-
-!             mag = sum(m)/num_sites
-
-!             print*, T, mag
-!             write(30,*) T, F, mag
-!             ! write(21,*) T, m
-
-!             T = T + step
-
-!             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
-!                T = T_max
-!             endif
-
-!          end do
-
-!          !----------------- NOVAS ENTRADAS  -----------------
-
-!          print*, '------------'
-!          Print*, 'State = ','', state
-!          print*, 'H =','', H
-!          print*, 'T','',T
-!          print*, 'J2','',J2
-!          print*, 'J3','',J3
-!          print*, '----END-----'
-
-
-!       !enddo
-
-!       print*, '=== FIM ==='
-
-!       close(30)
-!       ! close(21)
-! !----------------------------------------------------------------------------
-
-
-
-
-
-      state = '6'
-!-------------------------- FASE 6 ------------------------------------
-
-      open(unit=25, file= 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
-      open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
-      open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
 
          Alfa = 0.d0
 
@@ -178,69 +70,54 @@ program hexa_T_varre
          ! - - - - - - - - - - - - - - - - - - - - - - -
 
          do while (T/=T_max)
+
             error = 0.d0; erro = 1.d0; 
 
             do while(erro >= tol)
-
 
                call Ham_inter(state,J2,J3,s,m,m,H_inter)
 
                H_total = H_intra + H_inter - H*s_z
 
-            !---------------------- SHIFT DA HAMILTONIANA ----------------
-               if (T_max<=10.d0**(-1)) then
+               !---------------------- SHIFT DA HAMILTONIANA ----------------
+               if (T<=10.d0**(-1)) then
 
                   Alfa = minval(H_total)
 
                   H_total = H_total - Alfa
 
                endif
-            !---------------------- SHIFT DA HAMILTONIANA ----------------
+               !---------------------- SHIFT DA HAMILTONIANA ----------------
 
                call partition(H_total,T,Z)
 
-               ! do i = 1, num_sites
-
-               !    mag_prev = m(i)
-
-               !    call magnetization(H_total,Z,s,i,T,m(i))
-
-               !    error(i) = abs(mag_prev - m(i))
-               !    error(i+num_sites) = 0
-
-               ! end do
-
-               mag_prev = m(1)
-
-                  call magnetization(H_total,Z,s,1,T,m(1))
-
-                  error(1) = abs(mag_prev - m(1))
-
-                  m(1) = 0.5*m(1) + mag_prev*0.5
-
-                  m(2) = m(1)
-               
-               n = 15
-
-               do i = 3, 10
+                do i = 1, num_sites
 
                   mag_prev = m(i)
 
                   call magnetization(H_total,Z,s,i,T,m(i))
 
                   error(i) = abs(mag_prev - m(i))
-
+                  error(i+num_sites) = 0
+                  
                   m(i) = 0.5*m(i) + mag_prev*0.5
-
-                  m(i+n) = m(i)
-                  n = n - 2
 
                end do
 
-               erro = maxval(error)
+            iter = iter + 1
+            erro = maxval(error)
 
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
 
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
             call F_helm(T,Z,F)
 
@@ -248,15 +125,11 @@ program hexa_T_varre
 
             mag = sum(m)/num_sites
 
-            print*, T, mag
-            write(25,*) T, F, mag
-            write(21,*) T, m
-            write(22,*) T, m_prime
-
-
+            print*, 'Temp:',T, 'Campo:',H, 'Mag:',mag ,'Fase: ',state
+            write(30,*) T, F, mag
+            ! write(21,*) T, m
 
             T = T + step
-
 
             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
                T = T_max
@@ -274,20 +147,343 @@ program hexa_T_varre
          print*, 'J3','',J3
          print*, '----END-----'
 
+
       !enddo
 
       print*, '=== FIM ==='
 
-      close(25)
-      close(21)
-      close(22)
+      close(30)
+      ! close(21)
 !----------------------------------------------------------------------------
+
+
+
+
+
+!       state = '6'
+! !-------------------------- FASE 6 ------------------------------------
+
+!       open(unit=25, file= 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
+!       open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
+!       open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
+
+!          Alfa = 0.d0
+
+!          call mag_vetor(state,m)
+
+!          ! - - - - - - - - - - - - - - - - - - - - - - -
+
+!          do while (T/=T_max)
+!             error = 0.d0; erro = 1.d0; 
+
+!             do while(erro >= tol)
+
+
+!                call Ham_inter(state,J2,J3,s,m,m,H_inter)
+
+!                H_total = H_intra + H_inter - H*s_z
+
+!             !---------------------- SHIFT DA HAMILTONIANA ----------------
+!                if (T_max<=10.d0**(-1)) then
+
+!                   Alfa = minval(H_total)
+
+!                   H_total = H_total - Alfa
+
+!                endif
+!             !---------------------- SHIFT DA HAMILTONIANA ----------------
+
+!                call partition(H_total,T,Z)
+
+!                ! do i = 1, num_sites
+
+!                !    mag_prev = m(i)
+
+!                !    call magnetization(H_total,Z,s,i,T,m(i))
+
+!                !    error(i) = abs(mag_prev - m(i))
+!                !    error(i+num_sites) = 0
+
+!                ! end do
+
+!                mag_prev = m(1)
+
+!                   call magnetization(H_total,Z,s,1,T,m(1))
+
+!                   error(1) = abs(mag_prev - m(1))
+
+!                   m(1) = 0.5*m(1) + mag_prev*0.5
+
+!                   m(2) = m(1)
+               
+!                n = 15
+
+!                do i = 3, 10
+
+!                   mag_prev = m(i)
+
+!                   call magnetization(H_total,Z,s,i,T,m(i))
+
+!                   error(i) = abs(mag_prev - m(i))
+
+!                   m(i) = 0.5*m(i) + mag_prev*0.5
+
+!                   m(i+n) = m(i)
+!                   n = n - 2
+
+!                end do
+
+!                erro = maxval(error)
+
+!             end do
+
+
+!             call F_helm(T,Z,F)
+
+!             F = F + Alfa
+
+!             mag = sum(m)/num_sites
+
+!             print*, 'Temp:',T, 'Campo:',H, 'Mag:',mag ,'Fase: ',state
+!             write(25,*) T, F, mag
+!             write(21,*) T, m
+!             write(22,*) T, m_prime
+
+
+
+!             T = T + step
+
+
+!             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
+!                T = T_max
+!             endif
+
+!          end do
+
+!          !----------------- NOVAS ENTRADAS  -----------------
+
+!          print*, '------------'
+!          Print*, 'State = ','', state
+!          print*, 'H =','', H
+!          print*, 'T','',T
+!          print*, 'J2','',J2
+!          print*, 'J3','',J3
+!          print*, '----END-----'
+
+!       !enddo
+
+!       print*, '=== FIM ==='
+
+!       close(25)
+!       close(21)
+!       close(22)
+! !----------------------------------------------------------------------------
       
       
       
       
       
-      T = 1.77; T_max = 2
+!       T = 1.6; T_max = 1.85
+
+!       if (T < T_max) then
+!          step = 10.d0**(cd)
+!       else
+!          step = -10.d0**(cd)
+!       endif
+
+!       state = '5'; iter = 0
+! !-------------------------- FASE 5 -----------------------------------
+!       open(unit=20, file = 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
+!       ! open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
+!       ! open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
+
+!          Alfa = 0.d0; Beta = 0.d0
+
+!          call mag_vetor(state,m)
+
+!          m_prime = - m
+
+!          j = 0
+
+!          ! - - - - - - - - - - - - - - - - - - - - - - -
+
+!          do while (T/=T_max)
+
+!             error = 0.d0; erro = 1.d0; 
+
+!             do while(erro >= tol)
+
+!                call Ham_inter(state,J2,J3,s,m,m_prime,H_inter)
+
+!                call Ham_inter(state,J2,J3,s,m_prime,m,H_inter_prime)
+
+!                H_total = H_intra + H_inter - H*s_z
+!                H_total_prime = H_intra + H_inter_prime - H*s_z
+
+!                !---------------------- SHIFT DA HAMILTONIANA ----------------
+!                if (T<=10.d0**(-1)) then
+
+!                   Alfa = minval(H_total)
+!                   Beta = minval(H_total_prime)
+
+!                   H_total = H_total - Alfa
+!                   H_total_prime = H_total_prime - Beta
+
+!                endif
+!                !---------------------- SHIFT DA HAMILTONIANA ----------------
+
+
+!                call partition(H_total,T,Z)
+!                call partition(H_total_prime,T,Z_prime)
+
+!                ! do i = 1, num_sites
+
+!                !    mag_prev = m(i)
+!                !    mag_prev_prime = m_prime(i)
+
+!                !    call magnetization(H_total,Z,s,i,T,m(i))
+!                !    call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+!                !    error(i) = abs(mag_prev - m(i))
+
+!                !    error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+!                ! end do
+!                n = 7
+
+!                   error = 0.d0
+
+!                do i = 1, 4
+
+!                   mag_prev = m(i)
+!                   mag_prev_prime = m_prime(i)
+
+!                   call magnetization(H_total,Z,s,i,T,m(i))
+!                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+!                   error(i) = abs(mag_prev - m(i))
+!                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+!                   ! m(i) = 0.5*m(i) + 0.5*mag_prev
+!                   ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+!                   m(i+n) = m(i)
+!                   m_prime(i+n) = m_prime(i)
+
+!                   n = n - 2
+!                end do
+
+!                   n = 9
+
+!                do i = 9, 13
+
+!                   mag_prev = m(i)
+!                   mag_prev_prime = m_prime(i)
+
+!                   call magnetization(H_total,Z,s,i,T,m(i))
+!                   call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
+
+!                   error(i) = abs(mag_prev - m(i))
+!                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
+
+!                   ! m(i) = 0.5*m(i) + 0.5*mag_prev
+!                   ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+
+!                   m(i+n) = m(i)
+!                   m_prime(i+n) = m_prime(i)
+
+!                   n = n - 2
+!                end do
+
+!             iter = iter + 1
+!             erro = maxval(error)
+
+!             if (iter>=iter_max) then
+!                exit
+!             endif
+!             end do
+
+!             if (iter>=iter_max) then
+!                exit
+!             endif
+
+!             print*, iter
+!             iter = 0
+
+
+!             call F_helm(T,Z,F)
+!             call F_helm(T,Z_prime,F_prime)
+
+!             F = F + Alfa
+!             F_prime = F_prime + Beta
+
+!             F = (F + F_prime)/2
+
+            ! m_order =  ((m(1)-m(2)-m(3)+m(4)+m(5)-m(6)-m(7)+m(8)-m(9) &
+            ! & -m(10)+m(11)-m(12)+m(13)+m(14)-m(15)+m(16)-m(17)-m(18))&
+            ! & + (-m_prime(1)+m_prime(2)+m_prime(3)-m_prime(4) &
+            ! & - m_prime(5)+m_prime(6)+m_prime(7)-m_prime(8) &
+            ! & + m_prime(9)+m_prime(10)-m_prime(11)+m_prime(12) &
+            ! & - m_prime(13)-m_prime(14)+m_prime(15)-m_prime(16) &
+            ! & + m_prime(17)+m_prime(18)))/(2*num_sites)
+
+!             mag = (sum(m) + sum(m_prime))/(2*num_sites)
+
+!             print*, 'Temp:',T, 'Campo:',H, 'Mag:',mag ,'Fase: ',state
+!             ! write(21,*) T, m
+!             ! write(22,*) T, m_prime
+!             write(20,*) T, F, m_order
+
+
+!             if (j==0) then
+!                if (m_order<=10.d0**(-4)) then
+!                   print*, '============='
+!                   print*, 'Salto parâmetro de ordem (H-T)'
+!                   print*, '============='
+!                   write(*,11) H, (T-step/2)
+!    11               format ((F8.5))
+!                   j = 1
+!                   !write(20,*) T_inicial, H
+!                end if
+!             end if
+
+
+!             T = T + step
+
+
+!             if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
+!                T = T_max
+!             endif
+
+!          end do
+
+
+!          !----------------- NOVAS ENTRADAS  -----------------
+
+
+!          print*, '============='
+!          Print*, 'State = ','', state
+!          print*, 'H =','', H
+!          print*, 'T =','',T
+!          print*, 'J2 =','',J2
+!          print*, 'J3 =','',J3
+!          print*, '==== END ===='
+
+
+!       !enddo
+
+
+!       close(20)
+!       ! close(21)
+!       ! close(22)
+! !-------------------------------------------------------------------------      
+
+
+
+
+
+
+      T = 1.69; T_max = 1.75
 
       if (T < T_max) then
          step = 10.d0**(cd)
@@ -295,189 +491,11 @@ program hexa_T_varre
          step = -10.d0**(cd)
       endif
 
-      state = '5'
-!-------------------------- FASE 5 -----------------------------------
-      open(unit=20, file = 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
-      ! open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
-      ! open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
-
-         Alfa = 0.d0; Beta = 0.d0
-
-         call mag_vetor(state,m)
-
-         m_prime = - m
-
-         j = 0
-
-         ! - - - - - - - - - - - - - - - - - - - - - - -
-
-         do while (T/=T_max)
-
-            error = 0.d0; erro = 1.d0; 
-
-            do while(erro >= tol)
-
-               call Ham_inter(state,J2,J3,s,m,m_prime,H_inter)
-
-               call Ham_inter(state,J2,J3,s,m_prime,m,H_inter_prime)
-
-               H_total = H_intra + H_inter - H*s_z
-               H_total_prime = H_intra + H_inter_prime - H*s_z
-
-               !---------------------- SHIFT DA HAMILTONIANA ----------------
-               if (T<=10.d0**(-1)) then
-
-                  Alfa = minval(H_total)
-                  Beta = minval(H_total_prime)
-
-                  H_total = H_total - Alfa
-                  H_total_prime = H_total_prime - Beta
-
-               endif
-               !---------------------- SHIFT DA HAMILTONIANA ----------------
-
-
-               call partition(H_total,T,Z)
-               call partition(H_total_prime,T,Z_prime)
-
-               ! do i = 1, num_sites
-
-               !    mag_prev = m(i)
-               !    mag_prev_prime = m_prime(i)
-
-               !    call magnetization(H_total,Z,s,i,T,m(i))
-               !    call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
-
-               !    error(i) = abs(mag_prev - m(i))
-
-               !    error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
-
-               ! end do
-               n = 7
-
-                  error = 0.d0
-
-               do i = 1, 4
-
-                  mag_prev = m(i)
-                  mag_prev_prime = m_prime(i)
-
-                  call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
-
-                  error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
-
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
-
-                  m(i+n) = m(i)
-                  m_prime(i+n) = m_prime(i)
-
-                  n = n - 2
-               end do
-
-                  n = 9
-
-               do i = 9, 13
-
-                  mag_prev = m(i)
-                  mag_prev_prime = m_prime(i)
-
-                  call magnetization(H_total,Z,s,i,T,m(i))
-                  call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
-
-                  error(i) = abs(mag_prev - m(i))
-                  error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
-
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
-
-                  m(i+n) = m(i)
-                  m_prime(i+n) = m_prime(i)
-
-                  n = n - 2
-               end do
-
-            erro = maxval(error)
-
-            end do
-
-
-            call F_helm(T,Z,F)
-            call F_helm(T,Z_prime,F_prime)
-
-            F = F + Alfa
-            F_prime = F_prime + Beta
-
-            F = (F + F_prime)/2
-
-            m_order = ((m(1)-m(2)-m(3)+m(4)-m(9)-m(10)+m(11)-m(12)+m(13))&
-            & + (-m_prime(1)+m_prime(2)+m_prime(3)-m_prime(4)+m_prime(9)+m_prime(10)&
-            & -m_prime(11)+m_prime(12)-m_prime(13)))/num_sites
-
-            mag = (sum(m) + sum(m_prime))/(2*num_sites)
-
-            Print*, T, mag, m_order
-            ! write(21,*) T, m
-            ! write(22,*) T, m_prime
-            write(20,*) T, F, m_order
-
-
-            if (j==0) then
-               if (m_order<=10.d0**(-4)) then
-                  print*, '============='
-                  print*, 'Salto parâmetro de ordem (H-T)'
-                  print*, '============='
-                  write(*,11) H, (T-step/2)
-   11               format ((F8.5))
-                  j = 1
-                  !write(20,*) T_inicial, H
-               end if
-            end if
-
-
-            T = T + step
-
-
-            if ((max(T,T_max))-(min(T,T_max))<=abs(step)) then
-               T = T_max
-            endif
-
-         end do
-
-
-         !----------------- NOVAS ENTRADAS  -----------------
-
-
-         print*, '============='
-         Print*, 'State = ','', state
-         print*, 'H =','', H
-         print*, 'T =','',T
-         print*, 'J2 =','',J2
-         print*, 'J3 =','',J3
-         print*, '==== END ===='
-
-
-      !enddo
-
-
-      close(20)
-      ! close(21)
-      ! close(22)
-!-------------------------------------------------------------------------      
-
-
-
-
-
-
-
-      state = '4'
+      state = '4'; iter = 0
 !-------------------------- FASE 4 -----------------------------------
       open(unit=28, file = 'Fase_' // trim(state) // '_Campo_' // trim(temp) // "_T-H.dat")
-      open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
-      open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
+      ! open(unit=21, file = 'Mag_1_'// trim(state) // '.dat')
+      ! open(unit=22, file = 'Mag_2_'// trim(state) // '.dat')
 
          Alfa = 0.d0; Beta = 0.d0
 
@@ -587,13 +605,25 @@ program hexa_T_varre
 
                   error(i) = abs(mag_prev - m(i))
 
-                  m(i) = 0.5*m(i) + 0.5*mag_prev
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
 
                end do
 
                m(2) = m(1)
                n = 6
                do i = 1,2
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
+               n = 3
+               do i = 3, 15, 3
+                  m(i+n) = m(i)
+               enddo
+
+               n = 6
+               m(4) = m(5)
+               do i = 4,5
                   m(i+n) = m(i)
                   m(i+2*n) = m(i)
                enddo
@@ -611,23 +641,25 @@ program hexa_T_varre
                   error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                   ! m(i) = 0.5*m(i) + 0.5*mag_prev
-                  m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
+                  ! m_prime(i) = 0.5*m_prime(i) + 0.5*mag_prev_prime
 
 
                end do
 
+           iter = iter + 1
             erro = maxval(error)
 
-            ! print*, m
-            ! print*, m_prime
-            ! print*, erro
-            ! print*, k
-            ! read*,
-
+            if (iter>=iter_max) then
+               exit
+            endif
             end do
 
-            ! call order_parameter(state,m,m_order)
-            ! call order_parameter(state,m_prime,m_second)
+            if (iter>=iter_max) then
+               exit
+            endif
+
+            print*, iter
+            iter = 0
 
 
             call F_helm(T,Z,F)
@@ -643,13 +675,20 @@ program hexa_T_varre
 
             mag = (sum(m) + 3*sum(m_prime))/(4*num_sites)
 
-            write(28,*) T, F, mag
-            write(21,*) T, m
-            write(22,*) T, m_prime
+            m_order = ((m(1)+m(2)-m(3)+m(4)+m(5)-m(6)+m(7)+m(8)-m(9) &
+            & +m(10)+m(11)-m(12)+m(13)+m(14)-m(15)+m(16)+m(17)-m(18))&
+            & + (m_prime(1)-m_prime(2)+m_prime(3)+m_prime(4) &
+            & + m_prime(5)+m_prime(6)-m_prime(7)+m_prime(8) &
+            & + m_prime(9)-m_prime(10)+m_prime(11)+m_prime(12) &
+            & + m_prime(13)+m_prime(14)+m_prime(15)+m_prime(16) &
+            & - m_prime(17)+m_prime(18)))/(2*num_sites)
 
-            print*, T, mag
+            print*, 'Temp:',T, 'Campo:',H, 'Mag:',mag ,'Fase: ',state
+            write(28,*) T, F, m_order, mag
+            ! write(21,*) T, m
+            ! write(22,*) T, m_prime
+
             
-
             if (j==0) then
                if (m_order<=10.d0**(-4)) then
                   print*, '============='
@@ -690,13 +729,14 @@ program hexa_T_varre
 
 
       close(28)
-      close(21)
-      close(22)
+      ! close(21)
+      ! close(22)
 !-------------------------------------------------------------------------      
-      H = H + passo
+   
 
-   if (H>=H_final) stop
+   if ((max(H,H_final))-(min(H,H_final))<=abs(passo)) stop
       
+   H = H + passo
 
    enddo
 

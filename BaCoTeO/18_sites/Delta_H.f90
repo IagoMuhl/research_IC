@@ -523,19 +523,51 @@ program hexa_H
                call partition(H_total,T,Z)
                call partition(H_total_prime,T,Z_prime)
 
+               do i = 1, 5, 2
+
+                  mag_prev = m(i)
+                  mag_prev_prime = m_prime(i)
+
+                  call magnetization(H_total,Z,s,i,T,m(i))
+
+                  error(i) = abs(mag_prev - m(i))
+
+                  ! m(i) = 0.5*m(i) + 0.5*mag_prev
+
+               end do
+
+               m(2) = m(1)
+               n = 6
+               do i = 1,2
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
+               n = 3
+               do i = 3, 15, 3
+                  m(i+n) = m(i)
+               enddo
+
+               n = 6
+               m(4) = m(5)
+               do i = 4,5
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
 
                   do i = 1, num_sites
 
-                     mag_prev = m(i)
+                     ! mag_prev = m(i)
                      mag_prev_prime = m_prime(i)
 
-                     call magnetization(H_total,Z,s,i,T,m(i))
+                     ! call magnetization(H_total,Z,s,i,T,m(i))
                      call magnetization(H_total_prime,Z_prime,s,i,T,m_prime(i))
 
                      ! m(i) = 0.5*m(i) + mag_prev*0.5
                      ! m_prime(i) = 0.5*m_prime(i) + mag_prev_prime*0.5
 
-                     error(i) = abs(mag_prev - m(i))
+                     ! error(i) = abs(mag_prev - m(i))
                      error(i+num_sites) = abs(mag_prev_prime - m_prime(i))
 
                    end do

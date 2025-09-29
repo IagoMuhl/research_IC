@@ -545,7 +545,7 @@ program hexa_T
 
 
                ! end do
-                  do i = 1, 5, 2
+                 do i = 1, 5, 2
 
                   mag_prev = m(i)
                   mag_prev_prime = m_prime(i)
@@ -561,6 +561,18 @@ program hexa_T
                m(2) = m(1)
                n = 6
                do i = 1,2
+                  m(i+n) = m(i)
+                  m(i+2*n) = m(i)
+               enddo
+
+               n = 3
+               do i = 3, 15, 3
+                  m(i+n) = m(i)
+               enddo
+
+               n = 6
+               m(4) = m(5)
+               do i = 4,5
                   m(i+n) = m(i)
                   m(i+2*n) = m(i)
                enddo
